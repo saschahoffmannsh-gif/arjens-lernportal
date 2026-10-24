@@ -1,0 +1,144 @@
+/* Lektion: Écouter – Hörverstehen */
+const {F,G,conj,dlg,merk,attn,tip,hoer,card,reveal,tabs,track,steps,grp,ob,room,spk,spkLines}=H;
+const {mc,pick,gap,gapw,ord,wr,mt,dl,clk,mark,mul,seg,tf,det}=X;
+window.LESSON={slug:'ecouter',title:'Hörverstehen',fr:'Écouter – bien écouter!',icon:'🎧',color:'#0284c7',testN:16,
+ intro:'In der Klassenarbeit gibt es Hörtexte: eine Vorstellung, eine Zimmerbeschreibung oder ein Gespräch auf dem Schulhof. Hier lernst du die besten <b>Hör-Strategien</b> und trainierst mit Hörtexten wie in der Arbeit. <b>Das Transkript</b> (der Text zum Mitlesen) wird erst freigeschaltet, wenn du die Aufgaben gemacht hast.'};
+room('karim','La chambre de Karim',[
+ ['poster',10,12,42,'des posters',2],['etagere',296,4,94,'une étagère'],['bd',302,10,27,'des B.D.',3],['figurine',302,54,26,'des figurines',3],
+ ['lit',8,116,98,'un lit'],['armoire',112,102,70,'une armoire'],['table',196,118,74,'une table'],['ordinateur',214,104,36,'un ordinateur'],
+ ['guitare',282,112,52,'une guitare'],['minichaine',336,136,42,'une minichaîne'],['globe',236,184,34,'un globe'],['cd',300,196,22,'des CD',3]],{wx:150,wall:'#e0f2fe'});
+const T=(id)=>'T:'+id;
+window.TRACKS={
+ samira:{title:'Je me présente',kind:'Hörtext 1 · Vorstellung',intro:'Samira stellt sich vor. Lies zuerst die Aufgaben, dann hör zu.',lines:[
+  ['Samira','Bonjour! Je me présente: je m’appelle Samira. Samira, avec un S.','Guten Tag! Ich stelle mich vor: Ich heiße Samira. Samira, mit S.'],
+  ['Samira','Je suis de Berlin.','Ich komme aus Berlin.'],
+  ['Samira','Je suis élève à Strasbourg. Je suis en sixième B.','Ich bin Schülerin in Straßburg. Ich bin in der 6B.'],
+  ['Samira','La professeur de français, c’est Madame Fournier. Elle est très cool.','Die Französischlehrerin ist Frau Fournier. Sie ist sehr cool.'],
+  ['Samira','Voilà Jade. Jade et moi, nous sommes ensemble dans la classe.','Das ist Jade. Jade und ich sind zusammen in der Klasse.'],
+  ['Samira','À la maison, je parle avec Yasmine, j’écoute des CD et je regarde des photos.','Zu Hause rede ich mit Yasmine, höre CDs und schaue Fotos an.'],
+  ['Samira','Dans ma chambre, il y a un lit, une étagère et des figurines.','In meinem Zimmer gibt es ein Bett, ein Regal und Figuren.'],
+  ['Samira','Et toi? Tu t’appelles comment? Au revoir!','Und du? Wie heißt du? Auf Wiedersehen!']]},
+ karim:{title:'La chambre de Karim',kind:'Hörtext 2 · Zimmer',intro:'Karim zeigt sein Zimmer. Was gibt es dort – und was nicht?',lines:[
+  ['Karim','Salut! C’est Karim. Voilà ma chambre!','Hallo! Hier ist Karim. Das ist mein Zimmer!'],
+  ['Karim','Il y a un lit et une armoire.','Es gibt ein Bett und einen Schrank.'],
+  ['Karim','Là, il y a une table et un ordinateur.','Da gibt es einen Tisch und einen Computer.'],
+  ['Karim','Dans l’étagère, il y a des B.D. et des figurines.','Im Regal gibt es Comics und Figuren.'],
+  ['Karim','Dans le coin musique, il y a une guitare et une minichaîne.','In der Musikecke gibt es eine Gitarre und eine Mini-Stereoanlage.'],
+  ['Karim','Il y a aussi un globe – la géo, c’est super!','Es gibt auch einen Globus – Erdkunde ist super!'],
+  ['Karim','Un hamac? Non, le hamac est dans la chambre de Noah.','Eine Hängematte? Nein, die Hängematte ist in Noahs Zimmer.']]},
+ cour:{title:'À la récré',kind:'Hörtext 3 · Gespräch auf dem Schulhof',intro:'Clara und Théo sind in der Pause auf dem Schulhof. Dann kommt ein Junge dazu.',lines:[
+  ['Clara','Salut, Théo! Ça va?','Hallo, Théo! Wie geht’s?'],
+  ['Théo','Ça va très bien. Et toi?','Sehr gut. Und dir?'],
+  ['Clara','Super! Regarde, le garçon avec la guitare. C’est qui?','Super! Schau mal, der Junge mit der Gitarre. Wer ist das?'],
+  ['Théo','Je ne sais pas.','Ich weiß es nicht.'],
+  ['Karim','Salut! Je m’appelle Karim. Je suis nouveau.','Hallo! Ich heiße Karim. Ich bin neu.'],
+  ['Clara','Salut, Karim! Moi, c’est Clara. Clara, avec un C. Et voilà Théo.','Hallo, Karim! Ich bin Clara. Clara mit C. Und das ist Théo.'],
+  ['Théo','Tu es de Strasbourg?','Kommst du aus Straßburg?'],
+  ['Karim','Non, je suis de Berlin. Je suis en sixième A.','Nein, ich komme aus Berlin. Ich bin in der 6A.'],
+  ['Clara','Cool! Nous sommes aussi en sixième A!','Cool! Wir sind auch in der 6A!'],
+  ['Théo','Et la fille, là? C’est qui?','Und das Mädchen da? Wer ist das?'],
+  ['Karim','C’est Yasmine. Elle est en cinquième.','Das ist Yasmine. Sie ist in der 7. Klasse.']]},
+ tel:{title:'Au téléphone',kind:'Hörtext 4 · Probe-Hörverstehen',intro:'Lucas telefoniert mit Jade. Lies zuerst alle Aufgaben!',lines:[
+  ['Lucas','Salut, Jade! Ça va?','Hallo, Jade! Wie geht’s?'],
+  ['Jade','Ça va bien. Je regarde des photos de la classe. Et toi?','Gut. Ich schaue Fotos von der Klasse an. Und du?'],
+  ['Lucas','Moi, j’écoute un CD de Théo. C’est trop cool!','Ich höre eine CD von Théo. Die ist total cool!'],
+  ['Jade','Et Léo? Il est chez toi?','Und Léo? Ist er bei dir?'],
+  ['Lucas','Non, Léo et Noah sont à la maison. Ils regardent des B.D.','Nein, Léo und Noah sind zu Hause. Sie schauen Comics an.'],
+  ['Jade','Et Clara et Yasmine?','Und Clara und Yasmine?'],
+  ['Lucas','Elles sont chez Clara. Elles parlent, elles parlent …','Sie sind bei Clara. Sie reden und reden …'],
+  ['Jade','Ah, cool! Salut, Lucas! Au revoir!','Ach, cool! Tschüs, Lucas! Auf Wiedersehen!']]},
+};
+const STRAT=steps(['<b>Vor dem Hören: Aufgaben lesen!</b> Was sollst du herausfinden? Unterstreiche Schlüsselwörter (Namen, Orte, Zahlen, Sachen).','<b>Vermuten:</b> Worum geht es wohl? Welche Wörter könnten vorkommen (z. B. il y a, un lit, une table …)?','<b>1. Hören:</b> Nur zuhören – Worum geht es? Wer spricht? Nicht jedes Wort verstehen wollen!','<b>2. Hören:</b> Jetzt gezielt die Antworten suchen und Notizen machen (Stichworte reichen).','<b>Danach:</b> Lücken mit Logik füllen. Nichts leer lassen – lieber raten!']);
+window.CHAPTERS=[
+{id:'strategien',kind:'Strategien',icon:'🧭',title:'So hörst du wie ein Profi',sub:'5 Schritte für jeden Hörtext',lv:1,
+html:card('Die 5 Schritte','🧭',STRAT)
+ +tip('<b>Signalwörter</b> helfen dir: <span class="fr">il y a</span> → jetzt kommen Sachen · <span class="fr">Je suis de</span> → Herkunft · <span class="fr">C’est qui?</span> → eine Person wird vorgestellt · <span class="fr">Et toi?</span> → eine Frage.','🔑')
+ +hoer(`<ul><li><b>Endungen hört man oft nicht:</b> ${F('il regarde')} = ${F('ils regardent')}. Achte auf den Zusammenhang (Namen, <span class="fr">et</span>).</li><li><b>Liaison verrät den Plural:</b> ${F('ils‿écoutent')} [z]</li><li><b>le – les</b> klingt verschieden: ${F('le livre')} [lə] – ${F('les livres')} [le]</li><li><b>Frage oder Aussage?</b> Hör auf die Stimme: ${F('Tu es nouveau?')} geht am Ende nach oben ↗.</li></ul>`,'Worauf du beim Hören achtest')
+ +tip('Auf dem iPhone: <b>Stummschalter aus</b> und Lautstärke hoch – oder Kopfhörer benutzen.','🔊'),
+ex:[
+ mc('Was machst du <b>zuerst</b>, bevor der Hörtext startet?',['Die Aufgaben lesen und Schlüsselwörter markieren.','Sofort alles mitschreiben.','Die Augen zumachen.','Die Lösung raten.'],'Wenn du die Aufgaben kennst, weißt du, worauf du achten musst.'),
+ mc('Du verstehst ein Wort nicht. Was tust du?',['Weiterhören – man muss nicht jedes Wort verstehen.','Aufhören und auf den Anfang warten.','Die Aufgabe leer lassen.','Laut fragen.'],'Konzentriere dich auf das, was du für die Aufgabe brauchst.'),
+ mc('Warum hört man einen Hörtext <b>zweimal</b>?',['Beim 1. Mal: Worum geht es? Beim 2. Mal: Details und Antworten.','Weil es beim 1. Mal zu leise ist.','Beim 2. Mal liest man das Transkript.','Das braucht man nicht.'],'Erst das Ganze, dann die Details.'),
+ mc('Hör zu: Frage oder Aussage?',['Frage','Aussage'],'Die Stimme geht am Ende hoch ↗ – das ist eine Frage: «Tu es nouveau?»',{au:[['Clara','Tu es nouveau?']]}),
+ mc('Hör zu: Frage oder Aussage?',['Aussage','Frage'],'«Il est de Berlin.» – die Stimme geht am Ende nach unten: Aussage.',{au:[['Théo','Il est de Berlin.']]}),
+ mc('Welches Signalwort zeigt: Jetzt werden Sachen in einem Zimmer aufgezählt?',['il y a','je suis de','au revoir','c’est qui?'],'il y a = es gibt.',{fr:true}),
+ mc('Hör zu: Wie schreibt man den Namen?',['Karim','Carim','Karime','Carime'],'«Karim, avec un K.»',{au:[['Karim','Je m’appelle Karim. Karim, avec un K.']]}),
+]},
+{id:'hoergym',kind:'Hör-Gym',icon:'💪',title:'Hör-Gym: genau hinhören',sub:'le/la/les, un/une, il/ils, nous/vous',lv:1,
+html:hoer(`<table class="t"><tr><th>Das hörst du</th><th>Beispiel</th></tr><tr><td>[lə] / [la] / [le]</td><td>${F('le lit')} ${F('la lampe')} ${F('les lits')}</td></tr><tr><td>[œ̃] / [yn]</td><td>${F('un lit')} ${F('une table')}</td></tr><tr><td>[ilɛ] / [ɛlɛ]</td><td>${F('il est')} ${F('elle est')}</td></tr><tr><td>[ilsɔ̃] / [ɛlsɔ̃]</td><td>${F('ils sont')} ${F('elles sont')}</td></tr><tr><td>[z] bei Liaison</td><td>${F('ils‿écoutent')} ${F('les‿armoires')}</td></tr></table>`,'Kleine Wörter – großer Unterschied'),
+ex:[
+ mc('Hör zu: Welchen Artikel hörst du?',['les','le','la','l’'],'[le] = les → Plural: les chaises.',{au:'les chaises',say:false}),
+ mc('Hör zu: Welchen Artikel hörst du?',['le','les','la','l’'],'[lə] = le: le cahier.',{au:'le cahier',say:false}),
+ mc('Hör zu: Welchen Artikel hörst du?',['une','un','des'],'[yn] = une: une lampe.',{au:'une lampe',say:false}),
+ mc('Hör zu: Welchen Artikel hörst du?',['un','une','des'],'[œ̃n] = un mit Liaison: un‿ordinateur.',{au:'un ordinateur',say:false}),
+ pick('Hör zu und tippe auf das passende Bild.',[[ob('livre',3),'les livres'],[ob('livre'),'le livre'],[ob('cahier',3),'les cahiers'],[ob('cahier'),'le cahier']],'Du hörst [le livʁ] – les livres, Plural.',{au:'les livres'}),
+ pick('Hör zu und tippe auf das passende Bild.',[[ob('chaise'),'une chaise'],[ob('chaise',3),'des chaises'],[ob('table'),'une table'],[ob('lampe'),'une lampe']],'une chaise = ein Stuhl.',{au:'une chaise'}),
+ pick('Hör zu: Wer ist gemeint?',[[grp('ff'),'elles sont – mehrere Mädchen'],[grp('f'),'elle est – ein Mädchen'],[grp('m'),'il est – ein Junge'],[grp('mm'),'ils sont – mehrere Jungen']],'«Elles sont dans la cour.» – [ɛlsɔ̃] = elles sont.',{au:'Elles sont dans la cour.',say:false}),
+ pick('Hör zu: Wer ist gemeint?',[[grp('m'),'il est – ein Junge'],[grp('mm'),'ils sont – mehrere'],[grp('f'),'elle est – ein Mädchen'],[grp('ff'),'elles sont – mehrere Mädchen']],'«Il est nouveau.» – [ilɛ] = il est.',{au:'Il est nouveau.',say:false}),
+ seg('Hör zu: Einer oder mehrere?',['einer','mehrere','hört man nicht'],[['Satz 1','mehrere','Ils écoutent un CD.'],['Satz 2','einer','Il écoute un CD.'],['Satz 3','hört man nicht','Elle parle avec Jade.'],['Satz 4','mehrere','Ils sont en sixième.']],'ils‿écoutent [z] → mehrere · il écoute → einer · elle parle = elles parlent · ils sont [ilsɔ̃] → mehrere.',{sub:'Tippe auf 🔊 und entscheide.'}),
+ pick('Hör zu und tippe auf das passende Bild.',[[ob('stylo',3),'des stylos'],[ob('stylo'),'un stylo'],[ob('crayon',3),'des crayons'],[ob('regle'),'une règle']],'des stylos = Kulis (Plural).',{au:'des stylos'}),
+ pick('Hör zu und tippe auf das passende Bild.',[[ob('classeur'),'un classeur'],[ob('cahier'),'un cahier'],[ob('livre'),'un livre'],[ob('papier'),'le papier']],'un classeur = ein Ordner.',{au:'un classeur'}),
+ mc('Hör zu: Was hörst du?',['les élèves','l’élève','le élève','la élève'],'[lezelɛv] – das [z] der Liaison zeigt: les‿élèves, Plural.',{au:'les élèves',fr:true}),
+ seg('Hör zu: nous oder vous?',['nous','vous'],[['Satz 1','vous','Vous êtes de Berlin?'],['Satz 2','nous','Nous sommes en sixième A.'],['Satz 3','nous','Nous regardons des photos.'],['Satz 4','vous','Vous parlez français?']],'nous [nu] · vous [vu].',{sub:'Tippe auf 🔊 und entscheide.'}),
+]},
+{id:'vorstellung',kind:'Hörtext 1',icon:'🙋',title:'Samira stellt sich vor',sub:'Steckbrief ausfüllen, vrai ou faux',lv:2,
+html:card('Vor dem Hören','📝','<p>Lies zuerst die Aufgaben. Du sollst einen <b>Steckbrief</b> ausfüllen: Vorname, Herkunft, Klasse, Lehrerin, Freundin, was sie zu Hause macht, was in ihrem Zimmer ist.</p>'+tip('Signalwörter: <span class="fr">je m’appelle</span> → Name · <span class="fr">je suis de</span> → Herkunft · <span class="fr">en sixième</span> → Klasse · <span class="fr">à la maison</span> → Hobbys · <span class="fr">il y a</span> → Zimmer','🔑'))+track('samira'),
+ex:[
+ gapw('Steckbrief: Hör zu und notiere (Stichworte genügen).','Vorname: {0}<br>Sie kommt aus: {1}<br>Klasse: {2}<br>Französischlehrerin: {3}<br>Freundin in der Klasse: {4}',[['Samira'],['Berlin'],['sixième B','6e B','6B','6 B','sixieme B','6. Klasse B','B'],['Madame Fournier','Mme Fournier','Fournier','Frau Fournier'],['Jade']],'Samira · Berlin · sixième B · Madame Fournier · Jade.',{au:T('samira'),say:false,sub:'Hör den Text (gern zweimal) und schreibe in die Lücken.'}),
+ mul('Was macht Samira zu Hause? Tippe alle 3 an.',[['Sie redet mit Yasmine.',1],['Sie hört CDs.',1],['Sie schaut Fotos an.',1],['Sie schaut Comics an.',0],['Sie ruft Clara an.',0],['Sie spielt Gitarre.',0]],'«je parle avec Yasmine, j’écoute des CD et je regarde des photos.»',{au:T('samira')}),
+ mul('Was gibt es in Samiras Zimmer? Tippe alles an, was du hörst.',[['un lit',1],['une étagère',1],['des figurines',1],['un hamac',0],['une guitare',0],['des posters',0]],'«il y a un lit, une étagère et des figurines.»',{au:T('samira')}),
+ tf('Vrai ou faux?',[['Samira est de Strasbourg.',false],['Elle est en sixième B.',true],['Madame Fournier est très cool.',true],['Samira et Jade sont ensemble dans la classe.',true],['On écrit Samira avec un Z.',false]],'Samira ist aus <b>Berlin</b> und schreibt sich mit <b>S</b>.',{au:T('samira')}),
+ mc('Wie schreibt man den Namen?',['Samira','Zamira','Sammira','Samirah'],'«Samira, avec un S.»',{au:[['Samira','Je m’appelle Samira. Samira, avec un S.']]}),
+ mc('Was fragt Samira am Ende?',['Wie heißt du?','Woher kommst du?','Was gibt es in deinem Zimmer?','Wie geht’s?'],'«Et toi? Tu t’appelles comment?»',{au:T('samira')}),
+]},
+{id:'zimmer',kind:'Hörtext 2',icon:'🛏️',title:'Karims Zimmer',sub:'Hören und im Bild markieren',lv:2,
+html:card('Vor dem Hören','📝',`<p>Schau dir das Bild an. Welche Sachen kennst du schon auf Französisch? Sag sie leise mit Artikel (<span class="fr">un lit, une armoire …</span>).</p><div class="roomwrap">${window.ROOMS.karim.svg}</div><p class="legend">Achtung: Im Bild ist mehr, als Karim sagt – in der Aufgabe sind auch Sachen, die es gar nicht gibt.</p>`)+track('karim'),
+ex:[
+ mul('Was gibt es in Karims Zimmer? Tippe alles an, was du hörst. (Vier Sachen gibt es nicht!)',[['un lit',1],['une armoire',1],['une table',1],['un ordinateur',1],['des B.D.',1],['des figurines',1],['une guitare',1],['une minichaîne',1],['un globe',1],['un hamac',0],['une lampe',0],['une chaise',0],['des pierres',0]],'Nicht in Karims Zimmer: un hamac, une lampe, une chaise, des pierres.',{au:T('karim')}),
+ mark('Hör zu und markiere im Bild, was im <b>Regal</b> ist.','karim',['bd','figurine'],'«Dans l’étagère, il y a des B.D. et des figurines.»',{au:[['Karim','Dans l’étagère, il y a des B.D. et des figurines.']]}),
+ mark('Hör zu und markiere im Bild, was in der <b>Musikecke</b> ist.','karim',['guitare','minichaine'],'«Dans le coin musique, il y a une guitare et une minichaîne.»',{au:[['Karim','Dans le coin musique, il y a une guitare et une minichaîne.']]}),
+ tf('Vrai ou faux?',[['Dans la chambre de Karim, il y a un lit.',true],['Il y a une lampe.',false],['Dans l’étagère, il y a des livres.',false],['Il y a un ordinateur.',true]],'Im Regal sind <b>des B.D.</b> und <b>des figurines</b>, keine Bücher. Eine Lampe nennt Karim nicht.',{au:T('karim')}),
+ gap('Wo ist die Hängematte? Ergänze.','Le hamac est dans la chambre de {0}.',[['Noah','Karim','Jade','Théo']],'«Le hamac est dans la chambre de Noah.»',{au:T('karim')}),
+ mc('Welches Schulfach findet Karim super?',['Erdkunde (la géo)','Französisch','Musik','Deutsch'],'«Il y a aussi un globe – la géo, c’est super!» – la géo = Erdkunde.',{au:T('karim')}),
+ clk('Hör zu und tippe im Bild an.','karim','globe','«Il y a aussi un globe.»',{au:[['Karim','Il y a aussi un globe.']]}),
+]},
+{id:'pausenhof',kind:'Hörtext 3',icon:'🏫',title:'Gespräch auf dem Schulhof',sub:'Vrai ou faux & Qui dit quoi?',lv:2,
+html:card('Vor dem Hören','📝',`<p>Drei Kinder sprechen: <b>Clara</b>, <b>Théo</b> und ein neuer Junge. Achte auf <b>Namen</b>, <b>Herkunft</b> und <b>Klasse</b>.</p><div class="objrow">${['Clara','Théo','Karim'].map(w=>`<div class="objc"><div style="width:62px">${CHARS[w]}</div><span>${w}</span></div>`).join('')}</div>`)+track('cour'),
+ex:[
+ tf('Vrai ou faux?',[['Théo va très bien.',true],['Le garçon avec la guitare, c’est Karim.',true],['Karim est de Strasbourg.',false],['Karim est nouveau.',true],['Clara et Théo sont en sixième B.',false],['Yasmine est en cinquième.',true]],'Karim ist aus <b>Berlin</b>; Clara und Théo sind wie Karim in der <b>sixième A</b>.',{au:T('cour')}),
+ seg('Qui dit quoi? – Wer sagt das?',['Clara','Théo','Karim'],[['«Je ne sais pas.»','Théo'],['«Je suis nouveau.»','Karim'],['«Clara, avec un C.»','Clara'],['«Tu es de Strasbourg?»','Théo'],['«C’est Yasmine.»','Karim']],'Théo: Je ne sais pas / Tu es de Strasbourg? · Karim: Je suis nouveau / C’est Yasmine · Clara: Clara, avec un C.',{au:T('cour')}),
+ mc('Woher kommt Karim?',['aus Berlin','aus Straßburg','aus Paris','Das sagt er nicht.'],'«Non, je suis de Berlin.»',{au:T('cour')}),
+ mc('Wie geht es Clara?',['super','sehr gut','nicht so gut','Das sagt sie nicht.'],'Théo: «Ça va très bien. Et toi?» – Clara: «Super!»',{au:T('cour')}),
+ mc('Wer hat eine Gitarre?',['der neue Junge (Karim)','Théo','Clara','Yasmine'],'«Regarde, le garçon avec la guitare.»',{au:T('cour')}),
+ mc('In welcher Klasse ist Karim?',['sixième A','sixième B','cinquième','Das wird nicht gesagt.'],'«Je suis en sixième A.»',{au:T('cour'),fr:true}),
+ mc('Was bedeutet «Je ne sais pas.»?',['Ich weiß es nicht.','Ich bin nicht da.','Ich heiße nicht so.','Ich verstehe nicht.'],'Je ne sais pas. = Ich weiß es nicht.',{say:[['Théo','Je ne sais pas.']]}),
+]},
+{id:'diktat',kind:'Diktat',icon:'✏️',title:'Lückendiktat',sub:'Hören und richtig schreiben – mit Akzenten und Endungen',lv:2,
+html:tip('Bei einem Diktat zählt jeder Buchstabe. <b>Endungen</b> hört man oft nicht (ils regard<b>ent</b>) – überlege, <b>wer</b> etwas tut. Und: Akzente! Bei diesen Aufgaben zählen Akzente mit.','✏️')
+ +hoer(`<p>Hör jeden Satz so oft du willst. Schreibe erst, was du sicher hörst, dann prüfe die Grammatik:</p><ul><li>Wer? → Endung (je regarde, nous regardons, ils regardent)</li><li>Welches Nomen? → Artikel (le/la/les, un/une/des)</li></ul>`),
+ex:[
+ gapw('Hör zu und ergänze.','Voilà {0} classe de sixième B. Les élèves {1} dans la classe.',[['la'],['sont']],'la classe · les élèves sont.',{au:'Voilà la classe de sixième B. Les élèves sont dans la classe.',strict:true}),
+ gapw('Hör zu und ergänze.','{0} professeur de français, c’est Madame Fournier. Elle {1} très cool.',[['La','Le'],['est']],'La (oder Le) professeur … · Elle est très cool.',{au:'La professeur de français, c’est Madame Fournier. Elle est très cool.',strict:true}),
+ gapw('Hör zu und ergänze.','Lucas et Jade {0} des photos. Jade {1} un CD.',[['regardent'],['écoute']],'Lucas et Jade → regardent (-ent, stumm!) · Jade écoute (mit é).',{au:'Lucas et Jade regardent des photos. Jade écoute un CD.',strict:true}),
+ gapw('Hör zu und ergänze.','Nous {0} français. Et toi, tu {1} à Karim?',[['parlons'],['téléphones']],'nous parlons · tu téléphones.',{au:'Nous parlons français. Et toi, tu téléphones à Karim?',strict:true,lv:3}),
+ gapw('Hör zu und ergänze.','Dans ma chambre, il y a {0} lit, {1} lampe et {2} posters.',[['un'],['une'],['des']],'un lit · une lampe · des posters.',{au:'Dans ma chambre, il y a un lit, une lampe et des posters.',strict:true}),
+ gapw('Hör zu und ergänze.','Clara et moi, nous {0} ensemble. Vous {1} de Berlin?',[['sommes'],['êtes']],'nous sommes · vous êtes (mit ê!).',{au:'Clara et moi, nous sommes ensemble. Vous êtes de Berlin?',strict:true,lv:3}),
+]},
+{id:'probe',kind:'Probe-Hörverstehen',icon:'🎯',title:'Probe-Hörverstehen',sub:'Wie in der Klassenarbeit: ein Text, mehrere Aufgaben',lv:3,keepOrder:true,
+html:card('So läuft es in der Arbeit','📋',STRAT)+track('tel')+tip('Mach alle Aufgaben zu diesem Hörtext nacheinander. Hör den Text höchstens <b>zweimal</b> pro Aufgabe – wie in der Klassenarbeit!','⏱️'),
+ex:[
+ mc('Was macht Jade?',['Sie schaut Fotos von der Klasse an.','Sie hört eine CD.','Sie schaut Comics an.','Sie redet mit Clara.'],'«Je regarde des photos de la classe.»',{au:T('tel'),lv:3}),
+ mc('Was macht Lucas?',['Er hört eine CD von Théo.','Er schaut Fotos an.','Er ruft Léo an.','Er spielt Gitarre.'],'«Moi, j’écoute un CD de Théo.»',{au:T('tel'),lv:3}),
+ seg('Wer macht was?',['regardent des B.D.','parlent','écoute un CD'],[['Léo et Noah','regardent des B.D.'],['Clara et Yasmine','parlent'],['Lucas','écoute un CD']],'Léo et Noah regardent des B.D. · Clara et Yasmine parlent · Lucas écoute un CD.',{au:T('tel'),lv:3}),
+ mc('Wo sind Clara und Yasmine?',['bei Clara','in der Schule','bei Lucas','auf dem Schulhof'],'«Elles sont chez Clara.»',{au:T('tel'),lv:3}),
+ tf('Vrai ou faux?',[['Léo est chez Lucas.',false],['Léo et Noah sont à la maison.',true],['Clara et Yasmine sont chez Clara.',true],['Le CD est de Théo.',true]],'Léo ist <b>nicht</b> bei Lucas, er ist mit Noah zu Hause.',{au:T('tel'),lv:3}),
+ pick('Was macht Jade? Tippe auf das passende Bild.',[[ob('photo'),'des photos'],[ob('cd'),'un CD'],[ob('bd'),'des B.D.'],[ob('guitare'),'une guitare']],'Jade regarde des photos.',{au:T('tel'),labels:true,lv:3}),
+]},
+];
+window.TEST_EX=[
+ tf('Hörtext «À la récré»: Vrai ou faux?',[['Clara va super bien.',true],['Karim est en cinquième.',false],['On écrit Clara avec un C.',true]],'Karim ist in der <b>sixième A</b>; Yasmine ist in der cinquième.',{au:T('cour'),ref:'pausenhof',tag:'Gespräch verstehen'}),
+ mul('Hörtext «La chambre de Karim»: Was gibt es nicht? Tippe die 2 Sachen an, die es <b>nicht</b> gibt.',[['un hamac',1],['une lampe',1],['un globe',0],['une guitare',0],['un lit',0]],'Den Hamac gibt es nur bei Noah, eine Lampe nennt Karim nicht.',{au:T('karim'),ref:'zimmer',tag:'Zimmer: Hören'}),
+ gapw('Diktat: Hör zu und ergänze.','Les filles {0} des photos. Vous {1} en sixième?',[['regardent'],['êtes']],'regardent · êtes.',{au:'Les filles regardent des photos. Vous êtes en sixième?',strict:true,ref:'diktat',tag:'Diktat'}),
+ seg('Hör zu: Welchen Artikel hörst du?',['le','la','les','un','une'],[['Wort 1','les','les cahiers'],['Wort 2','une','une règle'],['Wort 3','le','le classeur'],['Wort 4','un','un stylo']],'les cahiers · une règle · le classeur · un stylo.',{ref:'hoergym',tag:'Genau hinhören',sub:'Tippe auf 🔊 und entscheide.'}),
+ gapw('Hörtext «Samira»: Ergänze den Steckbrief.','Herkunft: {0}<br>Klasse: {1}',[['Berlin'],['sixième B','6e B','6B','6 B','sixieme B']],'Berlin · sixième B.',{au:T('samira'),say:false,ref:'vorstellung',tag:'Steckbrief'}),
+];
