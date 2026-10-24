@@ -25,6 +25,9 @@ CHMAP.test={id:'test',title:'Abschlusstest',c:'#c8102e',icon:'🏆'};
 const ALLEX=CHAPTERS.flatMap(c=>c.ex).concat(TEST_EX);
 const TYPE={mc:['Multiple Choice','🔘'],pick:['Bild wählen','🖼️'],gap:['Lückentext','✏️'],gapw:['Lücken schreiben','⌨️'],order:['Satzpuzzle','🧩'],write:['Schreiben','⌨️'],
  match:['Zuordnen','🔗'],dialog:['Mini-Dialog','💬'],click:['Bild-Aufgabe','👆'],mark:['Bild markieren','🖍️'],multi:['Mehrfachauswahl','☑️'],seg:['Auswählen','🎯'],detect:['Fehlerdetektiv','🔍']};
+const RA=e=>!!((e&&e._L)||L).readAu;
+const HUB=window.HUB||null;
+const gidOf=e=>e.gid||(HUB?e.id:L.slug+':'+e.id);
 const tlabel=e=>e.au?['Hörverstehen','🎧']:e.type==='seg'&&e.tf?['Richtig oder falsch?','✔️']:TYPE[e.type];
 
 /* ---------- Audio: echte MP3-Dateien per HTMLAudioElement ---------- */
@@ -104,8 +107,8 @@ function go(view,arg,noPush){stopAudio();
   try{if(view==='home'&&curView==='home')history.replaceState(st,'');else history.pushState(st,'');}catch(e){}}
  curView=view;
  window.scrollTo(0,0);main.innerHTML='';main.classList.remove('fade');void main.offsetWidth;main.classList.add('fade');
- ({home,lesson,practice,result}[view])(arg);updateTop();}
-window.addEventListener('popstate',ev=>{const st=ev.state;if(!st||st.view==='home')go('home',null,true);else if(st.view==='lesson'&&CHMAP[st.arg])go('lesson',st.arg,true);else go('home',null,true);});
+ (VIEWS[view]||VIEWS.home)(arg);updateTop();}
+window.addEventListener('popstate',ev=>{const st=ev.state;if(!st||st.view==='home')go('home',null,true);else if(st.view==='lesson'&&CHMAP[st.arg])go('lesson',st.arg,true);else if(HUB&&HUB.views&&HUB.views[st.view]&&st.view!=='practice'&&st.view!=='result')go(st.view,st.arg,true);else go('home',null,true);});
 window.APPGO=(v,a)=>go(v,a);
 
 function nextChapter(){const c=REG().find(c=>!chapterStatus(c).done);return c||null;}
@@ -186,7 +189,7 @@ function mountWriter(el,w,id){if(!w)return;const sk=WKEY+'_w_'+id;let txt='';try
 
 /* ---------- Übungs-Sitzung ---------- */
 let S=null;
-function practice(cfg){S={mode:cfg.mode,ch:cfg.ch||null,list:cfg.list,i:0,res:[],att:[],t0:Date.now(),tt:[]};
+function practice(cfg){if(!cfg||!cfg.list){go('home');return;}S={mode:cfg.mode,ch:cfg.ch||null,list:cfg.list,i:0,res:[],att:[],t0:Date.now(),tt:[],cfg};
  if(S.mode==='chapter')S.run=(chp(S.ch).runs||0)+1;else if(S.mode==='test')S.run=(P.test.runs||0)+1;
  renderEx();}
 /* Auswahl pro Durchgang: Pflichtaufgaben + bevorzugt noch nicht gestellte Aufgaben, Aufgabentypen gemischt */
@@ -217,16 +220,16 @@ let cur=null;
 const readBox=a=>`<div class="readbox"><div class="rb-h">📖 ${a.title||'Text'} <span class="legend">– lies den Text (🔊 = Aussprache)</span></div>${a.lines.map(l=>`<div class="tl">${l[0]&&window.CHARS[l[0]]?`<b>${window.NAMES[l[0]]||l[0]}:</b> `:''}<span class="fr">${l[1]}</span>${spk(l[1],l[0])}</div>`).join('')}</div>`;
 function renderEx(){
  const e=S.list[S.i];const c=CHMAP[e.ch];const [tl,ti]=tlabel(e);
- const head=S.mode==='test'?'🏆 Abschlusstest':S.mode==='mix'?'🔀 Gemischt':S.mode==='single'?'Aufgabe':c.title;
+ const head=(HUB&&HUB.head&&HUB.head(S,e,c))||(S.mode==='test'?'🏆 Abschlusstest':S.mode==='mix'?'🔀 Gemischt':S.mode==='single'?'Aufgabe':c.title);
  const a=audioOf(e.au);
  main.innerHTML=`<div class="ex-wrap"><div class="ex-top"><button class="btn ghost small" data-quit="1" aria-label="Übung beenden">✕</button><div class="pbar"><i style="width:${S.i/S.list.length*100}%"></i></div><span class="ex-n">${S.i+1} / ${S.list.length}</span></div>
  <div class="ex-card fade" style="--c:${(CHMAP[e.ref]||c).c||L.color}"><div class="ex-meta"><span class="ex-type">${ti} ${tl}</span>${lvStars(e.lv)}<span class="ex-head">${head}</span></div>
- <div class="ex-q">${e.q}</div>${a&&L.readAu?readBox(a):''}${a&&!L.readAu?`<div class="ex-audio">${playBig(a,a.title?'Hörtext: '+a.title:'Anhören')}${e.auNote?`<div class="legend">${e.auNote}</div>`:''}</div>`:''}<div id="exBody"></div>
+ <div class="ex-q">${e.q}</div>${a&&RA(e)?readBox(a):''}${a&&!RA(e)?`<div class="ex-audio">${playBig(a,a.title?'Hörtext: '+a.title:'Anhören')}${e.auNote?`<div class="legend">${e.auNote}</div>`:''}</div>`:''}<div id="exBody"></div>
  <div class="fb" id="fb" role="status" aria-live="polite"></div><div class="actions"><button class="btn retry" id="retryBtn" hidden>↺ Nochmal versuchen</button><button class="btn" id="checkBtn" disabled>Prüfen</button></div>
  <div class="legend retrynote" id="retryNote" hidden></div></div>
  ${S.mode==='chapter'?`<div class="chreset slim"><button class="btn ghost small" data-chreset="${S.ch}">↺ Kapitel zurücksetzen</button></div>`:''}</div>`;
  const btn=$('#checkBtn'),rb=$('#retryBtn');
- btn.onclick=()=>{if(btn.dataset.next){next();return;}const r=cur.check();if(r==null)return;stopAudio();const first=!S.res[S.i];feedback(e,r,L.readAu?null:a);logAnswer(e,r,first);btn.textContent=S.i<S.list.length-1?'Weiter →':'Ergebnis ansehen';btn.dataset.next='1';btn.disabled=false;btn.classList.add(r.ok?'green':'red');
+ btn.onclick=()=>{if(btn.dataset.next){next();return;}const r=cur.check();if(r==null)return;stopAudio();const first=!S.res[S.i];feedback(e,r,RA(e)?null:a);logAnswer(e,r,first);btn.textContent=S.i<S.list.length-1?'Weiter →':'Ergebnis ansehen';btn.dataset.next='1';btn.disabled=false;btn.classList.add(r.ok?'green':'red');
   rb.hidden=false;rb.classList.toggle('hot',!r.ok);
   if(!r.ok&&(S.mode==='test'||S.mode==='chapter')){const n=$('#retryNote');n.hidden=false;n.textContent='Du kannst es nochmal versuchen – für die Punkte zählt aber dein erster Versuch.';}
   setTimeout(()=>{const f=$('#fb');if(f&&f.getBoundingClientRect().bottom>window.innerHeight)f.scrollIntoView({behavior:'smooth',block:'center'});},60);};
@@ -250,7 +253,8 @@ function lg(ev){if(!LG)return;try{LG.event(L.slug,ev);}catch(err){}}
 function promptOf(e){const t=e.prompt||e.text||(e.lines?e.lines.map(l=>(window.NAMES[l[0]]||l[0])+': '+l[1]).join(' / '):'')||(e.rows?e.rows.map(r=>r[0]).join(' / '):'')||(e.pairs?e.pairs.map(p=>p[0]).join(' / '):'');
  return strip(String(e.q||''))+(t?' | '+strip(String(t)).replace(/\{\d+\}/g,'___').replace(/\[([^\]|]+)\|[^\]]+\]/g,'$1'):'');}
 function logAnswer(e,r,first){if(!S)return;S.att[S.i]=(S.att[S.i]||0)+1;const C=LG?LG.clip:(x=>x);
- lg({kind:'answer',mode:S.mode,ch:e.ref||e.ch,chIn:e.ch,run:S.run||null,task:e.id,type:e.type,lv:e.lv,
+ if(window.TR&&S.mode!=='single'){try{const mv=window.TR.kiste.answer(gidOf(e),!!r.ok,first,{l:e._slug||L.slug,ch:(e._lch||String(e.ref||e.ch).replace(/^[^:]*:/,'')),p:promptOf(e),t:e.type,au:!!e.au,def:e.def});if(mv&&S)(S.kmv=S.kmv||[])[S.i]=mv;}catch(err){}}
+ lg({kind:'answer',mode:S.mode,lesson2:e._slug,gid:HUB?gidOf(e):undefined,ch:e.ref||e.ch,chIn:e.ch,run:S.run||null,task:e.id,type:e.type,lv:e.lv,
   prompt:C(promptOf(e),240),given:C(strip(String(r.given!=null?r.given:'').replace(/<br\s*\/?>/g,' / ')),240),correct:C(strip(String(r.sol||'').replace(/<br\s*\/?>/g,' / ')),240),
   ok:!!r.ok,pts:r.pts,max:r.max,accent:r.acc?true:undefined,attempt:S.att[S.i],first,pos:S.i+1,of:S.list.length,ms:Math.min(600000,Date.now()-(S.tt[S.i]||Date.now()))});}
 function feedback(e,r,a){
@@ -320,7 +324,7 @@ RENDER.gapw=(e,el)=>{
  <div class="acc">${['é','è','ê','à','ç','’'].map(c=>`<button type="button" data-c="${c}">${c}</button>`).join('')}</div>`;
  const ins=$$('.gapin',el);let lastI=ins[0];
  const upd=()=>ready(ins.every(i=>i.value.trim().length>0));
- ins.forEach(i=>{i.addEventListener('input',upd);i.addEventListener('focus',()=>lastI=i);i.addEventListener('keydown',ev=>{if(ev.key==='Enter'){const k=ins.indexOf(i);if(k<ins.length-1)ins[k+1].focus();else if(!$('#checkBtn').disabled)$('#checkBtn').click();}});});
+ ins.forEach(i=>{i.addEventListener('input',upd);i.addEventListener('focus',()=>lastI=i);i.addEventListener('keydown',ev=>{if(ev.key==='Enter'){const k=ins.indexOf(i);if(k<ins.length-1)ins[k+1].focus();else{const cb=$('#checkBtn');if(cb&&!cb.disabled)cb.click();}}});});
  $$('.acc button',el).forEach(b=>b.onclick=()=>{const i=lastI;const s=i.selectionStart??i.value.length,t=i.selectionEnd??s;i.value=i.value.slice(0,s)+b.dataset.c+i.value.slice(t);i.focus();i.setSelectionRange(s+1,s+1);upd();});
  const solT=e.text.replace(/\{(\d+)\}/g,(m,k)=>'<u>'+[].concat(e.ans[+k])[0]+'</u>');
  return {check(){if(!ins.every(i=>i.value.trim()))return null;let n=0;const accs=[];
@@ -345,7 +349,7 @@ RENDER.write=(e,el)=>{
  <div class="acc">${['é','è','ê','à','ç','’'].map(c=>`<button type="button" data-c="${c}">${c}</button>`).join('')}</div>
  <div class="legend">Groß-/Kleinschreibung ist egal. Akzente bitte mitschreiben – die Knöpfe helfen dir.</div>`;
  const inp=$('#inp',el);inp.addEventListener('input',()=>ready(inp.value.trim().length>0));
- inp.addEventListener('keydown',ev=>{if(ev.key==='Enter'&&inp.value.trim().length>0)$('#checkBtn').click();});
+ inp.addEventListener('keydown',ev=>{const cb=$('#checkBtn');if(ev.key==='Enter'&&inp.value.trim().length>0&&cb)cb.click();});
  $$('.acc button',el).forEach(b=>b.onclick=()=>{const s=inp.selectionStart??inp.value.length,t=inp.selectionEnd??s;inp.value=inp.value.slice(0,s)+b.dataset.c+inp.value.slice(t);inp.focus();inp.setSelectionRange(s+1,s+1);ready(inp.value.trim().length>0);});
  return {check(){if(!inp.value.trim())return null;const r=compare(inp.value,e.ans);if(r.acc&&e.strict)r.ok=false;inp.classList.add(r.ok?'ok':'bad');inp.disabled=true;$$('.acc button',el).forEach(b=>b.disabled=true);
   const best=r.acc||closest(inp.value,e.ans);return {ok:r.ok,pts:r.ok?1:0,max:1,acc:r.acc,sol:r.ok?e.ans[0]:best,showSol:!!r.acc,given:esc(inp.value),raw:inp.value,pairs:r.ok?[]:[[inp.value,best,e.prompt||'']],say:sayOf(e,strip(r.ok?e.ans[0]:best))};}};};
@@ -410,6 +414,7 @@ function medal(col,label){return `<svg class="medal" viewBox="0 0 120 120" aria-
 function result(){
  if(!S){go('home');return;}
  const res=S.res.filter(Boolean);const pts=res.reduce((a,r)=>a+r.pts,0),max=res.reduce((a,r)=>a+r.max,0)||1,pct=Math.round(pts/max*100);
+ if(HUB&&HUB.result){const out=HUB.result(S,{res,pts,max,pct});if(out!=null){main.innerHTML=out;if(HUB.mounted)HUB.mounted(S);return;}}
  const st=pct>=90?3:pct>=70?2:pct>=50?1:0;
  if(S.mode==='chapter'){const p=chp(S.ch);p.best=Math.max(p.best||0,pct);p.runs=(p.runs||0)+1;save();}
  if(S.mode==='test'){P.test.runs++;P.test.best=Math.max(P.test.best??0,pct);P.test.stars=Math.max(P.test.stars,st);P.test.last=pct;save();}
@@ -433,7 +438,7 @@ function result(){
 /* ---------- Navigation ---------- */
 document.addEventListener('click',ev=>{const b=ev.target.closest('[data-open],[data-practice],[data-test],[data-home],[data-mix],[data-reset],[data-quit],[data-chreset],[data-testreset]');if(!b)return;
  if(b.dataset.open)go('lesson',b.dataset.open);else if(b.dataset.practice)startChapter(b.dataset.practice);else if(b.dataset.test)startTest();else if(b.dataset.home)go('home');else if(b.dataset.mix)startMix();
- else if(b.dataset.quit){if(S&&S.res.filter(Boolean).length&&S.mode!=='single'&&!confirm('Übung abbrechen? Dein Ergebnis wird nicht gespeichert.'))return;if(S&&S.mode==='chapter')go('lesson',S.ch);else go('home');}
+ else if(b.dataset.quit){if(S&&S.res.filter(Boolean).length&&S.mode!=='single'&&!confirm('Übung abbrechen? Dein Ergebnis wird nicht gespeichert.'))return;if(S&&S.mode==='chapter')go('lesson',S.ch);else if(HUB&&HUB.quit)HUB.quit(S);else go('home');}
  else if(b.dataset.reset){if(confirm('Willst du wirklich den ganzen Fortschritt dieser Lektion löschen? Alle Haken, gelösten Aufgaben, eigenen Texte und Test-Bestwerte werden gelöscht.')){lg({kind:'reset_lesson',flush:true});P=blank();save();try{Object.keys(localStorage).filter(k=>k.startsWith(WKEY+'_w_')).forEach(k=>localStorage.removeItem(k));}catch(e){}go('home');toast('Fortschritt zurückgesetzt.');}}
  else if(b.dataset.chreset){const id=b.dataset.chreset,c=CHMAP[id];if(!confirm(`Kapitel „${strip(c.title)}“ zurücksetzen?\nHaken und Bestwert dieses Kapitels werden gelöscht. Beim nächsten Üben kommen bevorzugt Aufgaben, die du noch nicht hattest.`))return;
   const inLesson=!!b.closest('#chReset');lg({kind:'reset_chapter',ch:id,before:P.ch[id]?{runs:P.ch[id].runs||0,best:P.ch[id].best||0}:null,flush:true});delete P.ch[id];save();
@@ -441,6 +446,11 @@ document.addEventListener('click',ev=>{const b=ev.target.closest('[data-open],[d
   toast('Kapitel zurückgesetzt – neue Aufgaben!');}
  else if(b.dataset.testreset){if(confirm('Test-Bestwerte wirklich löschen?')){lg({kind:'reset_test',before:{runs:P.test.runs,best:P.test.best},flush:true});P.test=blank().test;save();const t=$('#testBest');if(t)t.innerHTML='Test-Bestwerte gelöscht.';b.disabled=true;toast('Test-Bestwerte gelöscht.');}}});
 const logo=$('#logo');if(logo)logo.onclick=()=>go('home');
-if(LG){LG.attach(L.slug);try{LG.backfill(L.slug,P,CHAPTERS);}catch(err){}}
-go('home');
+if(LG){LG.attach(L.slug);if(!HUB)try{LG.backfill(L.slug,P,CHAPTERS);}catch(err){}}
+const VIEWS={home,lesson,practice,result};
+window.ENGINE={cur:()=>curView,go,RENDER,speak,stopAudio,audioOf,playBig,transcript,compare,norm,shuffle,toast,confetti,medal,lg,CHMAP,ALLEX,gidOf,introBox,start:(mode,list,extra)=>go('practice',Object.assign({mode,list},extra||{})),state:()=>S,P:()=>P,tlabel,esc,strip,spk};
+if(HUB&&HUB.views){Object.assign(VIEWS,HUB.views);if(HUB.init)HUB.init(window.ENGINE);}
+/* Direktlink: #k=<kapitel> öffnet das Kapitel (z. B. aus der Probe-Klassenarbeit) */
+{const hm=!HUB&&location.hash.match(/^#k=([\w-]+)$/);const hv=HUB&&HUB.initial?HUB.initial():null;
+ if(hm&&CHMAP[hm[1]]){go('home',null);go('lesson',hm[1]);}else if(hv){go(hv[0],hv[1]);}else go('home');}
 })();
