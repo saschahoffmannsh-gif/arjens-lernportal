@@ -115,7 +115,7 @@ function nextChapter(){const c=REG().find(c=>!chapterStatus(c).done);return c||n
 
 /* ---------- Erklär-Kasten (Anfang der Lektion / des Kapitels) ---------- */
 function introBox(x,lesson){if(!x)return '';
- const body=window.V.explain(x)+(x.parts||[]).map((p,i)=>`<section class="inpart"><h3 class="inpart-h"><span class="inpart-n">${i+1}</span>${p.h}</h3>${window.V.explain(p)}</section>`).join('')+(x.ende?window.V.hint('💡',x.ende):'');
+ const body=window.V.explain(x)+(x.parts||[]).map((p,i)=>`<section class="inpart"><h3 class="inpart-h"><span class="inpart-n">${i+1}</span><span>${p.h}</span></h3>${window.V.explain(p)}</section>`).join('')+(x.ende?window.V.hint('💡',x.ende):'');
  return `<details class="intro${lesson?' lesson-intro':''}" open><summary><span class="in-ic">📖</span><span>Erklärung: ${x.t||''}</span><span class="in-tg" aria-hidden="true"></span></summary><div class="intro-body">${body}</div></details>`;}
 function home(){
  const o=overall(),nc=nextChapter(),RI=H.runInfo();

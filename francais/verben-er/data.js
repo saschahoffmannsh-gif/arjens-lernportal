@@ -263,7 +263,7 @@ entdecken:{vis:'<div class="aset">'+V.who('Clara')+'</div>'+V.train('Clara/s|reg
  warum:'Der Stamm bleibt gleich – nur die Endung ändert sich.',
  schritte:[['<span class="big-ic">📖</span>','Sätze lesen'],[V.lego('regard','e'),'Stamm finden'],['<span class="big-ic">🎨</span>','Endung ansehen (orange)']],
  fallen:[['Clara regarder des photos.','Clara regarde des photos.','Nicht die Grundform – Endung -e.']]},
-bauplan:{vis:V.legoGrid('parler'),
+bauplan:{parts:[V.onPart('er')],vis:V.legoGrid('parler'),
  was:'So baust du jede Form – Schritt für Schritt.',
  warumVis:'<div class="aset">'+V.lego('parl','e')+V.lego('parl','es')+V.lego('parl','ent')+' <span class="big-ic">≈</span> „parl“</div>',
  warum:'-e, -es, -ent hört man nicht – trotzdem muss man sie schreiben.',

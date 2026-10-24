@@ -124,6 +124,32 @@ V.explain=(x)=>{if(!x)return '';
   +SEC('👀','Beispiele <span class="legend">– tippe auf 🔊</span>',bsp?`<div class="excards">${bsp}</div>`:'','xs-bsp')
   +SEC('📌','Merksatz',x.merk?`<div class="merk1">${x.merk}</div>`:'','xs-merk')
   +SEC('⚠️','Achtung, Falle!',(x.fallen||[]).slice(0,x.fallMax||3).map(V.fall).join(''),'xs-fall');};
+/* ---------- Das Pronomen on (wiederverwendet in être und -er-Verben) ---------- */
+/** Kurzgrafik: 👥 = on (wir / man) → Verb wie il */
+V.onVis=(verb='est',st)=>{const w=()=>st?V.lego(st,verb,{ear:false}):V.b(verb,'v');return `<div class="onvis"><div class="on-l">${V.fig('mf')}<span class="on-eq">=</span>${V.b('on','p',{lbl:'wir / man'})}</div><div class="on-r${st?' on-col':''}"><span class="on-k">Verb wie il:</span><span class="on-g">${V.b('il','p')}${w()}</span><span class="on-eq">${st?'↓':'→'}</span><span class="on-g">${V.b('on','p')}${w()}</span></div></div>`;};
+/** 6-Schritte-Erklärung zu on; mode 'etre' oder 'er' */
+V.onPart=(mode='etre')=>mode==='er'?{h:'👥 <b>on</b> bei den -er-Verben',
+ vis:V.onVis('e','regard'),
+ was:'<b>on</b> = <b>wir</b> (oder <b>man</b>). Die Endung ist aber die von <b>il</b>: <b>-e</b>.',
+ warumVis:'<div class="cmp2"><span class="c2-f">📖</span>'+V.train('Nous/p|regardons/v|des photos./r')+'</div><div class="cmp2"><span class="c2-f">💬</span>'+V.train('On/p|regarde/v|des photos./r')+'</div>',
+ warum:'Im Alltag sagen Franzosen meistens <b>on</b> statt <b>nous</b>. Beides heißt „wir schauen“.',
+ schritte:[[V.fig('mf'),'<b>on</b> meint <b>mehrere</b> (wir)'],[V.b('il','p')+'<span class="on-eq">=</span>'+V.b('on','p'),'Endung wie bei <b>il / elle</b>'],[V.b('on','p')+V.b('regarde','v'),'also <b>-e</b> (stumm): on regarde, on parle'],[V.b('nous','p')+V.b('regardons','v'),'nur bei <b>nous</b> kommt <b>-ons</b>']],
+ bsp:[['On regarde des photos.','Wir schauen Fotos an.'],['On parle français.','Wir sprechen Französisch.'],['On écoute un CD.','Wir hören eine CD. (= Nous écoutons un CD.)'],['Théo et moi, on parle ensemble.','Théo und ich, wir reden zusammen.']],
+ merk:'on = wir – Endung wie il: on regarde',
+ fallen:[['On parlons français.','On parle français.','<b>-ons</b> gehört nur zu <b>nous</b>. on → <b>-e</b>.'],['On regardent des photos.','On regarde des photos.','<b>-ent</b> gehört zu ils / elles. on → <b>-e</b>.'],['On écoutes un CD.','On écoute un CD.','<b>-es</b> gehört zu tu. on → <b>-e</b>.']]}
+:{h:'👥 Das Pronomen <b>on</b>',
+ vis:V.onVis('est'),
+ was:'<b>on</b> heißt <b>man</b> – und im Alltag meistens <b>wir</b>.',
+ warumVis:'<div class="cmp2"><span class="c2-f">📖</span>'+V.train('Nous/p|sommes/v|en sixième./r')+'</div><div class="cmp2"><span class="c2-f">💬</span>'+V.train('On/p|est/v|en sixième./r')+'</div>',
+ warum:'Beim Sprechen sagen Franzosen viel öfter <b>on</b> als <b>nous</b>. Beides heißt „wir sind“.',
+ schritte:[[V.fig('mf'),'<b>on</b> meint <b>mehrere</b> (wir) – oder „man“'],[V.b('il','p')+'<span class="on-eq">=</span>'+V.b('on','p'),'aber das Verb steht <b>wie bei il / elle</b>'],[V.b('on','p')+V.b('est','v'),'also: <b>on est</b> – wie il est'],[V.b('on','p')+V.b('regarde','v'),'bei -er-Verben genauso: Endung <b>-e</b> wie il']],
+ bsp:[['On est en sixième.','Wir sind in der 6. Klasse.'],['On est dans la cour.','Wir sind auf dem Schulhof.'],['On est ensemble.','Wir sind zusammen. (= Nous sommes ensemble.)'],['Comment est-ce qu’on dit …?','Wie sagt man …? (on = man)']],
+ merk:'on = wir / man – aber Verb wie il → on est',fallMax:4,
+ fallen:[['On sommes en sixième.','On est en sixième.','<b>sommes</b> gehört nur zu <b>nous</b>.'],['On sont dans la cour.','On est dans la cour.','<b>sont</b> gehört zu ils / elles. on → <b>est</b>.'],['On es ensemble.','On est ensemble.','<b>es</b> gehört zu tu. on → <b>est</b> mit t.'],
+  '<b>on</b> ≠ <b>ont</b>: Das Wort <i>ont</i> klingt gleich, heißt aber etwas anderes. Für „wir / man“ schreibst du immer <b>on</b> – ohne t.']};
+/** Wie-Wörter passen sich an (nouveau / ami) */
+V.agree=()=>{const R=[['m','nouveau','l’ami','ein Junge'],['f','nouve<b>lle</b>','l’ami<b>e</b>','ein Mädchen'],['mm','nouveau<b>x</b>','les ami<b>s</b>','mehrere Jungen / gemischt'],['ff','nouvelle<b>s</b>','les amie<b>s</b>','nur Mädchen']];
+ return `<table class="agree"><tr><th></th><th>neu</th><th>Freund/in</th></tr>${R.map(r=>`<tr><td>${V.fig(r[0])}<small>${r[3]}</small></td><td>${V.b(r[1],'r')}</td><td>${V.b(r[2],'r')}</td></tr>`).join('')}</table>`;};
 /* ---------- Erklärungen nachträglich bebildern ---------- */
 H.patchIntro=m=>{const I=W.INTRO||{};Object.entries(m).forEach(([id,p])=>{const x=id==='_lesson'?(W.LESSON&&W.LESSON.explain)||I._lesson:I[id];if(!x)return;Object.assign(x,p);
  const c=(W.CHAPTERS||[]).find(c=>c.id===id);if(c){c.merk=x.merk;if(p.rule)c.rule=p.rule;}if(id==='_lesson'&&W.LESSON)W.LESSON.merk=x.merk;});};

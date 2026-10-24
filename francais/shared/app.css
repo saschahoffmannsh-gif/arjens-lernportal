@@ -715,3 +715,13 @@ details.howto{margin-top:16px}
 .gend .vs{margin:8px 0}
 @media (min-width:700px){.hubgrid{grid-template-columns:repeat(3,1fr)}.glist{grid-template-columns:repeat(3,1fr)}}
 @media (prefers-reduced-motion:reduce){.gend .rec{animation:none}}
+/* on-Grafik + Wie-Wörter */
+.onvis{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center}
+.on-l,.on-r{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center;background:#fff;border:2px dashed #cbd5e1;border-radius:14px;padding:6px 10px}
+.on-eq{font-weight:900;color:#64748b;font-size:1.2rem;margin:0 2px}.on-k{font-weight:800;color:var(--muted);font-size:.85rem}
+.onvis .figs .fg svg{width:34px;height:auto}
+.agree{border-collapse:collapse;margin:0 auto;width:100%;max-width:420px}.agree th{font-size:.85rem;color:var(--muted);padding:2px 4px}.agree td{padding:4px;border-top:1px solid #e2e8f0;text-align:center}
+.agree td:first-child{text-align:left}.agree td:first-child small{display:block;font-size:.7rem;color:var(--muted)}.agree .figs .fg svg{width:26px;height:auto}
+.agree .wb{white-space:nowrap}.agree .wb .wt{white-space:nowrap}.agree td{font-size:.92rem}
+.agree .wb b{color:#dc2626;font-weight:900}
+.on-g{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}.on-r.on-col{flex-direction:column;gap:2px}
