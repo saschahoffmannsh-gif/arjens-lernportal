@@ -209,3 +209,52 @@ fehler:{rule:"Text prüfen: Passt die Verbform zur Person? Stimmt der Artikel? A
  fallen:['j’écoute – nicht je écoute.'],
  check:['Lesen.','Prüfen.','Antippen.']}
 });
+(function(){const W=window,V=window.V;
+/* Bildliche Erklärungen (feste Vorlage) – Texte */
+const SK_MOI=[['👋','Begrüßung','Salut!'],['🙋','Name','Je m’appelle …'],['🏙️','Woher?','Je suis de …'],['🏫','Klasse','Je suis en sixième A.'],['👫','Freunde','… et moi, nous sommes …'],['🏠','Zu Hause','À la maison, j’écoute …'],['👋','Schluss','Salut!']];
+const SK_CH=[['🚪','Einleitung','Voilà ma chambre!'],['🛏️','Was gibt es?','Il y a un lit, une …'],['📍','Wo?','Dans le coin, il y a …'],['⭐','Lieblingssache','Le hamac est super!']];
+H.patchIntro({
+_lesson:{vis:V.skel(SK_MOI.slice(0,4))+V.skel(SK_CH.slice(0,3)),
+ was:'In der Arbeit schreibst du einen kurzen Text: <b>C’est moi!</b> oder <b>C’est ma chambre!</b>',
+ warum:'Mit fertigen Bausteinen schreibst du sicher und schnell.',
+ schritte:[['<span class="big-ic">📝</span>','Infos sammeln'],['<span class="big-ic">🧱</span>','Bausteine nehmen'],['<span class="big-ic">✅</span>','prüfen: Verb, Artikel, Akzente']],
+ merk:'Begrüßung – Infos in ganzen Sätzen – Schluss. Dann prüfen!',
+ fallen:[['Je suis von Berlin.','Je suis de Berlin.','„aus“ = <b>de</b>.'],['je écoute','j’écoute','Vokal → <b>j’</b>.'],['Il y a le lit.','Il y a un lit.','il y a + un / une / des.']]},
+'moi-text':{vis:'<div class="aset">'+V.who('Léo')+'</div>'+V.skel(SK_MOI),
+ was:'Léo stellt sich vor. Schau, wie sein Text gebaut ist.',
+ warum:'Dein Text bekommt denselben Bauplan.',
+ schritte:[['<span class="big-ic">👋</span>','Begrüßung + Name'],['<span class="big-ic">🏙️🏫</span>','Woher? Klasse?'],['<span class="big-ic">👫🏠</span>','Freunde, zu Hause – Schluss']],
+ fallen:[['Je suis eleve a Strasbourg.','Je suis élève à Strasbourg.','élève: 2 Akzente · à mit Akzent.']]},
+'moi-bausteine':{vis:V.skel(SK_MOI.slice(1,5)),
+ was:'Bausteine = fertige Satzanfänge. Du setzt nur deine Infos ein.',
+ warum:'So sind die Sätze automatisch richtig gebaut.',
+ schritte:[[V.b('Je m’appelle','v'),'Name'],[V.b('Je suis de','v'),'Herkunft'],[V.b('… et moi, nous sommes','v'),'Freunde']],
+ fallen:[['je mapelle Clara','Je m’appelle Clara.','m’ + pp + ll.'],['Jade et moi, nous sont amis.','Jade et moi, nous sommes amis.','nous → <b>sommes</b>.']]},
+'moi-schreiben':{vis:V.skel(SK_MOI),
+ was:'Jetzt dein eigener Text über dich.',
+ warum:'Lieber kurze, richtige Sätze als lange mit Fehlern.',
+ schritte:[['<span class="big-ic">📝</span>','Stichpunkte sammeln'],['<span class="big-ic">🧱</span>','mit Bausteinen ganze Sätze'],['<span class="big-ic">✅</span>','Checkliste – dann Mustertext vergleichen']],
+ fallen:[['Je regardes des photos.','Je regarde des photos.','je → <b>-e</b>.']]},
+'chambre-text':{vis:(W.ROOMS&&W.ROOMS.jade?W.ROOMS.jade.svg:'')+V.skel(SK_CH),
+ was:'Jade beschreibt ihr Zimmer: was es gibt und wo.',
+ warum:'il y a + un / une / des – damit zählst du Sachen auf.',
+ schritte:[['<span class="big-ic">🚪</span>','Voilà ma chambre!'],[V.b('Il y a','v')+V.art('un'),'Sachen aufzählen'],['<span class="big-ic">📍</span>','Wo? Dans le coin …']],
+ fallen:[['Il y a des CDs.','Il y a des CD.','CD ohne -s.']]},
+'chambre-bausteine':{vis:V.skel(SK_CH),
+ was:'Mit diesen Bausteinen beschreibst du jedes Zimmer.',
+ warum:'Einleitung – was gibt es – wo – was ist super.',
+ schritte:[[V.b('Dans ma chambre, il y a','v'),'Was gibt es?'],[V.b('Dans le coin,','x'),'Wo?'],[V.b('… est super!','v'),'Bewertung']],
+ fallen:[['Dans ma chambre, il y a la table.','Dans ma chambre, il y a une table.','nach il y a → <b>une</b>.']]},
+'chambre-schreiben':{vis:V.skel(SK_CH),
+ was:'Jetzt beschreibst du dein eigenes Zimmer.',
+ warum:'Der gleiche Bauplan – nur deine Sachen.',
+ schritte:[['<span class="big-ic">🛏️</span>','Sachen sammeln (mit un / une / des)'],['<span class="big-ic">🧱</span>','Bausteine'],['<span class="big-ic">✅</span>','prüfen']],
+ fallen:[['Il y a un lampe.','Il y a une lampe.','lampe ist weiblich.']]},
+fehler:{vis:V.vs('Il/s|et/v|de Berlin./r','Il/s|est/v|de Berlin./r'),
+ was:'Finde typische Text-Fehler.',
+ warum:'Wer Fehler findet, macht sie seltener.',
+ schritte:[['<span class="big-ic">🔍</span>','Satz für Satz lesen'],[V.b('est','v')+' / '+V.b('et','r'),'Verb, Artikel, Akzente prüfen'],['<span class="big-ic">👆</span>','Fehler antippen']],
+ fallen:[['Il et nouveau.','Il est nouveau.','<b>est</b> = ist · <b>et</b> = und.']]}
+});
+
+})();

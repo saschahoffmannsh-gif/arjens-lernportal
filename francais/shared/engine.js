@@ -111,17 +111,9 @@ window.APPGO=(v,a)=>go(v,a);
 function nextChapter(){const c=REG().find(c=>!chapterStatus(c).done);return c||null;}
 
 /* ---------- Erklär-Kasten (Anfang der Lektion / des Kapitels) ---------- */
-function introBody(x,part){
- const F=(t,w)=>`<span class="fr">${t}</span>${spk(strip(t),w||'')}`;
- return `${x.was?`<p class="in-p"><b>${part?'Was ist das?':'Worum geht’s?'}</b> ${x.was}</p>`:''}${x.warum?`<p class="in-p"><b>${part?'Warum macht man das so?':'Wozu brauchst du das?'}</b> ${x.warum}</p>`:''}
- ${x.schritte&&x.schritte.length?`<div class="rulebox"><div class="bx-h">${part?'👣 So gehst du vor – Schritt für Schritt':'📏 Die Regel – Schritt für Schritt'}</div><ol>${x.schritte.map(t=>`<li>${t}</li>`).join('')}</ol>${x.tab||''}</div>`:''}
- ${x.bsp&&x.bsp.length?`<div class="bspbox"><div class="bx-h">🔎 Beispiele <span class="legend">– tippe auf 🔊 und sprich nach</span></div><table class="bsptab"><tbody>${x.bsp.map(b=>`<tr><td class="bf">${F(b[0],b[2])}</td><td class="bd">${b[1]}</td></tr>`).join('')}</tbody></table></div>`:''}
- ${x.merk?`<div class="merkbox"><span class="mb-ic">📌</span><div><b>Merksatz</b><br>${x.merk}</div></div>`:''}
- ${x.fallen&&x.fallen.length?`<div class="fallbox"><div class="bx-h">⚠️ Achtung, Falle!</div><ul>${x.fallen.map(t=>`<li>${t}</li>`).join('')}</ul></div>`:''}
- ${x.check&&x.check.length?`<div class="checkbox"><div class="bx-h">✅ So gehst du vor</div><ol>${x.check.map(t=>`<li>${t}</li>`).join('')}</ol></div>`:''}`;}
 function introBox(x,lesson){if(!x)return '';
- const body=introBody(x,false)+(x.parts||[]).map((p,i)=>`<section class="inpart"><h3 class="inpart-h"><span class="inpart-n">${i+1}</span>${p.h}</h3>${introBody(p,true)}</section>`).join('')+(x.ende?`<div class="tip"><span class="tip-ic">💡</span><div>${x.ende}</div></div>`:'');
- return `<details class="intro${lesson?' lesson-intro':''}" open><summary><span class="in-ic">📖</span><span>${lesson?'Erklärung: ':'Erklärung: '}${x.t||''}</span><span class="in-tg" aria-hidden="true"></span></summary><div class="intro-body">${body}</div></details>`;}
+ const body=window.V.explain(x)+(x.parts||[]).map((p,i)=>`<section class="inpart"><h3 class="inpart-h"><span class="inpart-n">${i+1}</span>${p.h}</h3>${window.V.explain(p)}</section>`).join('')+(x.ende?window.V.hint('💡',x.ende):'');
+ return `<details class="intro${lesson?' lesson-intro':''}" open><summary><span class="in-ic">📖</span><span>Erklärung: ${x.t||''}</span><span class="in-tg" aria-hidden="true"></span></summary><div class="intro-body">${body}</div></details>`;}
 function home(){
  const o=overall(),nc=nextChapter(),RI=H.runInfo();
  let h=`<section class="lhero" style="--c:${L.color}"><div class="lh-txt"><div class="kicker"><span class="flag"><i></i><i></i><i></i></span>Französisch · Klassenarbeit 30.10.</div>
@@ -273,11 +265,12 @@ function feedback(e,r,a){
  let own=[];if(!r.ok&&typeof e.dx==='function'){try{own=e.dx(r.raw!=null?String(r.raw):strip(String(r.given||'')),r,e)||[];}catch(err){own=[];}}
  const dg=own.slice();if(!own.length)allP.forEach(p=>dg.push(...diagnose(p[0],p[1],p[2]||'')));
  const pairs=allP.filter(p=>!/^(vrai|faux)$/.test(p[0])&&(own.length||close(p[0],p[1])||diagnose(p[0],p[1],p[2]||'').length));
- const seen=new Set();const D=dg.filter(x=>!seen.has(x.t)&&seen.add(x.t)).slice(0,own.length?4:3);
+ const seen=new Set();const D=dg.filter(x=>!seen.has(x.t)&&seen.add(x.t)).slice(0,own.length?3:2);
  const why=e.why||'';const sw=DN(strip(r.sol||''));const dw=DN(why);const quote=/^\s*«/.test(strip(why));const weak=!quote&&strip(why).length<45||!quote&&(sw.length>8&&(dw===sw||dw.startsWith(sw.slice(0,Math.min(40,sw.length)))&&dw.length<sw.length+25));
- const ovl=(x,y)=>{const A=new Set(DN(x).split(' ').filter(w=>w.length>2)),B=DN(y).split(' ').filter(w=>w.length>2);if(!B.length)return 1;return B.filter(w=>A.has(w)).length/B.length;};const dtxt=D.map(x=>x.t).join(' ');const showWhy=why&&!(D.length&&(weak||ovl(dtxt,why)>0.5));
+ const ovl=(x,y)=>{const A=new Set(DN(x).split(' ').filter(w=>w.length>2)),B=DN(y).split(' ').filter(w=>w.length>2);if(!B.length)return 1;return B.filter(w=>A.has(w)).length/B.length;};const dtxt=D.map(x=>x.t).join(' ');const showWhy=why&&!D.length;void ovl;void dtxt;
  const merk=(D[0]&&D[0].m)||e.merk||c.merk||L.merk||'';
- const cmp=r.detect?'':pairs.slice(0,4).map(p=>`<div class="cmp"><span class="cmp-w" aria-label="deine Antwort">✗ <s>${esc(p[0])}</s></span><span class="cmp-a">→</span><span class="cmp-r" aria-label="richtig">✓ ${hlDiff(p[0],p[1])}</span></div>`).join('');
+ const cmpV=p=>{const v=(window.V&&String(p[0]).trim().split(/\s+/).length>1&&String(p[1]).trim().split(/\s+/).length>1)?window.V.diff(p[0],p[1]):'';return v;};
+ const cmp=r.detect?'':pairs.slice(0,4).map(p=>cmpV(p)||`<div class="cmp"><span class="cmp-w" aria-label="deine Antwort">✗ <s>${esc(p[0])}</s></span><span class="cmp-a">→</span><span class="cmp-r" aria-label="richtig">✓ ${hlDiff(p[0],p[1])}</span></div>`).join('');
  const dcmp=r.detect?pairs.map(p=>`<div class="cmp"><span class="cmp-w">✗ <s>${esc(p[0])}</s></span><span class="cmp-a">→</span><span class="cmp-r">✓ ${hlDiff(p[0],p[1])}</span></div>`).join(''):'';
  const onOK=r.ok&&/\bon (est|parle|regarde|écoute|téléphone|présente|appelle)\b/i.test(strip(r.sol||'')+' '+strip(why))&&!/on\b.*wie il/i.test(strip(why));
  let h=`<div class="ico">${r.ok?'✓':'✗'}</div><div class="fb-in"><div class="ttl">${r.ok?PRAISE[Math.floor(Math.random()*PRAISE.length)]:r.pts>0?`Teilweise richtig (${r.pts} von ${r.max})`:'Leider nicht richtig.'}</div>`;
