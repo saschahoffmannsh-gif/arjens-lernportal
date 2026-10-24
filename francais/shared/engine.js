@@ -253,7 +253,6 @@ function lg(ev){if(!LG)return;try{LG.event(L.slug,ev);}catch(err){}}
 function promptOf(e){const t=e.prompt||e.text||(e.lines?e.lines.map(l=>(window.NAMES[l[0]]||l[0])+': '+l[1]).join(' / '):'')||(e.rows?e.rows.map(r=>r[0]).join(' / '):'')||(e.pairs?e.pairs.map(p=>p[0]).join(' / '):'');
  return strip(String(e.q||''))+(t?' | '+strip(String(t)).replace(/\{\d+\}/g,'___').replace(/\[([^\]|]+)\|[^\]]+\]/g,'$1'):'');}
 function logAnswer(e,r,first){if(!S)return;S.att[S.i]=(S.att[S.i]||0)+1;const C=LG?LG.clip:(x=>x);
- if(window.TR&&S.mode!=='single'){try{const mv=window.TR.kiste.answer(gidOf(e),!!r.ok,first,{l:e._slug||L.slug,ch:(e._lch||String(e.ref||e.ch).replace(/^[^:]*:/,'')),p:promptOf(e),t:e.type,au:!!e.au,def:e.def});if(mv&&S)(S.kmv=S.kmv||[])[S.i]=mv;}catch(err){}}
  lg({kind:'answer',mode:S.mode,lesson2:e._slug,gid:HUB?gidOf(e):undefined,ch:e.ref||e.ch,chIn:e.ch,run:S.run||null,task:e.id,type:e.type,lv:e.lv,
   prompt:C(promptOf(e),240),given:C(strip(String(r.given!=null?r.given:'').replace(/<br\s*\/?>/g,' / ')),240),correct:C(strip(String(r.sol||'').replace(/<br\s*\/?>/g,' / ')),240),
   ok:!!r.ok,pts:r.pts,max:r.max,accent:r.acc?true:undefined,attempt:S.att[S.i],first,pos:S.i+1,of:S.list.length,ms:Math.min(600000,Date.now()-(S.tt[S.i]||Date.now()))});}

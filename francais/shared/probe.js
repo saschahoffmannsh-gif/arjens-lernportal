@@ -140,34 +140,30 @@ HUB.views.probeRun=function(){if(!PR||!PR.X){HUB.E.go('probe');return;}const X=P
   if(PR.run){PR.acc+=(Date.now()-PR.since)/1000;PR.run=false;}stopTick();E.stopAudio();grade1();HUB.E.go('probeText');};
  $('#pSubmit').onclick=sub;$('#pSubmit2').onclick=sub;};
 /* ---------- Auswerten (A–E automatisch) ---------- */
-function grade1(){const X=PR.X,E=HUB.E,A=PR.ans;const G={};const wrong=[];const kadd=[];
- const W2=(part,q,given,right,ref,def)=>{wrong.push({part,q,given:String(given||'–'),right,ref});if(def)kadd.push(def);};
+function grade1(){const X=PR.X,E=HUB.E,A=PR.ans;const G={};const wrong=[];
+ const W2=(part,q,given,right,ref)=>{wrong.push({part,q,given:String(given||'–'),right,ref});};
  // A
- let ra=0,rm=0;X.A.tasks.forEach((e,i)=>{const r=PR.R[i].check();const mx=rawMax(e);rm+=mx;if(r){ra+=r.pts;if(!r.ok)W2('A',strip(e.q),strip(r.given||''),strip(r.sol||''),['ecouter',e.ch.split(':')[1]]);}else W2('A',strip(e.q),'nicht bearbeitet','',['ecouter',e.ch.split(':')[1]]);
-  try{TR.kiste.answer(E.gidOf(e),!!(r&&r.ok),true,{l:'ecouter',ch:e.ch.split(':')[1],p:strip(e.q),t:e.type,au:true});}catch(x){}});
+ let ra=0,rm=0;X.A.tasks.forEach((e,i)=>{const r=PR.R[i].check();const mx=rawMax(e);rm+=mx;if(r){ra+=r.pts;if(!r.ok)W2('A',strip(e.q),strip(r.given||''),strip(r.sol||''),['ecouter',e.ch.split(':')[1]]);}else W2('A',strip(e.q),'nicht bearbeitet','',['ecouter',e.ch.split(':')[1]]);});
  let a1=rm?ra/rm*6:0,a2=0;if(X.A.dict){const r=PR.RD.check();const mx=rawMax(X.A.dict);if(r){a2=r.pts/mx*2;if(!r.ok)W2('A','Diktat',strip(r.given),strip(r.sol),['ecouter','diktat']);}else W2('A','Diktat','nicht bearbeitet','',['ecouter','diktat']);}else a1=rm?ra/rm*8:0;
  G.A=h2(a1+a2);
  // B
- let b=0;X.B.nouns.forEach((n,i)=>{const s=nounScore(A['B'+i]||'',n);b+=s.pts;const right=n[1]+(n[1]==='l’'?'':' ')+n[2];if(s.pts<1)W2('B',n[0],A['B'+i],right,['artikel-bestimmt','regel'],{l:'artikel-bestimmt',ch:'regel',e:{type:'write',q:'Übersetze <b>mit Artikel</b>:',prompt:n[0],ans:[right],why:`${n[0]} = <b>${right}</b>`+(n[3]?` (${n[3]==='f'?'weiblich':'männlich'})`:'')}});});
- X.B.phr.forEach((p,i)=>{const s=word(A['Bp'+i]||'',p[1]);b+=s;if(s<1)W2('B',p[0],A['Bp'+i],p[1][0],['texte','moi-bausteine'],{l:'texte',ch:'moi-bausteine',e:{type:'write',q:'Wie sagt man das auf Französisch?',prompt:p[0],ans:p[1],why:`${p[0]} = <b>${p[1][0]}</b>`}});});
+ let b=0;X.B.nouns.forEach((n,i)=>{const s=nounScore(A['B'+i]||'',n);b+=s.pts;const right=n[1]+(n[1]==='l’'?'':' ')+n[2];if(s.pts<1)W2('B',n[0],A['B'+i],right,['artikel-bestimmt','regel']);});
+ X.B.phr.forEach((p,i)=>{const s=word(A['Bp'+i]||'',p[1]);b+=s;if(s<1)W2('B',p[0],A['Bp'+i],p[1][0],['texte','moi-bausteine']);});
  G.B=h2(b);
  // C
- let c=0;X.C.etre.forEach((s,i)=>{const v=word(A['C'+i]||'',s[1]);c+=v;if(v<1)W2('C',s[0].replace('{}','___'),A['C'+i],s[0].replace('{}',s[1]),['etre','formen'],{l:'etre',ch:'formen',e:{type:'gapw',q:'Setze die richtige Form von <b>être</b> ein.',text:s[0].replace('{}','{0}'),ans:{0:[s[1]]},strict:true}});});
+ let c=0;X.C.etre.forEach((s,i)=>{const v=word(A['C'+i]||'',s[1]);c+=v;if(v<1)W2('C',s[0].replace('{}','___'),A['C'+i],s[0].replace('{}',s[1]),['etre','formen']);});
  const cr=sentence(A.Cr||'',X.C.ers[1]);const pr=NRM(A.Cr||'').split(' ')[0]===NRM(X.C.ers[1]).split(' ')[0];const crs=cr===2?2:cr===1.5?1.5:pr?1:0;c+=crs;
- if(crs<2)W2('C','Ersetze: «'+X.C.ers[0]+'»',A.Cr,X.C.ers[1],['etre','nachholbedarf'],{l:'etre',ch:'nachholbedarf',e:{type:'write',q:'Ersetze die Person durch ein Pronomen. Schreibe den ganzen Satz.',prompt:'«'+X.C.ers[0]+'»',ans:[X.C.ers[1]]}});
+ if(crs<2)W2('C','Ersetze: «'+X.C.ers[0]+'»',A.Cr,X.C.ers[1],['etre','nachholbedarf']);
  G.C=h2(c);
  // D
- let d=0;X.D.best.forEach((n,i)=>{const ok=A['Db'+i]===n[1];if(ok)d++;else W2('D','… '+n[0],A['Db'+i],n[1]+(n[1]==='l’'?'':' ')+n[0],['artikel-bestimmt',/s$|^CD$/.test(n[0])?'plural':'regel'],{l:'artikel-bestimmt',ch:'regel',e:{type:'mc',q:'Welcher Artikel passt?',prompt:'… '+n[0],o:[n[1],...['le','la','l’','les'].filter(x=>x!==n[1])],fr:true}});});
- X.D.unb.forEach((n,i)=>{const ok=A['Du'+i]===n[1];if(ok)d++;else W2('D','il y a … '+n[0],A['Du'+i],n[1]+' '+n[0],['artikel-unbestimmt','regel'],{l:'artikel-unbestimmt',ch:'regel',e:{type:'mc',q:'Dans ma chambre, il y a …',prompt:'… '+n[0],o:[n[1],...['un','une','des'].filter(x=>x!==n[1])],fr:true}});});
+ let d=0;X.D.best.forEach((n,i)=>{const ok=A['Db'+i]===n[1];if(ok)d++;else W2('D','… '+n[0],A['Db'+i],n[1]+(n[1]==='l’'?'':' ')+n[0],['artikel-bestimmt',/s$|^CD$/.test(n[0])?'plural':'regel']);});
+ X.D.unb.forEach((n,i)=>{const ok=A['Du'+i]===n[1];if(ok)d++;else W2('D','il y a … '+n[0],A['Du'+i],n[1]+' '+n[0],['artikel-unbestimmt','regel']);});
  G.D=d;
  // E
- let ee=0;X.E.verbs.forEach((v,i)=>{const s=word(A['E'+i]||'',v[2]);ee+=s;if(s<1)W2('E',v[0].replace('{}','___')+' ('+v[1]+')',A['E'+i],v[0].replace('{}',v[2]),['verben-er',v[1]==='appeler'?'appeler':'heftverben'],{l:'verben-er',ch:v[1]==='appeler'?'appeler':'heftverben',e:{type:'gapw',q:`Setze <b>${v[1]}</b> in der richtigen Form ein.`,text:v[0].replace('{}','{0}'),ans:{0:[v[2]]},strict:true}});});
- X.E.plur.forEach((p,i)=>{const s=sentence(A['Ep'+i]||'',p[1]);ee+=s;if(s<2)W2('E','Plural: '+p[0],A['Ep'+i],p[1],[p[2],p[3]],{l:p[2],ch:p[3],e:{type:'write',q:'Schreibe den Satz im <b>Plural</b>.',prompt:p[0],ans:[p[1]]}});});
+ let ee=0;X.E.verbs.forEach((v,i)=>{const s=word(A['E'+i]||'',v[2]);ee+=s;if(s<1)W2('E',v[0].replace('{}','___')+' ('+v[1]+')',A['E'+i],v[0].replace('{}',v[2]),['verben-er',v[1]==='appeler'?'appeler':'heftverben']);});
+ X.E.plur.forEach((p,i)=>{const s=sentence(A['Ep'+i]||'',p[1]);ee+=s;if(s<2)W2('E','Plural: '+p[0],A['Ep'+i],p[1],[p[2],p[3]]);});
  G.E=h2(ee);
- PR.G=G;PR.wrong=wrong;
- // falsche Aufgaben → Fehlerkiste (als eigene Karten)
- kadd.forEach(def=>{const gid='gen:'+hash(def.l+def.ch+JSON.stringify(def.e));def.e.why=def.e.why||'';try{TR.kiste.wrong(gid,{l:def.l,ch:def.ch,p:strip((def.e.q||'')+' '+(def.e.prompt||def.e.text||'')),t:def.e.type,def});}catch(x){}});
- PR.kn=kadd.length+wrong.filter(w=>w.part==='A').length;}
+ PR.G=G;PR.wrong=wrong;}
 /* ---------- Text selbst prüfen ---------- */
 HUB.views.probeText=function(){if(!PR||!PR.G){HUB.E.go('probe');return;}const t=PR.ans.text||'',f=PR.ans.f||'A',n=sents(t);const errs=findErrs(t);
  const C=CONTENT[f].map(([l,fn])=>[l,!!fn(t,n)]);const sp=SPR.map(([c,l,mx])=>{const k=errs.filter(e=>e.c===c).length;return [c,l,mx,Math.max(0,mx-k)];});
@@ -202,10 +198,9 @@ HUB.views.probeResult=function(){if(!PR||PR.total==null){HUB.E.go('probe');retur
  M().innerHTML=`<div class="paper result-paper"><div class="pp-head"><div><b>Auswertung</b><br><span class="legend">Probe-Klassenarbeit · ${new Date().toLocaleDateString('de-DE')} · Zeit ${fmtT(PR.acc)}${PR.acc>DUR?' (über 45 Min.)':''}</span></div><div class="gradebig g${g}"><small>Note</small>${g}</div></div>
  <table class="ptab2">${rows}<tr class="tot"><td>Gesamt</td><td class="num"><b>${fmtP(PR.total)} / ${TOTAL}</b></td><td>${String(PR.pct).replace(".",",")} %</td></tr></table>
  <div class="scale"><div class="legend">Notenschlüssel (Orientierung – üblicher Schlüssel wie im Übungspaket: ab 92 / 81 / 67 / 50 / 30 %; deine Lehrerin kann abweichen):</div><table><tr>${scale}</tr></table></div>
- ${PR.kn?V.hint('🗃️',`<b>${PR.kn} Fehler</b> sind jetzt in deiner <b>Fehlerkiste</b> – sie kommen morgen wieder.`):''}
  <h3>📌 Das solltest du wiederholen</h3>${weak.length?weak.map(p=>`<div class="rep"><b>${p.ic} ${p.k} · ${p.t.split(' – ')[1]||p.t}</b> <span class="legend">${fmtP(PR.G[p.k]||0)} / ${p.max} P.</span><div class="rep-l">${(REP[p.k]||[]).map(r=>link(...r)).join('')}</div></div>`).join(''):'<p>🎉 Alles sitzt – super!</p>'}
  <h3>🔍 Deine Fehler im Einzelnen</h3>${PARTS.filter(p=>byPart(p.k).length).map(p=>`<details class="pcorr"><summary>${p.ic} ${p.k} – ${byPart(p.k).length} Fehler</summary>${byPart(p.k).map(w=>`<div class="pc"><div class="legend">${esc(w.q)}</div>${w.right?(V.diff&&w.given&&w.given!=='nicht bearbeitet'&&w.right.split(' ').length>1&&String(w.given).split(' ').length>1?V.diff(w.given,w.right):`<div class="cmp"><span class="cmp-w">✗ <s>${esc(w.given||'–')}</s></span><span class="cmp-a">→</span><span class="cmp-r">✓ <b>${esc(w.right)}</b></span></div>`):`<div class="legend">✗ ${esc(w.given)}</div>`}${dg(w)}</div>`).join('')}</details>`).join('')||'<p>Keine Fehler in A–E.</p>'}
- <div class="toolbar center"><button class="btn red" id="pAgain">↻ Neue Probe-Arbeit</button><button class="btn ghost" data-hub="kiste">🗃️ Fehlerkiste</button><a class="btn ghost" href="../">Zur Übersicht</a></div></div>`;
+ <div class="toolbar center"><button class="btn red" id="pAgain">↻ Neue Probe-Arbeit</button><a class="btn ghost" href="../">Zur Übersicht</a></div></div>`;
  $('#pAgain').onclick=()=>{PR=null;HUB.E.go('probe');};if(g<=2)HUB.E.confetti();};
 HUB.probeTest={genExam,nounScore,sentence,word,findErrs,CONTENT,TOTAL,PARTS,state:()=>PR,grade1};
 })();
