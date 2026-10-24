@@ -428,3 +428,4 @@ table.t th{background:#eff6ff;color:var(--navy);font-family:'FredokaApp',sans-se
 .ov-check ul{list-style:none;margin:0;padding:0}.ov-check li{display:flex;align-items:center;gap:10px;justify-content:space-between;padding:9px 0;border-top:1px solid var(--line)}.ov-check li:first-child{border-top:0}
 .ov-check label{display:flex;gap:10px;align-items:flex-start;flex:1;cursor:pointer}.ov-check input{width:24px;height:24px;flex:0 0 auto;accent-color:var(--green);margin-top:1px}.ov-check a{font-size:14px;white-space:nowrap;color:var(--blue);text-decoration:none;font-weight:700}
 .ov-plan table{width:100%;border-collapse:collapse}.ov-plan th{text-align:left;white-space:nowrap;padding:8px 12px 8px 0;color:var(--red);vertical-align:top;font-size:16px}.ov-plan td{padding:8px 0;border-top:1px solid var(--line)}.ov-plan tr:first-child td{border-top:0}.ov-plan a{color:var(--navy);font-weight:700;text-decoration:none}
+.runinfo{margin:-4px 0 12px}

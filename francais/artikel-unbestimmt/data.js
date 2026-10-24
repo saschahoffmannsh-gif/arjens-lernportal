@@ -175,3 +175,5 @@ window.TEST_EX=[
  det('Fehlerdetektiv: Finde die 4 Fehler.','Dans ma chambre, il y a [une|un] lit et [un|une] chaise. Il y a [photos|des photos] et [une|un] globe.','un lit · une chaise · des photos · un globe.',{ref:'fehler',tag:'Fehler finden'}),
  mark('Hör zu und markiere im Bild, was es in Noahs Zimmer gibt.','noah',['hamac','ordinateur','lampe','cd'],'Du hörst: un hamac, un ordinateur, une lampe et des CD.',{au:[['Noah','Il y a un hamac, un ordinateur, une lampe et des CD.']],ref:'szenen',tag:'Hören: Bild markieren'}),
 ];
+/* Pro Durchgang: so viele Aufgaben je Kapitel (Rest = Reserve-Pool); Pflichtaufgaben zu den Heftfehlern */
+H.setRun({entdecken:3,regel:3,'le-un':3,szenen:3,leicht:5,mittel:5,schwer:5,fehler:4},{fehler:[0],test:[4]});

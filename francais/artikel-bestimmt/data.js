@@ -178,3 +178,5 @@ window.TEST_EX=[
  wr('Übersetze: „Die Lampe ist im Zimmer.“',['La lampe est dans la chambre.'],'La lampe est dans la chambre.',{ref:'schwer',tag:'Übersetzen'}),
  det('Fehlerdetektiv: Finde die 4 Fehler.','Voilà [le|la] classe de sixième A. [Le|Les] élèves sont dans la cour. [La|L’] étagère est dans [la|le] coin.','la classe · Les élèves · L’étagère · le coin.',{ref:'fehler',tag:'Fehler finden'}),
 ];
+/* Pro Durchgang: so viele Aufgaben je Kapitel (Rest = Reserve-Pool); Pflichtaufgaben zu den Heftfehlern */
+H.setRun({entdecken:3,regel:3,plural:3,szenen:3,leicht:5,mittel:5,schwer:5,fehler:4},{fehler:[0],test:[5]});

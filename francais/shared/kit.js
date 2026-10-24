@@ -74,6 +74,13 @@ H.tabs=(items)=>`<div class="tabs"><div class="tabbar" role="tablist">${items.ma
 H.track=(id)=>`<div class="track" data-track="${id}"></div>`;
 H.writer=(id)=>`<div class="writer" data-writer="${id}"></div>`;
 H.steps=(arr)=>`<ol class="steps">${arr.map(s=>`<li>${s}</li>`).join('')}</ol>`;
+/** Aufgaben pro Durchgang (take) und Pflichtaufgaben (must) festlegen.
+   takes: {kapitelId:n}; must: {kapitelId:[index,…], test:[index,…]} */
+H.setRun=(takes,must={})=>{(W.CHAPTERS||[]).forEach(c=>{c.take=Math.min(c.ex.length,takes[c.id]||4);(must[c.id]||[]).forEach(i=>{c.ex[i].must=true;});});
+ (must.test||[]).forEach(i=>{W.TEST_EX[i].must=true;});};
+H.TEST_N=10;
+/** Aufgaben pro Durchgang einer Lektion (Kapitel + Abschlusstest) und geschätzte Minuten */
+H.runInfo=()=>{const n=(W.CHAPTERS||[]).reduce((a,c)=>a+(c.take||4),0)+H.TEST_N;return {n,min:Math.round(n*1.1/5)*5};};
 W.H=H;
 /* ---------- Aufgaben-Konstruktoren (richtige Option immer zuerst – wird beim Anzeigen gemischt) ---------- */
 const X={};

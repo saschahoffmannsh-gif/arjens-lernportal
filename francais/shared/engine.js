@@ -5,10 +5,15 @@ const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelect
 const L=window.LESSON, CHAPTERS=window.CHAPTERS, TRACKS=window.TRACKS||{}, WRITERS=window.WRITERS||{}, TEST_EX=window.TEST_EX||[];
 const {esc,strip,ttsText,akey,H}=window;
 const main=$('#main');
-const KEY='fr_lekt_'+L.slug+'_v1';
+const KEY='fr_lekt_'+L.slug+'_v2', OLDKEY='fr_lekt_'+L.slug+'_v1', WKEY=OLDKEY; // WKEY: eigene Texte bleiben unter dem alten Schlüssel
 let P=load();
-function blank(){return {ch:{},test:{best:null,stars:0,runs:0,pts:null}};}
-function load(){try{const p=JSON.parse(localStorage.getItem(KEY)||'null')||blank();p.ch=p.ch||{};p.test=p.test||blank().test;return p;}catch(e){return blank();}}
+function blank(){return {v:2,ch:{},asked:{},test:{best:null,stars:0,runs:0,pts:null}};}
+/* v1 → v2: Bestwerte, Durchläufe und Test bleiben; bisher gelöste Aufgaben gelten als „schon gestellt“ */
+function migrate(){try{const o=JSON.parse(localStorage.getItem(OLDKEY)||'null');if(!o||typeof o!=='object')return null;const p=blank();
+ Object.entries(o.ch||{}).forEach(([id,c])=>{if(!c)return;p.ch[id]={seen:!!c.seen,best:+c.best||0,runs:+c.runs||0,solved:{}};Object.keys(c.solved||{}).forEach(k=>{p.asked[k]=1;});});
+ if(o.test&&typeof o.test==='object')p.test=Object.assign(p.test,{best:o.test.best??null,stars:+o.test.stars||0,runs:+o.test.runs||0});
+ localStorage.setItem(KEY,JSON.stringify(p));localStorage.removeItem(OLDKEY);return p;}catch(e){try{localStorage.removeItem(OLDKEY);}catch(x){}return null;}}
+function load(){try{let p=JSON.parse(localStorage.getItem(KEY)||'null');if(!p||typeof p!=='object')p=migrate()||blank();p.ch=p.ch||{};p.asked=p.asked||{};p.test=p.test||blank().test;return p;}catch(e){return blank();}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(P));}catch(e){}}
 function chp(id){return P.ch[id]=P.ch[id]||{seen:false,best:0,runs:0,solved:{}};}
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
@@ -82,7 +87,8 @@ function confetti(){const c=document.createElement('div');c.className='confetti'
  document.body.appendChild(c);setTimeout(()=>c.remove(),3500);}
 
 /* ---------- Fortschritt ---------- */
-function chapterStatus(c){const p=chp(c.id);const solved=c.ex.filter(e=>p.solved[e.id]).length;return {p,solved,total:c.ex.length,done:p.seen&&p.best>=70};}
+function chapterStatus(c){const p=chp(c.id);const n=take(c);return {p,n,pool:c.ex.length,done:(p.runs||0)>0&&p.best>=70};}
+function take(c){return Math.min(c.ex.length,c.take||4);}
 function overall(){let d=0;CHAPTERS.forEach(c=>{if(chapterStatus(c).done)d++;});return {d,t:CHAPTERS.length};}
 function updateTop(){const o=overall();const el=$('#topProg');if(el)el.innerHTML=`<span class="tp-n">${o.d}/${o.t}</span><div class="pbar" role="progressbar" aria-valuenow="${o.d}" aria-valuemax="${o.t}"><i style="width:${o.d/o.t*100}%"></i></div>`;}
 const stars=n=>'★'.repeat(n)+'☆'.repeat(3-n);
@@ -101,23 +107,23 @@ window.APPGO=(v,a)=>go(v,a);
 
 function nextChapter(){const c=CHAPTERS.find(c=>!chapterStatus(c).done);return c||null;}
 function home(){
- const o=overall(),nc=nextChapter();
+ const o=overall(),nc=nextChapter(),RI=H.runInfo();
  let h=`<section class="lhero" style="--c:${L.color}"><div class="lh-txt"><div class="kicker"><span class="flag"><i></i><i></i><i></i></span>Französisch · Klassenarbeit 30.10.</div>
  <h1>${L.title}</h1><div class="lh-fr">${L.fr}</div><p>${L.intro}</p>
  <div class="lh-btns">${nc?`<button class="btn big" data-open="${nc.id}">▶ ${o.d?'Weiter mit Kapitel '+(nc.idx+1):'Los geht’s: Kapitel 1'}</button>`:`<button class="btn big red" data-test="1">🏆 Abschlusstest</button>`}</div></div>
  <div class="lh-art">${window.HERO[L.slug]||''}</div></section>
  <div class="soundtip"><span class="st-ic">🔊</span><div><b>Mit Ton lernen:</b> Tippe auf einen Lautsprecher, dann hörst du den Satz (nochmal tippen = Stopp). <b>Kein Ton auf dem iPhone?</b> Stummschalter an der Seite aus und lauter stellen.</div></div>
- <div class="section-title"><div class="bar"></div><h2>Deine Kapitel</h2><span class="sct-n">${o.d}/${o.t} geschafft</span></div><ol class="path">`;
- CHAPTERS.forEach((c,i)=>{const s=chapterStatus(c);const pct=Math.round(s.solved/s.total*100);
+ <div class="section-title"><div class="bar"></div><h2>Deine Kapitel</h2><span class="sct-n">${o.d}/${o.t} geschafft</span></div><p class="legend runinfo">📏 Ein Durchgang: <b>≈ ${RI.n} Aufgaben · ca. ${RI.min} Min.</b> (${RI.n-H.TEST_N} in den Kapiteln + ${H.TEST_N} im Abschlusstest) – am besten auf 2–3 kurze Lernzeiten verteilen.</p><ol class="path">`;
+ CHAPTERS.forEach((c,i)=>{const s=chapterStatus(c);const pct=s.p.best||0;
   if(c.block)h+=`<li class="pblock" style="--c:${c.c}"><span>${c.block}</span></li>`;
   h+=`<li><button class="pstep${s.done?' done':''}" style="--c:${c.c}" data-open="${c.id}"><span class="pnum">${s.done?'✓':i+1}</span><span class="pbody"><span class="pk">${c.kind||'Kapitel '+(i+1)}</span><span class="pt"><span class="pic">${c.icon||''}</span>${c.title}</span><span class="ps">${c.sub||''}</span>
-  <span class="pst"><span class="mini"><i style="width:${pct}%"></i></span>${s.solved}/${s.total} Aufgaben${s.p.best?` · Bestwert ${s.p.best} %`:''}</span></span></button></li>`;});
+  <span class="pst"><span class="mini"><i style="width:${pct}%"></i></span>${s.n} Aufgaben${s.p.best?` · Bestwert ${s.p.best} %`:''}</span></span></button></li>`;});
  const t=P.test;
  h+=`<li><button class="pstep test${t.stars>=2?' done':''}" data-test="1"><span class="pnum">🏆</span><span class="pbody"><span class="pk">Finale</span><span class="pt">Abschlusstest</span><span class="ps">${testSize()} Aufgaben auf Klassenarbeitsniveau – mit Punkten, Medaille und „Das solltest du noch einmal üben“</span>
  <span class="pst">${t.best!==null?`Bestwert ${t.best} % · <span class="stars-s">${stars(t.stars)}</span> · ${t.runs}× gemacht`:'Noch nicht gemacht'}</span></span></button></li></ol>
- <div class="merk blue"><h3>🧭 So lernst du am besten</h3><ul><li>Gehe die Kapitel <b>der Reihe nach</b> durch: erst lesen und anhören, dann <b>„Jetzt üben“</b>.</li><li>Ein Kapitel bekommt seinen Haken ✓ ab <b>70 %</b>. Für die Punkte zählt immer der <b>erste Versuch</b> – mit „Nochmal versuchen“ kannst du aber jede Aufgabe wiederholen.</li><li>Die Aufgaben kommen jedes Mal <b>neu gemischt</b>.</li><li>Zum Schluss: <b>Abschlusstest</b>. Danach siehst du genau, was du noch üben solltest.</li></ul></div>
- <div class="toolbar"><button class="btn" data-mix="1">🔀 Gemischt üben (12 Aufgaben)</button><a class="btn ghost" href="../">📋 Alle Lektionen</a></div>
- <div class="resetbox"><div><h3>↺ Neu anfangen</h3><p>Löscht in dieser Lektion <b>alle</b> Haken, gelösten Aufgaben und Test-Bestwerte. Einzelne Kapitel setzt du im Kapitel selbst zurück.</p></div><button class="btn red" data-reset="1">↺ Gesamten Fortschritt zurücksetzen</button></div>
+ <div class="merk blue"><h3>🧭 So lernst du am besten</h3><ul><li>Gehe die Kapitel <b>der Reihe nach</b> durch: erst lesen und anhören, dann <b>„Jetzt üben“</b>.</li><li>Jedes Kapitel hat nur <b>wenige Aufgaben pro Durchgang</b>. Übst du es noch einmal, kommen bevorzugt <b>neue Aufgaben</b> dran.</li><li>Ein Kapitel bekommt seinen Haken ✓ ab <b>70 %</b> in einem Durchgang. Für die Punkte zählt immer der <b>erste Versuch</b> – mit „Nochmal versuchen“ kannst du aber jede Aufgabe wiederholen.</li><li>Die Aufgaben kommen jedes Mal <b>neu gemischt</b>.</li><li>Zum Schluss: <b>Abschlusstest</b>. Danach siehst du genau, was du noch üben solltest.</li></ul></div>
+ <div class="toolbar"><button class="btn" data-mix="1">🔀 Gemischt üben (8 Aufgaben)</button><a class="btn ghost" href="../">📋 Alle Lektionen</a></div>
+ <div class="resetbox"><div><h3>↺ Neu anfangen</h3><p>Löscht in dieser Lektion <b>alle</b> Haken, Bestwerte und Test-Ergebnisse. Einzelne Kapitel setzt du im Kapitel selbst zurück.</p></div><button class="btn red" data-reset="1">↺ Gesamten Fortschritt zurücksetzen</button></div>
  ${lessonNav()}`;
  main.innerHTML=h;
 }
@@ -129,11 +135,11 @@ function lesson(id){
  let h=`<div class="crumb"><button class="btn ghost small" data-home="1">← Übersicht</button><span class="crumb-n">Kapitel ${c.idx+1} von ${CHAPTERS.length}</span></div>
  <header class="chead" style="--c:${c.c}"><span class="cic">${c.icon||'📘'}</span><div><div class="ck">${c.kind||'Kapitel '+(c.idx+1)}</div><h1>${c.title}</h1>${c.sub?`<div class="cs">${c.sub}</div>`:''}</div></header>
  <div class="lesson-body">${c.html||''}</div>`;
- h+=chResetBar(id)+`<div class="toolbar center"><button class="btn green big" data-practice="${id}">✏️ Jetzt üben (${c.ex.length} Aufgaben)</button>${c.idx<CHAPTERS.length-1?`<button class="btn ghost" data-open="${CHAPTERS[c.idx+1].id}">Nächstes Kapitel →</button>`:`<button class="btn red" data-test="1">🏆 Zum Abschlusstest</button>`}</div>`;
+ h+=chResetBar(id)+`<div class="toolbar center"><button class="btn green big" data-practice="${id}">✏️ Jetzt üben (${take(c)} Aufgaben)</button>${c.idx<CHAPTERS.length-1?`<button class="btn ghost" data-open="${CHAPTERS[c.idx+1].id}">Nächstes Kapitel →</button>`:`<button class="btn red" data-test="1">🏆 Zum Abschlusstest</button>`}</div>`;
  main.innerHTML=h;mountWidgets(main,c);
 }
 function chResetBar(id){const c=CHMAP[id],s=chapterStatus(c);
- return `<div class="chreset" id="chReset"><span class="legend">Dein Stand: <b>${s.solved}/${s.total} gelöst</b>${s.p.best?` · Bestwert ${s.p.best} %`:''}${s.done?' · ✓ Haken':''}</span><button class="btn ghost small" data-chreset="${id}">↺ Kapitel zurücksetzen</button></div>`;}
+ return `<div class="chreset" id="chReset"><span class="legend">Dein Stand: ${s.p.runs?`<b>Bestwert ${s.p.best} %</b> · ${s.p.runs}× geübt`:'<b>noch nicht geübt</b>'}${s.done?' · ✓ Haken':''}<br>Pro Durchgang ${s.n} Aufgaben – beim Wiederholen kommen neue aus ${s.pool} Übungen.</span><button class="btn ghost small" data-chreset="${id}">↺ Kapitel zurücksetzen</button></div>`;}
 
 /* ---------- Widgets in Lektionstexten ---------- */
 function mountWidgets(root,c){
@@ -146,7 +152,7 @@ function mountWidgets(root,c){
 }
 document.addEventListener('click',e=>{const t=e.target.closest('.tab');if(!t)return;const box=t.closest('.tabs');const i=+t.dataset.tab;
  $$('.tab',box).forEach((x,k)=>{x.classList.toggle('on',k===i);});[...box.children].filter(x=>x.classList.contains('tabpane')).forEach((p,k)=>p.hidden=k!==i);stopAudio();});
-function mountWriter(el,w,id){if(!w)return;const sk=KEY+'_w_'+id;let txt='';try{txt=localStorage.getItem(sk)||'';}catch(e){}
+function mountWriter(el,w,id){if(!w)return;const sk=WKEY+'_w_'+id;let txt='';try{txt=localStorage.getItem(sk)||'';}catch(e){}
  el.innerHTML=`<div class="wr-head">✍️ ${w.title}</div><p class="legend">${w.hint||''}</p>
  <div class="wr-frame"><div class="wr-ft">🧱 Schreibrahmen – tippe auf einen Baustein, dann wird er in deinen Text eingefügt:</div>${w.frame.map(([fr,de])=>`<button type="button" class="wr-b" data-ins="${esc(fr)}"><span class="fr">${fr}</span><small>${de}</small></button>`).join('')}</div>
  <textarea class="wr-ta" rows="9" autocapitalize="sentences" spellcheck="false" placeholder="Schreibe hier deinen Text auf Französisch …">${esc(txt)}</textarea>
@@ -171,16 +177,27 @@ function mountWriter(el,w,id){if(!w)return;const sk=KEY+'_w_'+id;let txt='';try{
 /* ---------- Übungs-Sitzung ---------- */
 let S=null;
 function practice(cfg){S={mode:cfg.mode,ch:cfg.ch||null,list:cfg.list,i:0,res:[]};renderEx();}
-function startChapter(id){const c=CHMAP[id];const l=[1,2,3].flatMap(lv=>shuffle(c.ex.filter(e=>e.lv===lv)));go('practice',{mode:'chapter',ch:id,list:c.keepOrder?c.ex.slice():l});}
-function startMix(){go('practice',{mode:'mix',list:shuffle(ALLEX.filter(e=>e.ch!=='test')).slice(0,12)});}
-function testSize(){return L.testN||18;}
+/* Auswahl pro Durchgang: Pflichtaufgaben + bevorzugt noch nicht gestellte Aufgaben, Aufgabentypen gemischt */
+const tkey=e=>e.au?'au':e.type;
+function pickFrom(pool,n,pre=[]){const sel=pre.slice();const rest=shuffle(pool.filter(e=>!sel.includes(e)));
+ while(sel.length<n&&rest.length){let best=0,bs=Infinity;rest.forEach((e,k)=>{const tc=sel.filter(x=>tkey(x)===tkey(e)).length;const sc=(P.asked[e.id]||0)*100+tc*3+Math.random()*2;if(sc<bs){bs=sc;best=k;}});sel.push(rest.splice(best,1)[0]);}
+ return sel;}
+function markAsked(list){list.forEach(e=>{P.asked[e.id]=(P.asked[e.id]||0)+1;});save();}
+function startChapter(id){const c=CHMAP[id];const n=take(c);const sel=pickFrom(c.ex,n,c.ex.filter(e=>e.must).slice(0,n));markAsked(sel);
+ const l=c.keepOrder?c.ex.filter(e=>sel.includes(e)):[1,2,3].flatMap(lv=>shuffle(sel.filter(e=>e.lv===lv)));go('practice',{mode:'chapter',ch:id,list:l});}
+function startMix(){go('practice',{mode:'mix',list:shuffle(ALLEX.filter(e=>e.ch!=='test')).slice(0,8)});}
+function testSize(){return H.TEST_N;}
 function startTest(){
- const n=testSize();const pick=TEST_EX.slice();
- CHAPTERS.forEach(c=>{const pool=c.ex.filter(e=>e.lv>=2&&!c.noTest);const e=shuffle(pool.length?pool:c.ex)[0];if(e&&!c.noTest&&pick.length<n)pick.push(e);});
- const rest=shuffle(ALLEX.filter(e=>e.lv>=2&&e.ch!=='test'&&!pick.includes(e)&&!(CHMAP[e.ch]||{}).noTest));
- for(const e of rest){if(pick.length>=n)break;pick.push(e);}
- go('practice',{mode:'test',list:shuffle(pick.slice(0,n))});}
-window.APPTEST={single:(id)=>go('practice',{mode:'single',list:[ALLEX.find(e=>e.id===id)]}),ALLEX,CHAPTERS,startTest,startChapter,state:()=>S,KEY};
+ const n=testSize();const least=arr=>arr.slice().sort((a,b)=>((P.asked[a.id]||0)-(P.asked[b.id]||0))||(Math.random()-.5))[0];
+ const pick=TEST_EX.filter(e=>e.must).slice(0,n);
+ const tx=shuffle(TEST_EX.filter(e=>!e.must)).sort((a,b)=>(P.asked[a.id]||0)-(P.asked[b.id]||0));
+ while(pick.length<Math.min(4,n)&&tx.length)pick.push(tx.shift());
+ const chs=shuffle(CHAPTERS.filter(c=>!c.noTest)).sort((a,b)=>(pick.some(e=>e.ref===a.id)?1:0)-(pick.some(e=>e.ref===b.id)?1:0));
+ for(const c of chs){if(pick.length>=n)break;const pool=c.ex.filter(e=>e.lv>=2&&!pick.includes(e));const p2=pool.length?pool:c.ex.filter(e=>!pick.includes(e));if(p2.length)pick.push(least(p2));}
+ while(pick.length<n&&tx.length)pick.push(tx.shift());
+ const rest=ALLEX.filter(e=>e.lv>=2&&!pick.includes(e)&&!(CHMAP[e.ch]||{}).noTest);while(pick.length<n&&rest.length)pick.push(rest.splice(Math.floor(Math.random()*rest.length),1)[0]);
+ markAsked(pick);go('practice',{mode:'test',list:shuffle(pick.slice(0,n))});}
+window.APPTEST={P:()=>P,take:id=>take(CHMAP[id]),single:(id)=>go('practice',{mode:'single',list:[ALLEX.find(e=>e.id===id)]}),ALLEX,CHAPTERS,startTest,startChapter,state:()=>S,KEY};
 
 let cur=null;
 function renderEx(){
@@ -354,7 +371,7 @@ function result(){
  ${badge}<div class="stars">${[0,1,2].map(i=>`<span class="s ${i<st?'on':''}" style="animation-delay:${i*.2}s">★</span>`).join('')}</div>
  <div class="score">${pts} / ${max} Punkte</div><div class="score-sub">${pct} % · ${title}</div>
  ${S.mode==='chapter'?`<div class="legend" style="margin-top:8px">${pct>=70?'✓ Kapitel geschafft! Der Haken ist gesetzt.':'Für den Haken brauchst du mindestens 70 %.'}</div>`:''}${S.mode==='test'?`<div class="legend" style="margin-top:8px">${res.length} Aufgaben · gezählt wird der erste Versuch</div>`:''}${rev}
- <div class="toolbar center">${S.mode==='test'?'<button class="btn red" data-test="1">↻ Neuer Test</button>':S.mode==='chapter'?`<button class="btn" data-practice="${S.ch}">↻ Noch einmal (neu gemischt)</button>${CHMAP[S.ch].idx<CHAPTERS.length-1?`<button class="btn green" data-open="${CHAPTERS[CHMAP[S.ch].idx+1].id}">Nächstes Kapitel →</button>`:'<button class="btn red" data-test="1">🏆 Abschlusstest</button>'}`:S.mode==='mix'?'<button class="btn" data-mix="1">↻ Neue Mischung</button>':''}<button class="btn ghost" data-home="1">Zur Übersicht</button></div>
+ <div class="toolbar center">${S.mode==='test'?'<button class="btn red" data-test="1">↻ Neuer Test</button>':S.mode==='chapter'?`<button class="btn" data-practice="${S.ch}">↻ Noch einmal (neue Aufgaben)</button>${CHMAP[S.ch].idx<CHAPTERS.length-1?`<button class="btn green" data-open="${CHAPTERS[CHMAP[S.ch].idx+1].id}">Nächstes Kapitel →</button>`:'<button class="btn red" data-test="1">🏆 Abschlusstest</button>'}`:S.mode==='mix'?'<button class="btn" data-mix="1">↻ Neue Mischung</button>':''}<button class="btn ghost" data-home="1">Zur Übersicht</button></div>
  ${S.mode==='test'?`<div class="chreset"><span class="legend" id="testBest">Test-Bestwert: <b>${P.test.best??0} %</b> · ${stars(P.test.stars)} · ${P.test.runs}× gemacht</span><button class="btn ghost small" data-testreset="1">🗑 Test-Bestwerte löschen</button></div>`:S.mode==='chapter'?`<div class="chreset"><span class="legend">Ganz von vorn beginnen?</span><button class="btn ghost small" data-chreset="${S.ch}">↺ Kapitel zurücksetzen</button></div>`:''}</div></div>`;
  if(st>=2&&S.mode!=='single')confetti();
 }
@@ -363,11 +380,11 @@ function result(){
 document.addEventListener('click',ev=>{const b=ev.target.closest('[data-open],[data-practice],[data-test],[data-home],[data-mix],[data-reset],[data-quit],[data-chreset],[data-testreset]');if(!b)return;
  if(b.dataset.open)go('lesson',b.dataset.open);else if(b.dataset.practice)startChapter(b.dataset.practice);else if(b.dataset.test)startTest();else if(b.dataset.home)go('home');else if(b.dataset.mix)startMix();
  else if(b.dataset.quit){if(S&&S.res.filter(Boolean).length&&S.mode!=='single'&&!confirm('Übung abbrechen? Dein Ergebnis wird nicht gespeichert.'))return;if(S&&S.mode==='chapter')go('lesson',S.ch);else go('home');}
- else if(b.dataset.reset){if(confirm('Willst du wirklich den ganzen Fortschritt dieser Lektion löschen? Alle Haken, gelösten Aufgaben, eigenen Texte und Test-Bestwerte werden gelöscht.')){P=blank();save();try{Object.keys(localStorage).filter(k=>k.startsWith(KEY+'_w_')).forEach(k=>localStorage.removeItem(k));}catch(e){}go('home');toast('Fortschritt zurückgesetzt.');}}
- else if(b.dataset.chreset){const id=b.dataset.chreset,c=CHMAP[id];if(!confirm(`Kapitel „${strip(c.title)}“ zurücksetzen?\nHaken, gelöste Aufgaben und Bestwert dieses Kapitels werden gelöscht.`))return;
+ else if(b.dataset.reset){if(confirm('Willst du wirklich den ganzen Fortschritt dieser Lektion löschen? Alle Haken, gelösten Aufgaben, eigenen Texte und Test-Bestwerte werden gelöscht.')){P=blank();save();try{Object.keys(localStorage).filter(k=>k.startsWith(WKEY+'_w_')).forEach(k=>localStorage.removeItem(k));}catch(e){}go('home');toast('Fortschritt zurückgesetzt.');}}
+ else if(b.dataset.chreset){const id=b.dataset.chreset,c=CHMAP[id];if(!confirm(`Kapitel „${strip(c.title)}“ zurücksetzen?\nHaken und Bestwert dieses Kapitels werden gelöscht. Beim nächsten Üben kommen bevorzugt Aufgaben, die du noch nicht hattest.`))return;
   const inLesson=!!b.closest('#chReset');delete P.ch[id];save();
   if(inLesson){chp(id).seen=true;save();$('#chReset').outerHTML=chResetBar(id);updateTop();}else startChapter(id);
-  toast('Kapitel zurückgesetzt – neu gemischt!');}
+  toast('Kapitel zurückgesetzt – neue Aufgaben!');}
  else if(b.dataset.testreset){if(confirm('Test-Bestwerte wirklich löschen?')){P.test=blank().test;save();const t=$('#testBest');if(t)t.innerHTML='Test-Bestwerte gelöscht.';b.disabled=true;toast('Test-Bestwerte gelöscht.');}}});
 const logo=$('#logo');if(logo)logo.onclick=()=>go('home');
 go('home');

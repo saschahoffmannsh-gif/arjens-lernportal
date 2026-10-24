@@ -196,3 +196,5 @@ window.TEST_EX=[
  det('Fehlerdetektiv: Finde die 4 Fehler.','Les élèves [écoutont|écoutent] Monsieur Martel. Tu [téléphonez|téléphones] à Léo? Nous [appellons|appelons] Samira. Vous [presentez|présentez] la classe.','écoutent · téléphones · appelons · présentez.',{ref:'fehler',tag:'Fehler finden'}),
  wr('Übersetze: „Ihr schaut die Fotos an.“',['Vous regardez les photos.'],'Vous regardez les photos.',{strict:true,ref:'schwer',tag:'Übersetzen'}),
 ];
+/* Pro Durchgang: so viele Aufgaben je Kapitel (Rest = Reserve-Pool); Pflichtaufgaben zu den Heftfehlern */
+H.setRun({entdecken:3,bauplan:3,heftverben:3,appeler:4,hoeren:3,leicht:5,mittel:5,schwer:5,fehler:4},{bauplan:[0],heftverben:[9],appeler:[0],fehler:[0,1,2],test:[2,4]});

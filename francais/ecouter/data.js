@@ -142,3 +142,5 @@ window.TEST_EX=[
  seg('Hör zu: Welchen Artikel hörst du?',['le','la','les','un','une'],[['Wort 1','les','les cahiers'],['Wort 2','une','une règle'],['Wort 3','le','le classeur'],['Wort 4','un','un stylo']],'les cahiers · une règle · le classeur · un stylo.',{ref:'hoergym',tag:'Genau hinhören',sub:'Tippe auf 🔊 und entscheide.'}),
  gapw('Hörtext «Samira»: Ergänze den Steckbrief.','Herkunft: {0}<br>Klasse: {1}',[['Berlin'],['sixième B','6e B','6B','6 B','sixieme B']],'Berlin · sixième B.',{au:T('samira'),say:false,ref:'vorstellung',tag:'Steckbrief'}),
 ];
+/* Pro Durchgang: so viele Aufgaben je Kapitel (Rest = Reserve-Pool); Pflichtaufgaben zu den Heftfehlern */
+H.setRun({strategien:3,hoergym:5,vorstellung:4,zimmer:4,pausenhof:4,diktat:4,probe:5},{vorstellung:[0],zimmer:[0],pausenhof:[0]});

@@ -190,3 +190,5 @@ window.TEST_EX=[
  tf('Hör dir die Szene an. Richtig oder falsch?',[['Noah et Karim sont en sixième A.',true],['Madame Fournier est le professeur de français.',false],['Monsieur Martel est dans la classe.',true]],'Madame Fournier ist <b>la surveillante</b> (die Aufsicht). Monsieur Martel ist in der Klasse.',{au:L2(D3),ref:'szenen',tag:'Hörverstehen'}),
  wr('Setze in den Plural: «Elle est nouvelle.»',['Elles sont nouvelles.'],'elle est → elles sont; nouvelle → nouvelles.',{ref:'schwer',tag:'Plural'}),
 ];
+/* Pro Durchgang: so viele Aufgaben je Kapitel (Rest = Reserve-Pool); Pflichtaufgaben zu den Heftfehlern */
+H.setRun({entdecken:3,formen:3,pronomen:3,szenen:3,leicht:5,mittel:5,schwer:5,fehler:4},{fehler:[0],test:[4]});
