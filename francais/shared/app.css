@@ -429,3 +429,50 @@ table.t th{background:#eff6ff;color:var(--navy);font-family:'FredokaApp',sans-se
 .ov-check label{display:flex;gap:10px;align-items:flex-start;flex:1;cursor:pointer}.ov-check input{width:24px;height:24px;flex:0 0 auto;accent-color:var(--green);margin-top:1px}.ov-check a{font-size:14px;white-space:nowrap;color:var(--blue);text-decoration:none;font-weight:700}
 .ov-plan table{width:100%;border-collapse:collapse}.ov-plan th{text-align:left;white-space:nowrap;padding:8px 12px 8px 0;color:var(--red);vertical-align:top;font-size:16px}.ov-plan td{padding:8px 0;border-top:1px solid var(--line)}.ov-plan tr:first-child td{border-top:0}.ov-plan a{color:var(--navy);font-weight:700;text-decoration:none}
 .runinfo{margin:-4px 0 12px}
+
+/* ---------- Erklär-Kästen ---------- */
+.intro{background:#fff;border:2px solid #dbe4f3;border-radius:18px;margin:14px 0 18px;box-shadow:0 2px 0 #e6ecf6;overflow:hidden}
+.intro>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:13px 16px;background:linear-gradient(90deg,#eef4ff,#fff);font-weight:800;font-size:1.06rem;color:#1e3a8a}
+.intro>summary::-webkit-details-marker{display:none}
+.intro .in-ic{font-size:1.3rem}.intro .in-tg{margin-left:auto;width:12px;height:12px;border-right:3px solid #1e3a8a;border-bottom:3px solid #1e3a8a;transform:rotate(45deg);transition:transform .2s}
+.intro[open] .in-tg{transform:rotate(-135deg)}
+.intro-body{padding:4px 16px 16px;line-height:1.55}
+.in-p{margin:10px 0}
+.bx-h{font-weight:800;margin-bottom:6px}
+.rulebox,.bspbox,.fallbox,.checkbox{border-radius:14px;padding:12px 14px;margin:12px 0}
+.rulebox{background:#eff6ff;border-left:6px solid #2563eb}
+.rulebox ol,.checkbox ol,.fallbox ul{margin:0;padding-left:1.3em}.rulebox li,.checkbox li,.fallbox li{margin:4px 0}
+.rulebox table{margin-top:8px}
+.bspbox{background:#f8fafc;border:1px solid #e2e8f0}
+.bsptab{width:100%;border-collapse:collapse}
+.bsptab td{padding:7px 6px;border-top:1px solid #e2e8f0;vertical-align:middle}
+.bsptab tr:first-child td{border-top:0}
+.bsptab .bf{font-weight:700;color:#0f2a5c}.bsptab .bf .spk{margin-left:6px}
+.bsptab .bd{color:#475569;font-size:.95rem}
+.merkbox{display:flex;gap:10px;align-items:flex-start;background:#fef9c3;border:2px dashed #eab308;border-radius:14px;padding:12px 14px;margin:12px 0;font-size:1.04rem}
+.merkbox .mb-ic{font-size:1.4rem}
+.fallbox{background:#fef2f2;border-left:6px solid #dc2626}
+.checkbox{background:#f0fdf4;border-left:6px solid #16a34a}
+.lb-h{font-weight:800;color:#475569;margin:6px 0 4px;font-size:.95rem;text-transform:uppercase;letter-spacing:.04em}
+@media (max-width:520px){.bsptab td{display:block;border-top:0;padding:2px 4px}.bsptab tr{display:block;border-top:1px solid #e2e8f0;padding:6px 0}.bsptab tr:first-child{border-top:0}.intro-body{padding:2px 12px 12px}}
+
+/* ---------- Fehler-Erklärung ---------- */
+.fb .you{margin:6px 0;color:#334155}
+.fb .lbl{font-weight:800;color:#334155}
+.fb .gw{background:#fee2e2;color:#b91c1c;text-decoration:line-through;border-radius:4px;padding:0 3px}
+.fb .cmps{margin:8px 0;display:flex;flex-direction:column;gap:6px}
+.fb .cmp{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;background:#fff;border-radius:10px;padding:6px 10px;border:1px solid #fecaca;font-size:1.04rem}
+.fb .cmp-w{color:#b91c1c}.fb .cmp-w s{text-decoration-thickness:2px}
+.fb .cmp-a{color:#64748b;font-weight:800}
+.fb .cmp-r{color:#166534;font-weight:700}
+.fb mark{background:#bbf7d0;color:#14532d;border-radius:4px;padding:0 2px;font-weight:800}
+.fb .whybox{background:#fff;border:2px solid #fca5a5;border-radius:12px;padding:10px 12px;margin:8px 0;line-height:1.5}
+.fb .whybox .wb-h{font-weight:800;margin-bottom:4px;color:#7f1d1d}
+.fb .whybox ul{margin:0;padding-left:1.2em}.fb .whybox li{margin:3px 0}.fb .whybox p{margin:4px 0}
+.fb .whybox .fr{font-weight:700}
+.fb .merkline{background:#fef9c3;border:2px dashed #eab308;border-radius:10px;padding:8px 12px;margin:8px 0;color:#422006}
+.fb .okwhy{margin-top:6px}
+.rulebox .cj{border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden;min-width:min(100%,340px)}
+.rulebox .cj td{padding:6px 10px;border-top:1px solid #dbeafe}.rulebox .cj tr:first-child td{border-top:0}
+.rulebox .cj td:first-child{font-weight:600;color:#0f2a5c}.rulebox .cj td:last-child{color:#475569}
+.rulebox .cj b{color:#c8102e}

@@ -3,7 +3,7 @@
 'use strict';
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const L=window.LESSON, CHAPTERS=window.CHAPTERS, TRACKS=window.TRACKS||{}, WRITERS=window.WRITERS||{}, TEST_EX=window.TEST_EX||[];
-const {esc,strip,ttsText,akey,H}=window;
+const {esc,strip,ttsText,akey,H,diagnose,hlDiff,DN}=window;
 const main=$('#main');
 const KEY='fr_lekt_'+L.slug+'_v2', OLDKEY='fr_lekt_'+L.slug+'_v1', WKEY=OLDKEY; // WKEY: eigene Texte bleiben unter dem alten Schlüssel
 let P=load();
@@ -106,6 +106,17 @@ window.addEventListener('popstate',ev=>{const st=ev.state;if(!st||st.view==='hom
 window.APPGO=(v,a)=>go(v,a);
 
 function nextChapter(){const c=CHAPTERS.find(c=>!chapterStatus(c).done);return c||null;}
+
+/* ---------- Erklär-Kasten (Anfang der Lektion / des Kapitels) ---------- */
+function introBox(x,lesson){if(!x)return '';
+ const F=(t,w)=>`<span class="fr">${t}</span>${spk(strip(t),w||'')}`;
+ const body=`${x.was?`<p class="in-p"><b>Worum geht’s?</b> ${x.was}</p>`:''}${x.warum?`<p class="in-p"><b>Wozu brauchst du das?</b> ${x.warum}</p>`:''}
+ ${x.schritte&&x.schritte.length?`<div class="rulebox"><div class="bx-h">📏 Die Regel – Schritt für Schritt</div><ol>${x.schritte.map(t=>`<li>${t}</li>`).join('')}</ol>${x.tab||''}</div>`:''}
+ ${x.bsp&&x.bsp.length?`<div class="bspbox"><div class="bx-h">🔎 Beispiele <span class="legend">– tippe auf 🔊 und sprich nach</span></div><table class="bsptab"><tbody>${x.bsp.map(b=>`<tr><td class="bf">${F(b[0],b[2])}</td><td class="bd">${b[1]}</td></tr>`).join('')}</tbody></table></div>`:''}
+ ${x.merk?`<div class="merkbox"><span class="mb-ic">📌</span><div><b>Merksatz</b><br>${x.merk}</div></div>`:''}
+ ${x.fallen&&x.fallen.length?`<div class="fallbox"><div class="bx-h">⚠️ Achtung, Falle!</div><ul>${x.fallen.map(t=>`<li>${t}</li>`).join('')}</ul></div>`:''}
+ ${x.check&&x.check.length?`<div class="checkbox"><div class="bx-h">✅ So gehst du vor</div><ol>${x.check.map(t=>`<li>${t}</li>`).join('')}</ol></div>`:''}`;
+ return `<details class="intro${lesson?' lesson-intro':''}" open><summary><span class="in-ic">📖</span><span>${lesson?'Erklärung: ':'Erklärung: '}${x.t||''}</span><span class="in-tg" aria-hidden="true"></span></summary><div class="intro-body">${body}</div></details>`;}
 function home(){
  const o=overall(),nc=nextChapter(),RI=H.runInfo();
  let h=`<section class="lhero" style="--c:${L.color}"><div class="lh-txt"><div class="kicker"><span class="flag"><i></i><i></i><i></i></span>Französisch · Klassenarbeit 30.10.</div>
@@ -113,6 +124,7 @@ function home(){
  <div class="lh-btns">${nc?`<button class="btn big" data-open="${nc.id}">▶ ${o.d?'Weiter mit Kapitel '+(nc.idx+1):'Los geht’s: Kapitel 1'}</button>`:`<button class="btn big red" data-test="1">🏆 Abschlusstest</button>`}</div></div>
  <div class="lh-art">${window.HERO[L.slug]||''}</div></section>
  <div class="soundtip"><span class="st-ic">🔊</span><div><b>Mit Ton lernen:</b> Tippe auf einen Lautsprecher, dann hörst du den Satz (nochmal tippen = Stopp). <b>Kein Ton auf dem iPhone?</b> Stummschalter an der Seite aus und lauter stellen.</div></div>
+ ${introBox(L.explain,true)}
  <div class="section-title"><div class="bar"></div><h2>Deine Kapitel</h2><span class="sct-n">${o.d}/${o.t} geschafft</span></div><p class="legend runinfo">📏 Ein Durchgang: <b>≈ ${RI.n} Aufgaben · ca. ${RI.min} Min.</b> (${RI.n-H.TEST_N} in den Kapiteln + ${H.TEST_N} im Abschlusstest) – am besten auf 2 kurze Lernzeiten à 15–20 Min. verteilen.</p><ol class="path">`;
  CHAPTERS.forEach((c,i)=>{const s=chapterStatus(c);const pct=s.p.best||0;
   if(c.block)h+=`<li class="pblock" style="--c:${c.c}"><span>${c.block}</span></li>`;
@@ -134,7 +146,7 @@ function lesson(id){
  const c=CHMAP[id];const p=chp(id);p.seen=true;save();
  let h=`<div class="crumb"><button class="btn ghost small" data-home="1">← Übersicht</button><span class="crumb-n">Kapitel ${c.idx+1} von ${CHAPTERS.length}</span></div>
  <header class="chead" style="--c:${c.c}"><span class="cic">${c.icon||'📘'}</span><div><div class="ck">${c.kind||'Kapitel '+(c.idx+1)}</div><h1>${c.title}</h1>${c.sub?`<div class="cs">${c.sub}</div>`:''}</div></header>
- <div class="lesson-body">${c.html||''}</div>`;
+ ${introBox(c.intro)}${c.intro&&c.html?'<div class="lb-h">📚 Material zum Kapitel</div>':''}<div class="lesson-body">${c.html||''}</div>`;
  h+=chResetBar(id)+`<div class="toolbar center"><button class="btn green big" data-practice="${id}">✏️ Jetzt üben (${take(c)} Aufgaben)</button>${c.idx<CHAPTERS.length-1?`<button class="btn ghost" data-open="${CHAPTERS[c.idx+1].id}">Nächstes Kapitel →</button>`:`<button class="btn red" data-test="1">🏆 Zum Abschlusstest</button>`}</div>`;
  main.innerHTML=h;mountWidgets(main,c);
 }
@@ -233,12 +245,34 @@ function feedback(e,r,a){
  if(first)S.res[S.i]={e,ok:r.ok,pts:r.pts,max:r.max};
  if(r.ok&&S.mode!=='single'&&e.ch!=='test'){const p=chp(e.ch);p.solved[e.id]=1;save();}
  fb.className='fb show '+(r.ok?'ok':'bad');
- const say=r.say&&r.say.length?r.say:null;
- fb.innerHTML=`<div class="ico">${r.ok?'✓':'✗'}</div><div class="fb-in"><div class="ttl">${r.ok?PRAISE[Math.floor(Math.random()*PRAISE.length)]:r.pts>0?`Teilweise richtig (${r.pts} von ${r.max})`:'Leider nicht richtig.'}</div>
- ${r.ok&&!r.showSol?'':`<div class="sol">${r.ok?'Lösung':'Richtig ist'}: <span class="fr">${r.sol}</span> ${say?spk(say.map(x=>x[1]),say.map(x=>x[0]),'mini','Lösung anhören'):''}</div>`}
- ${r.ok&&say&&!r.showSol?`<div class="sol-say">${spk(say.map(x=>x[1]),say.map(x=>x[0]),'mini','Anhören')} <span class="legend">Zum Nachsprechen anhören</span></div>`:''}
- ${r.acc?`<div class="warnacc">✍️ ${e.strict?'Hier zählen die Akzente mit! Richtig geschrieben':'Fast perfekt! Achte auf die <b>Akzente</b>'}: <span class="fr">${esc(r.acc)}</span> – in der Klassenarbeit ist ein fehlender Akzent ein Fehler.</div>`:''}
- <div class="why">💡 ${e.why}</div>${a?`<details class="trans"><summary>📄 Transkript anzeigen</summary>${transcript(a)}</details>`:''}</div>`;
+ const say=r.say&&r.say.length?r.say:null;const c=CHMAP[e.ref]||CHMAP[e.ch]||{};
+ // Diagnose typischer Fehler
+ const close=(a,b)=>{a=DN(a);b=DN(b);let p=0;while(p<a.length&&p<b.length&&a[p]===b[p])p++;let q=0;while(q<a.length-p&&q<b.length-p&&a[a.length-1-q]===b[b.length-1-q])q++;return p+q>=Math.min(3,Math.min(a.length,b.length));};
+ const allP=(r.pairs||[]).filter(p=>p&&p[0]!=null&&p[1]!=null&&DN(p[0])!==DN(p[1]));
+ const dg=[];allP.forEach(p=>dg.push(...diagnose(p[0],p[1],p[2]||'')));
+ const pairs=allP.filter(p=>!/^(vrai|faux)$/.test(p[0])&&(close(p[0],p[1])||diagnose(p[0],p[1],p[2]||'').length));
+ const seen=new Set();const D=dg.filter(x=>!seen.has(x.t)&&seen.add(x.t)).slice(0,3);
+ const why=e.why||'';const sw=DN(strip(r.sol||''));const dw=DN(why);const quote=/^\s*«/.test(strip(why));const weak=!quote&&strip(why).length<45||!quote&&(sw.length>8&&(dw===sw||dw.startsWith(sw.slice(0,Math.min(40,sw.length)))&&dw.length<sw.length+25));
+ const ovl=(x,y)=>{const A=new Set(DN(x).split(' ').filter(w=>w.length>2)),B=DN(y).split(' ').filter(w=>w.length>2);if(!B.length)return 1;return B.filter(w=>A.has(w)).length/B.length;};const dtxt=D.map(x=>x.t).join(' ');const showWhy=why&&!(D.length&&(weak||ovl(dtxt,why)>0.5));
+ const merk=(D[0]&&D[0].m)||e.merk||c.merk||L.merk||'';
+ const cmp=r.detect?'':pairs.slice(0,4).map(p=>`<div class="cmp"><span class="cmp-w" aria-label="deine Antwort">✗ <s>${esc(p[0])}</s></span><span class="cmp-a">→</span><span class="cmp-r" aria-label="richtig">✓ ${hlDiff(p[0],p[1])}</span></div>`).join('');
+ const dcmp=r.detect?pairs.map(p=>`<div class="cmp"><span class="cmp-w">✗ <s>${esc(p[0])}</s></span><span class="cmp-a">→</span><span class="cmp-r">✓ ${hlDiff(p[0],p[1])}</span></div>`).join(''):'';
+ const onOK=r.ok&&/\bon (est|parle|regarde|écoute|téléphone|présente|appelle)\b/i.test(strip(r.sol||'')+' '+strip(why))&&!/on\b.*wie il/i.test(strip(why));
+ let h=`<div class="ico">${r.ok?'✓':'✗'}</div><div class="fb-in"><div class="ttl">${r.ok?PRAISE[Math.floor(Math.random()*PRAISE.length)]:r.pts>0?`Teilweise richtig (${r.pts} von ${r.max})`:'Leider nicht richtig.'}</div>`;
+ if(!r.ok){
+  if(r.given&&(!pairs.length||r.detect||['gap','gapw','dialog','seg'].includes(e.type)))h+=`<div class="you"><span class="lbl">Deine Antwort:</span> ${r.given||'–'}</div>`;
+  if(cmp||dcmp)h+=`<div class="cmps">${cmp||dcmp}</div>`;
+  h+=`<div class="sol"><span class="lbl">Richtig ist:</span> <span class="fr">${r.sol}</span> ${say?spk(say.map(x=>x[1]),say.map(x=>x[0]),'mini','Lösung anhören'):''}</div>`;
+  h+=`<div class="whybox"><div class="wb-h">🤔 Warum?</div>${D.length?`<ul>${D.map(x=>`<li>${x.t}</li>`).join('')}</ul>`:''}${showWhy?`<p>${quote?'Im Text heißt es: ':''}${why}</p>`:''}${!D.length&&weak&&(c.rule||L.merk)?`<p><b>Regel:</b> ${c.rule||L.merk}</p>`:''}${r.orderHint?'<p class="legend">Tipp: Im Französischen steht meist <b>wer</b> (Subjekt) → <b>Verb</b> → <b>Rest</b> – wie im Deutschen.</p>':''}</div>`;
+  if(merk)h+=`<div class="merkline">📌 <b>Merksatz:</b> ${merk}</div>`;
+ }else{
+  if(r.showSol)h+=`<div class="sol">Lösung: <span class="fr">${r.sol}</span> ${say?spk(say.map(x=>x[1]),say.map(x=>x[0]),'mini','Lösung anhören'):''}</div>`;
+  else if(say)h+=`<div class="sol-say">${spk(say.map(x=>x[1]),say.map(x=>x[0]),'mini','Anhören')} <span class="legend">Zum Nachsprechen anhören</span></div>`;
+  h+=`<div class="why okwhy">👍 <b>Richtig, weil:</b> ${why||c.rule||''}${onOK?' <br><span class="legend">Denk dran: <b>on</b> heißt oft „wir“, hat aber die Form von il / elle → <b>on est</b>, on parl<b>e</b>.</span>':''}</div>`;
+ }
+ if(r.acc)h+=`<div class="warnacc">✍️ ${e.strict?'Hier zählen die Akzente mit! Richtig geschrieben':'Fast perfekt! Achte auf die <b>Akzente</b>'}: <span class="fr">${esc(r.acc)}</span> – in der Klassenarbeit ist ein fehlender Akzent ein Fehler.</div>`;
+ h+=`${a?`<details class="trans"><summary>📄 Transkript anzeigen</summary>${transcript(a)}</details>`:''}</div>`;
+ fb.innerHTML=h;
 }
 function next(){S.i++;if(S.i>=S.list.length){go('result');}else renderEx();}
 
@@ -250,20 +284,22 @@ RENDER.mc=(e,el)=>{
  el.innerHTML=(e.img?`<div class="ex-img">${e.img}</div>`:'')+(e.prompt?`<div class="prompt"><span class="fr">${e.prompt}</span>${e.promptSay===false?'':spk(e.prompt,e.promptWho||'')}</div>`:'')+`<div class="opts${e.o.every(o=>strip(o).length<14)?' short':''}">`+opts.map((o,k)=>`<button class="opt" data-k="${k}">${o.t}</button>`).join('')+'</div>';
  $$('.opt',el).forEach(b=>b.onclick=()=>{if(b.disabled)return;$$('.opt',el).forEach(x=>x.classList.remove('sel'));b.classList.add('sel');sel=opts[+b.dataset.k].i;ready(true);});
  return {check(){if(sel==null)return null;const ok=sel===0;$$('.opt',el).forEach(b=>{b.disabled=true;const i=opts[+b.dataset.k].i;if(i===0)b.classList.add('ok');else if(i===sel)b.classList.add('bad');});
-  return {ok,pts:ok?1:0,max:1,sol:e.o[0],say:sayOf(e,e.fr?strip(e.o[0]):null)};}};};
+  return {ok,pts:ok?1:0,max:1,sol:e.o[0],given:e.o[sel],pairs:ok?[]:[[strip(e.o[sel]),strip(e.o[0]),e.prompt||'']],say:sayOf(e,e.fr?strip(e.o[0]):null)};}};};
 RENDER.pick=(e,el)=>{
  const opts=shuffle(e.cards.map((c,i)=>({c,i})));let sel=null;
  el.innerHTML=`<div class="cards">`+opts.map((o,k)=>`<button class="pcard" data-k="${k}" aria-label="Bild ${k+1}">${o.c[0]}${e.labels?`<span class="pl">${o.c[1]}</span>`:''}</button>`).join('')+'</div>';
  $$('.pcard',el).forEach(b=>b.onclick=()=>{if(b.disabled)return;$$('.pcard',el).forEach(x=>x.classList.remove('sel'));b.classList.add('sel');sel=opts[+b.dataset.k].i;ready(true);});
  return {check(){if(sel==null)return null;const ok=sel===0;$$('.pcard',el).forEach(b=>{b.disabled=true;const i=opts[+b.dataset.k].i;if(!e.labels)b.insertAdjacentHTML('beforeend',`<span class="pl">${e.cards[i][1]}</span>`);if(i===0)b.classList.add('ok');else if(i===sel)b.classList.add('bad');});
-  return {ok,pts:ok?1:0,max:1,sol:e.cards[0][1],say:sayOf(e,strip(e.cards[0][1]))};}};};
+  return {ok,pts:ok?1:0,max:1,sol:e.cards[0][1],given:e.cards[sel][1],pairs:ok?[]:[[strip(e.cards[sel][1]).split(' – ')[0],strip(e.cards[0][1]).split(' – ')[0]]],say:sayOf(e,strip(e.cards[0][1]))};}};};
 function gapSelects(e,text){return text.replace(/\{(\d+)\}/g,(m,k)=>{const g=e.gaps[+k];const o=shuffle(g);return `<select class="gapsel" data-g="${k}" aria-label="Lücke ${+k+1}"><option value="">…</option>${o.map(x=>`<option value="${esc(x)}">${x}</option>`).join('')}</select>`;});}
 function gapCheck(e,el){const ss=$$('select.gapsel',el);if(ss.some(s=>!s.value))return null;let n=0;
- ss.forEach(s=>{const right=s.value===e.gaps[+s.dataset.g][0];s.classList.add(right?'ok':'bad');if(right)n++;s.disabled=true;});return {n,max:ss.length};}
+ const pairs=[],vals={};ss.forEach(s=>{const c=e.gaps[+s.dataset.g][0];const right=s.value===c;vals[s.dataset.g]=[s.value,right];s.classList.add(right?'ok':'bad');if(right)n++;else pairs.push([s.value,c,gapCtx(s)]);s.disabled=true;});return {n,max:ss.length,pairs,vals};}
+function gapCtx(s){let t='';let n=s.previousSibling;while(n&&t.length<40){t=(n.tagName==='SELECT'||n.tagName==='INPUT'?' '+n.value+' ':(n.textContent||''))+t;n=n.previousSibling;}return t;}
+const givenFill=(t,vals)=>t.replace(/\{(\d+)\}/g,(m,k)=>{const v=vals[k];if(!v)return '…';return v[1]?esc(v[0]):`<span class="gw">${esc(v[0])}</span>`;});
 function bindGaps(el){$$('select.gapsel',el).forEach(s=>s.onchange=()=>ready($$('select.gapsel',el).every(x=>x.value)));}
 const fill=(e,t,u=true)=>t.replace(/\{(\d+)\}/g,(m,k)=>u?'<u>'+e.gaps[+k][0]+'</u>':e.gaps[+k][0]);
 RENDER.gap=(e,el)=>{el.innerHTML=`<div class="ex-sub">${e.sub||'Wähle in jeder Lücke das passende Wort.'}</div><div class="gaptext${e.table?' tbl':''}">${gapSelects(e,e.text)}</div>`;bindGaps(el);
- return {check(){const r=gapCheck(e,el);if(r==null)return null;return {ok:r.n===r.max,pts:r.n,max:r.max,sol:fill(e,e.text),say:sayOf(e,e.table?null:strip(fill(e,e.text,false)))};}};};
+ return {check(){const r=gapCheck(e,el);if(r==null)return null;return {ok:r.n===r.max,pts:r.n,max:r.max,sol:fill(e,e.text),pairs:r.pairs,given:givenFill(e.text,r.vals),say:sayOf(e,e.table?null:strip(fill(e,e.text,false)))};}};};
 RENDER.gapw=(e,el)=>{
  el.innerHTML=`<div class="ex-sub">${e.sub||'Schreibe die fehlenden Wörter in die Lücken.'}</div><div class="gaptext">${e.text.replace(/\{(\d+)\}/g,(m,k)=>{const len=Math.max(...[].concat(e.ans[+k]).map(x=>x.length));return `<input class="gapin" data-g="${k}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Lücke ${+k+1}" style="width:${Math.max(3.2,len*0.72+1.4)}em">`;})}</div>
  <div class="acc">${['é','è','ê','à','ç','’'].map(c=>`<button type="button" data-c="${c}">${c}</button>`).join('')}</div>`;
@@ -273,11 +309,12 @@ RENDER.gapw=(e,el)=>{
  $$('.acc button',el).forEach(b=>b.onclick=()=>{const i=lastI;const s=i.selectionStart??i.value.length,t=i.selectionEnd??s;i.value=i.value.slice(0,s)+b.dataset.c+i.value.slice(t);i.focus();i.setSelectionRange(s+1,s+1);upd();});
  const solT=e.text.replace(/\{(\d+)\}/g,(m,k)=>'<u>'+[].concat(e.ans[+k])[0]+'</u>');
  return {check(){if(!ins.every(i=>i.value.trim()))return null;let n=0;const accs=[];
-  ins.forEach(i=>{const r=compare(i.value,[].concat(e.ans[+i.dataset.g]));if(r.acc&&e.strict)r.ok=false;i.classList.add(r.ok?'ok':'bad');if(r.ok)n++;if(r.acc)accs.push(r.acc);i.disabled=true;});$$('.acc button',el).forEach(b=>b.disabled=true);
-  return {ok:n===ins.length,pts:n,max:ins.length,acc:accs.join(' · '),sol:solT,showSol:accs.length>0,say:sayOf(e,strip(solT))};}};};
+  const pairs=[],vals={};ins.forEach(i=>{const A=[].concat(e.ans[+i.dataset.g]);const r=compare(i.value,A);if(r.acc&&e.strict)r.ok=false;vals[i.dataset.g]=[i.value,r.ok];i.classList.add(r.ok?'ok':'bad');if(r.ok)n++;else pairs.push([i.value,r.acc||A[0],gapCtx(i)]);if(r.acc)accs.push(r.acc);i.disabled=true;});$$('.acc button',el).forEach(b=>b.disabled=true);
+  return {ok:n===ins.length,pts:n,max:ins.length,acc:accs.join(' · '),sol:solT,pairs,given:givenFill(e.text,vals),showSol:accs.length>0,say:sayOf(e,strip(solT))};}};};
 RENDER.dialog=(e,el)=>{let side={},n=0;
  el.innerHTML=`<div class="ex-sub">Wähle in jeder Lücke das passende Wort.</div><div class="dlg">`+e.lines.map(([w,t])=>{if(!(w in side))side[w]=n++%2;return `<div class="row ${side[w]?'r':''}"><div class="av">${window.CHARS[w]||''}<span>${window.NAMES[w]||w}</span></div><div class="bub"><span class="tx">${gapSelects(e,t)}</span></div></div>`;}).join('')+'</div>';bindGaps(el);
- return {check(){const r=gapCheck(e,el);if(r==null)return null;return {ok:r.n===r.max,pts:r.n,max:r.max,sol:e.lines.map(([w,t])=>`${window.NAMES[w]||w}: `+fill(e,t)).join('<br>'),say:e.lines.map(([w,t])=>[w,strip(fill(e,t,false))])};}};};
+ return {check(){const r=gapCheck(e,el);if(r==null)return null;return {ok:r.n===r.max,pts:r.n,max:r.max,pairs:r.pairs,given:e.lines.map(([w,t])=>`${window.NAMES[w]||w}: `+givenFill(t,r.vals)).join('<br>'),sol:e.lines.map(([w,t])=>`${window.NAMES[w]||w}: `+fill(e,t)).join('<br>'),say:e.lines.map(([w,t])=>[w,strip(fill(e,t,false))])};}};};
+function closest(v,ans){const n=x=>DN(x).split(' ');const a=n(v);let best=ans[0],bs=-1;ans.forEach(x=>{const b=n(x);let sc=0;b.forEach((t,i)=>{if(a[i]===t)sc+=i===0?3:2;else if(a.includes(t))sc+=1;});sc-=Math.abs(a.length-b.length);if(sc>bs){bs=sc;best=x;}});return best;}
 const joinTok=a=>a.join(' ').replace(/\s+([?.!,])/g,'$1').replace(/’ /g,'’');
 RENDER.order=(e,el)=>{
  let toks=e.tok.map((t,i)=>({t,i}));let sh;do{sh=shuffle(toks);}while(toks.length>2&&sh.every((x,k)=>x.i===k));
@@ -287,7 +324,7 @@ RENDER.order=(e,el)=>{
  const upd=()=>{zone.classList.toggle('empty',!zone.children.length);ready(pool.children.length===0);};
  el.addEventListener('click',ev=>{const b=ev.target.closest('.tok');if(!b||b.disabled)return;(b.parentElement===pool?zone:pool).appendChild(b);upd();});
  return {check(){if(pool.children.length)return null;const got=$$('.tok',zone).map(b=>b.textContent);$$('.tok',el).forEach(b=>{b.disabled=true;});
-  const r=compare(joinTok(got),[joinTok(e.tok),...e.alts]);zone.classList.add(r.ok?'ok':'bad');return {ok:r.ok,pts:r.ok?1:0,max:1,sol:joinTok(e.tok),say:sayOf(e,joinTok(e.tok))};}};};
+  const r=compare(joinTok(got),[joinTok(e.tok),...e.alts]);zone.classList.add(r.ok?'ok':'bad');return {ok:r.ok,pts:r.ok?1:0,max:1,sol:joinTok(e.tok),given:esc(joinTok(got)),orderHint:!r.ok,say:sayOf(e,joinTok(e.tok))};}};};
 RENDER.write=(e,el)=>{
  el.innerHTML=(e.img?`<div class="ex-img">${e.img}</div>`:'')+(e.prompt?`<div class="prompt">${e.prompt}</div>`:'')+`<input class="inp" id="inp" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="${e.ph||'Schreibe hier auf Französisch …'}" aria-label="Antwort">
  <div class="acc">${['é','è','ê','à','ç','’'].map(c=>`<button type="button" data-c="${c}">${c}</button>`).join('')}</div>
@@ -296,7 +333,7 @@ RENDER.write=(e,el)=>{
  inp.addEventListener('keydown',ev=>{if(ev.key==='Enter'&&inp.value.trim().length>0)$('#checkBtn').click();});
  $$('.acc button',el).forEach(b=>b.onclick=()=>{const s=inp.selectionStart??inp.value.length,t=inp.selectionEnd??s;inp.value=inp.value.slice(0,s)+b.dataset.c+inp.value.slice(t);inp.focus();inp.setSelectionRange(s+1,s+1);ready(inp.value.trim().length>0);});
  return {check(){if(!inp.value.trim())return null;const r=compare(inp.value,e.ans);if(r.acc&&e.strict)r.ok=false;inp.classList.add(r.ok?'ok':'bad');inp.disabled=true;$$('.acc button',el).forEach(b=>b.disabled=true);
-  return {ok:r.ok,pts:r.ok?1:0,max:1,acc:r.acc,sol:e.ans[0],showSol:!!r.acc,say:sayOf(e,strip(e.ans[0]))};}};};
+  const best=r.acc||closest(inp.value,e.ans);return {ok:r.ok,pts:r.ok?1:0,max:1,acc:r.acc,sol:r.ok?e.ans[0]:best,showSol:!!r.acc,given:esc(inp.value),pairs:r.ok?[]:[[inp.value,best,e.prompt||'']],say:sayOf(e,strip(r.ok?e.ans[0]:best))};}};};
 const PCOL=['#2563eb','#c8102e','#16a34a','#d97706','#7c3aed','#0891b2'];
 RENDER.match=(e,el)=>{
  const Ls=shuffle(e.pairs.map((p,i)=>({t:p[0],i}))),Rs=shuffle(e.pairs.map((p,i)=>({t:p[1],i})));
@@ -311,7 +348,7 @@ RENDER.match=(e,el)=>{
   else{const owner=Object.keys(pairs).find(k=>pairs[k]===i);if(owner!=null){delete pairs[owner];}else if(selL!=null){pairs[selL]=i;selL=null;}else{toast('Tippe zuerst links etwas an.');}}
   paint();});
  return {check(){if(Object.keys(pairs).length<e.pairs.length)return null;let n=0;Object.entries(pairs).forEach(([l,r])=>{const g=l===r;if(g)n++;[$(`.mi[data-side="L"][data-i="${l}"]`,el),$(`.mi[data-side="R"][data-i="${r}"]`,el)].forEach(b=>b.classList.add(g?'ok':'bad'));});
-  $$('.mi',el).forEach(b=>b.disabled=true);return {ok:n===e.pairs.length,pts:n,max:e.pairs.length,sol:e.pairs.map(p=>`${p[0]} → ${p[1]}`).join('<br>'),say:sayOf(e,null)};}};};
+  $$('.mi',el).forEach(b=>b.disabled=true);const wrongP=Object.entries(pairs).filter(([l,r])=>l!==r).map(([l,r])=>`${e.pairs[l][0]} → <span class="gw">${e.pairs[r][1]}</span>`);return {ok:n===e.pairs.length,pts:n,max:e.pairs.length,given:wrongP.join('<br>'),sol:e.pairs.map(p=>`${p[0]} → ${p[1]}`).join('<br>'),say:sayOf(e,null)};}};};
 function roomSel(el,e,multi){const R=window.ROOMS[e.room];
  el.innerHTML=`<div class="ex-sub">${multi?'Tippe im Bild alles an, was passt. Nochmal tippen hebt die Markierung auf.':'Tippe im Bild auf den richtigen Gegenstand.'}</div><div class="roomwrap">${R.svg}</div>`;
  const sel=new Set();
@@ -321,26 +358,27 @@ function roomSel(el,e,multi){const R=window.ROOMS[e.room];
  return {R,sel};}
 RENDER.click=(e,el)=>{const {R,sel}=roomSel(el,e,false);
  return {check(){if(!sel.size)return null;const s=[...sel][0];$$('.ri',el).forEach(g=>{g.dataset.lock=1;g.classList.remove('sel');if(g.dataset.item===e.target)g.classList.add('ok');else if(g.dataset.item===s)g.classList.add('bad');});
-  const ok=s===e.target;return {ok,pts:ok?1:0,max:1,sol:R.labels[e.target]+(ok?'':` <span class="soft">(du hast ${R.labels[s]} angetippt)</span>`),say:sayOf(e,strip(R.labels[e.target]))};}};};
+  const ok=s===e.target;return {ok,pts:ok?1:0,max:1,given:R.labels[s],sol:R.labels[e.target],say:sayOf(e,strip(R.labels[e.target]))};}};};
 RENDER.mark=(e,el)=>{const {R,sel}=roomSel(el,e,true);const T=new Set(e.targets);
  return {check(){if(!sel.size)return null;let hit=0,fp=0;$$('.ri',el).forEach(g=>{g.dataset.lock=1;const k=g.dataset.item;g.classList.remove('sel');
   if(T.has(k)&&sel.has(k)){g.classList.add('ok');hit++;}else if(!T.has(k)&&sel.has(k)){g.classList.add('bad');fp++;}else if(T.has(k))g.classList.add('miss');});
-  const pts=Math.max(0,hit-fp);return {ok:hit===T.size&&fp===0,pts,max:T.size,sol:e.targets.map(k=>R.labels[k]).join(', '),say:sayOf(e,null)};}};};
+  const pts=Math.max(0,hit-fp);const miss=e.targets.filter(k=>!sel.has(k)),extra=[...sel].filter(k=>!T.has(k));return {ok:hit===T.size&&fp===0,pts,max:T.size,given:[miss.length?'Nicht markiert: '+miss.map(k=>R.labels[k]).join(', '):'',extra.length?'Zu viel markiert: '+extra.map(k=>R.labels[k]).join(', '):''].filter(Boolean).join('<br>'),sol:e.targets.map(k=>R.labels[k]).join(', '),say:sayOf(e,null)};}};};
 RENDER.multi=(e,el)=>{
  const o=shuffle(e.o);el.innerHTML=`${e.img?`<div class="ex-img">${e.img}</div>`:''}<div class="ex-sub">${e.sub||'Tippe alle passenden an (mehrere sind richtig).'}</div><div class="chips">${o.map((x,i)=>`<button class="chipc" data-i="${i}">${x[0]}</button>`).join('')}</div>`;
  $$('.chipc',el).forEach(b=>b.onclick=()=>{if(b.disabled)return;b.classList.toggle('sel');ready($$('.chipc.sel',el).length>0);});
  return {check(){const s=$$('.chipc.sel',el);if(!s.length)return null;let hit=0,fp=0;const T=e.o.filter(x=>x[1]).length;$$('.chipc',el).forEach(b=>{const x=o[+b.dataset.i];const on=b.classList.contains('sel');b.disabled=true;
   if(x[1]&&on){b.classList.add('ok');hit++;}else if(!x[1]&&on){b.classList.add('bad');fp++;}else if(x[1]&&!on){b.classList.add('miss');}});
-  return {ok:hit===T&&fp===0,pts:Math.max(0,hit-fp),max:T,sol:e.o.filter(x=>x[1]).map(x=>x[0]).join(' · '),say:sayOf(e,null)};}};};
+  const mi=e.o.filter((x,i)=>x[1]&&!$$('.chipc',el).find(b=>o[+b.dataset.i]===x&&b.classList.contains('ok'))).map(x=>x[0]),ex=e.o.filter(x=>!x[1]&&$$('.chipc',el).find(b=>o[+b.dataset.i]===x&&b.classList.contains('bad'))).map(x=>x[0]);
+  return {ok:hit===T&&fp===0,pts:Math.max(0,hit-fp),max:T,sol:e.o.filter(x=>x[1]).map(x=>x[0]).join(' · '),given:[mi.length?'Vergessen: '+mi.join(', '):'',ex.length?'Falsch angetippt: '+ex.join(', '):''].filter(Boolean).join('<br>'),say:sayOf(e,null)};}};};
 RENDER.seg=(e,el)=>{
  const ch={};
  el.innerHTML=`${e.img?`<div class="ex-img">${e.img}</div>`:''}<div class="ex-sub">${e.sub||(e.tf?'Tippe bei jedem Satz auf <b>vrai</b> (richtig) oder <b>faux</b> (falsch).':'Wähle in jeder Zeile die richtige Antwort.')}</div><div class="segs">`+e.rows.map((r,i)=>{const [p,ans,au,who]=r;
   return `<div class="segrow" data-r="${i}"><div class="sg-p">${au?spk(au,who||'','', 'Anhören'):''}<span class="sg-t">${p}</span></div><div class="sg-o${e.tf?' tf':''}">${(r[4]||e.opts).map(o=>`<button type="button" class="sgb${e.tf?(o==='vrai'?' v':' f'):''}" data-v="${esc(o)}">${e.tf?(o==='vrai'?'✓ vrai':'✗ faux'):o}</button>`).join('')}</div></div>`;}).join('')+'</div>';
  $$('.segrow',el).forEach(row=>{$$('.sgb',row).forEach(b=>b.onclick=()=>{if(b.disabled)return;$$('.sgb',row).forEach(x=>x.classList.remove('sel'));b.classList.add('sel');ch[row.dataset.r]=b.dataset.v;ready(Object.keys(ch).length===e.rows.length);});});
- return {check(){if(Object.keys(ch).length<e.rows.length)return null;let n=0;
-  $$('.segrow',el).forEach(row=>{const r=e.rows[+row.dataset.r];const v=ch[row.dataset.r];const okr=v===r[1];if(okr)n++;row.classList.add(okr?'ok':'bad');
+ return {check(){if(Object.keys(ch).length<e.rows.length)return null;let n=0;const pairs=[],gv=[];
+  $$('.segrow',el).forEach(row=>{const r=e.rows[+row.dataset.r];const v=ch[row.dataset.r];const okr=v===r[1];if(okr)n++;else{pairs.push([v,r[1],strip(r[0])]);gv.push(`${strip(r[0]).trim()||'…'}: <span class="gw">${esc(v)}</span> (richtig: <b>${esc(r[1])}</b>)`);}row.classList.add(okr?'ok':'bad');
    $$('.sgb',row).forEach(b=>{b.disabled=true;if(b.dataset.v===r[1])b.classList.add('ok');else if(b.dataset.v===v)b.classList.add('bad');});});
-  return {ok:n===e.rows.length,pts:n,max:e.rows.length,sol:e.rows.map(r=>`${strip(r[0]).trim()||(r[2]?'«&nbsp;'+r[2]+'&nbsp;»':'…')} → <b>${r[1]}</b>`).join('<br>'),showSol:false,say:sayOf(e,null)};}};};
+  return {ok:n===e.rows.length,pts:n,max:e.rows.length,pairs,given:gv.join('<br>'),sol:e.rows.map(r=>`${strip(r[0]).trim()||(r[2]?'«&nbsp;'+r[2]+'&nbsp;»':'…')} → <b>${r[1]}</b>`).join('<br>'),showSol:false,say:sayOf(e,null)};}};};
 RENDER.detect=(e,el)=>{
  const parts=[];e.text.replace(/\[([^\]|]+)\|([^\]]+)\]|(\S+)/g,(m,w,r,plain)=>{parts.push(w?{t:w,r,err:true}:{t:plain,err:false});return m;});
  el.innerHTML=`<div class="ex-sub">${e.sub||`Tippe alle falschen Wörter an. Es sind <b>${parts.filter(p=>p.err).length} Fehler</b>.`}</div><div class="dettext">${parts.map((p,i)=>`<button type="button" class="dw" data-i="${i}">${p.t}</button>`).join(' ')}</div>`;
@@ -349,8 +387,8 @@ RENDER.detect=(e,el)=>{
  const errs=parts.filter(p=>p.err).length;
  return {check(){if(!sel.size)return null;let hit=0,fp=0;$$('.dw',el).forEach(b=>{const p=parts[+b.dataset.i];b.disabled=true;const on=sel.has(+b.dataset.i);
   if(p.err){if(on)hit++;b.classList.add(on?'ok':'miss');b.innerHTML=`<s>${p.t}</s> <ins>${p.r}</ins>`;}else if(on){fp++;b.classList.add('bad');}});
-  const fixed=parts.map(p=>p.err?p.r:p.t).join(' ');
-  return {ok:hit===errs&&fp===0,pts:Math.max(0,hit-fp),max:errs,sol:parts.map(p=>p.err?`<u>${p.r}</u>`:p.t).join(' '),showSol:true,say:sayOf(e,e.speak===false?null:fixed)};}};};
+  const fixed=parts.map(p=>p.err?p.r:p.t).join(' ');const dpairs=parts.map((p,i)=>p.err?[p.t,p.r,i>0?parts[i-1].t:'']:null).filter(Boolean);const fps=parts.filter((p,i)=>!p.err&&sel.has(i)).map(p=>p.t);
+  return {ok:hit===errs&&fp===0,pts:Math.max(0,hit-fp),max:errs,pairs:dpairs,detect:true,given:`${hit} von ${errs} Fehlern gefunden${fps.length?` · ohne Fehler waren: ${fps.map(esc).join(', ')}`:''}`,sol:parts.map(p=>p.err?`<u>${p.r}</u>`:p.t).join(' '),showSol:true,say:sayOf(e,e.speak===false?null:fixed)};}};};
 
 /* ---------- Ergebnis ---------- */
 function medal(col,label){return `<svg class="medal" viewBox="0 0 120 120" aria-hidden="true"><path d="M40,4 L60,48 L80,4 Z" fill="#c8102e"/><path d="M48,4 L60,32 L72,4Z" fill="#2563eb"/><circle cx="60" cy="74" r="38" fill="${col}" stroke="#fff" stroke-width="5"/><circle cx="60" cy="74" r="28" fill="none" stroke="#ffffff88" stroke-width="3"/><text x="60" y="82" text-anchor="middle" font-family="FredokaApp,sans-serif" font-size="${label.length>4?17:22}" font-weight="700" fill="#fff">${label}</text></svg>`;}
