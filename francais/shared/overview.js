@@ -7,7 +7,8 @@ const get=k=>{try{return JSON.parse(localStorage.getItem(k)||'null');}catch(e){r
 const set=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}};
 function prog(m){const p=get('fr_lekt_'+m.slug+'_v2')||get('fr_lekt_'+m.slug+'_v1')||{ch:{},test:{}};let done=0;
  m.chapters.forEach(id=>{const c=(p.ch||{})[id]||{};if((c.best||0)>=70&&(c.runs||0)>0)done++;});
- const t=p.test||{};return {done,pct:Math.round(done/Math.max(1,m.chapters.length)*100),test:t.best!=null?t.best:null,stars:t.stars||0};}
+ const xs=(m.extras||[]).map(x=>{const c=(p.ch||{})[x.id]||{};return {t:x.title,done:(c.best||0)>=70&&(c.runs||0)>0,best:c.best||0,runs:c.runs||0};});
+ const t=p.test||{};return {xs,done,pct:Math.round(done/Math.max(1,m.chapters.length)*100),test:t.best!=null?t.best:null,stars:t.stars||0};}
 const exam=new Date(2026,9,30,8,0,0);
 const days=Math.ceil((exam-new Date())/864e5);
 const cd=days>1?`Noch <b>${days} Tage</b>`:days===1?'<b>Morgen</b> ist es so weit!':days===0?'<b>Heute</b> ist die Klassenarbeit – Bonne chance!':'Die Klassenarbeit ist geschafft 🎉';
@@ -18,7 +19,7 @@ let h=`<section class="ov-hero"><div class="ov-flag"><i></i><i></i><i></i></div>
 <div class="soundtip"><span class="st-ic">🔊</span><div><b>Mit Ton lernen:</b> Alle französischen Sätze kannst du anhören. <b>Kein Ton auf dem iPhone?</b> Stummschalter an der Seite aus und lauter stellen.</div></div>
 <div class="section-title"><div class="bar"></div><h2>Deine Lektionen</h2></div><div class="ov-grid">`;
 LS.forEach((m,i)=>{const p=prog(m);if(i===0)h+=`<div class="ov-part">Teil 1 · Grammatik & Texte – zuerst alles in Ruhe durcharbeiten</div>`;if(m.slug==='ecouter')h+=`<div class="ov-part">Teil 2 · Hören & Aussprache – zum Schluss</div>`;h+=`<a class="ov-card" href="${m.slug}/" style="--c:${m.color}"><span class="ov-ic">${m.icon}</span><span class="ov-b"><span class="ov-n">Lektion ${i+1}</span><span class="ov-t">${m.title}</span><span class="ov-fr">${m.fr}</span>
- <span class="ov-bar"><i style="width:${p.pct}%"></i></span><span class="ov-s">${p.done}/${m.chapters.length} Kapitel ✓ · ≈ ${m.perRun} Aufgaben · ca. ${m.min} Min.${p.test!=null?` · Test: ${p.test} % ${'★'.repeat(p.stars)}${'☆'.repeat(3-p.stars)}`:''}</span></span></a>`;});
+ <span class="ov-bar"><i style="width:${p.pct}%"></i></span><span class="ov-s">${p.done}/${m.chapters.length} Kapitel ✓ · ≈ ${m.perRun} Aufgaben · ca. ${m.min} Min.${p.test!=null?` · Test: ${p.test} % ${'★'.repeat(p.stars)}${'☆'.repeat(3-p.stars)}`:''}</span>${p.xs.map(x=>`<span class="ov-extra">🧡 Extra-Übung: ${x.t}${x.done?' ✓':x.runs?` · ${x.best} %`:' · noch offen'}</span>`).join('')}</span></a>`;});
 h+=`</div><div class="section-title"><div class="bar"></div><h2>Was kommt dran? – Checkliste</h2></div><div class="card ov-check"><p class="legend">Hake ab, was du sicher kannst. (Die Häkchen werden auf diesem Gerät gespeichert.)</p><ul>`;
 CHECK.forEach(([k,t])=>{const m=LS.find(x=>x.slug===k);h+=`<li><label><input type="checkbox" data-k="${k}" ${ck[k]?'checked':''}><span>${t}</span></label>${m?`<a href="${m.slug}/">zur Lektion ›</a>`:''}</li>`;});
 h+=`</ul></div><div class="section-title"><div class="bar"></div><h2>Lernplan bis zur Arbeit</h2></div><div class="card ov-plan"><table>`;
@@ -42,12 +43,12 @@ function stats(m,events){const C={};const ch=id=>C[id]=C[id]||{runs:0,bfRuns:0,b
  return C;}
 const fmtMin=ms=>ms<60000?'< 1 Min.':Math.round(ms/60000)+' Min.';
 function berichtHTML(data){let h='';
- LS.forEach((m,i)=>{const d=data[m.slug]||{events:[]};const C=stats(m,d.events);const ids=m.chapters.concat(['test']);
+ LS.forEach((m,i)=>{const d=data[m.slug]||{events:[]};const C=stats(m,d.events);const XT={};(m.extras||[]).forEach(x=>XT[x.id]=x.title);const ids=m.chapters.concat(Object.keys(XT),['test']);
   Object.keys(C).forEach(id=>{if(!ids.includes(id))ids.push(id);});const any=ids.some(id=>C[id]);
   h+=`<div class="card rp-l"><h3>${m.icon} Lektion ${i+1}: ${esc(m.title)} <span class="legend">(${d.src}, ${d.events.length} Einträge)</span></h3>`;
   if(!any){h+='<p class="legend">Noch keine Daten.</p></div>';return;}
   h+='<div class="rp-scroll"><table class="rp"><tr><th>Kapitel</th><th>Durchgänge</th><th>Bestwert</th><th>1. Versuch richtig</th><th>Zeit</th><th>Häufigste Fehler</th></tr>';
-  ids.forEach((id,k)=>{const x=C[id];if(!x)return;const t=id==='test'?'🏆 Abschlusstest':(m.chTitles||[])[k]?esc(m.chTitles[k]):esc(id)+' <span class="legend">(früheres Kapitel – jetzt in „Hörverstehen“)</span>';
+  ids.forEach((id,k)=>{const x=C[id];if(!x)return;const t=id==='test'?'🏆 Abschlusstest':XT[id]?'🧡 '+esc(XT[id])+' <span class="legend">(Extra-Übung)</span>':(m.chTitles||[])[k]?esc(m.chTitles[k]):esc(id)+' <span class="legend">(früheres Kapitel – jetzt in „Hörverstehen“)</span>';
    const fe=Object.values(x.err).sort((a,b)=>b.n-a.n).slice(0,3);
    h+=`<tr><td>${t}</td><td>${x.runs+x.bfRuns}${x.bfRuns?` <span class="legend">(${x.bfRuns} vor Protokoll)</span>`:''}</td><td>${x.best!=null?x.best+' %':'–'}</td><td>${x.first?Math.round(x.firstOk/x.first*100)+' % <span class="legend">('+x.firstOk+'/'+x.first+')</span>':'–'}</td><td>${x.ms?fmtMin(x.ms):'–'}</td>
    <td>${fe.length?'<ul>'+fe.map(f=>`<li><span class="legend">${esc(f.prompt).slice(0,90)}</span><br><s>${esc(f.given)}</s> → <b>${esc(f.correct)}</b>${f.n>1?` (${f.n}×)`:''}</li>`).join('')+'</ul>':'–'}</td></tr>`;});

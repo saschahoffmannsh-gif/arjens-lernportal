@@ -18,7 +18,8 @@ function save(){try{localStorage.setItem(KEY,JSON.stringify(P));}catch(e){}}
 function chp(id){return P.ch[id]=P.ch[id]||{seen:false,best:0,runs:0,solved:{}};}
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
 const CHMAP={};
-CHAPTERS.forEach((c,i)=>{c.idx=i;c.c=c.c||L.color;CHMAP[c.id]=c;c.ex.forEach((e,j)=>{e.ch=c.id;e.id=c.id+'-'+j;e.lv=e.lv||c.lv||1;});});
+const REGN=CHAPTERS.filter(c=>!c.extra).length;let XN=0;
+CHAPTERS.forEach((c,i)=>{c.idx=i;c.c=c.c||L.color;CHMAP[c.id]=c;c.num=c.extra?REGN+2+(XN++):i+1;if(c.extra)c.noTest=true;c.ex.forEach((e,j)=>{e.ch=c.id;e.id=c.id+'-'+j;e.lv=e.lv||c.lv||1;});});
 TEST_EX.forEach((e,j)=>{e.ch='test';e.id='test-'+j;e.lv=e.lv||3;});
 CHMAP.test={id:'test',title:'Abschlusstest',c:'#c8102e',icon:'🏆'};
 const ALLEX=CHAPTERS.flatMap(c=>c.ex).concat(TEST_EX);
@@ -89,7 +90,9 @@ function confetti(){const c=document.createElement('div');c.className='confetti'
 /* ---------- Fortschritt ---------- */
 function chapterStatus(c){const p=chp(c.id);const n=take(c);return {p,n,pool:c.ex.length,done:(p.runs||0)>0&&p.best>=70};}
 function take(c){return Math.min(c.ex.length,c.take||4);}
-function overall(){let d=0;CHAPTERS.forEach(c=>{if(chapterStatus(c).done)d++;});return {d,t:CHAPTERS.length};}
+const REG=()=>CHAPTERS.filter(c=>!c.extra),EXTRA=()=>CHAPTERS.filter(c=>c.extra);
+function nextReg(c){const r=REG();const k=r.indexOf(c);return k>=0&&k<r.length-1?r[k+1]:null;}
+function overall(){let d=0;REG().forEach(c=>{if(chapterStatus(c).done)d++;});return {d,t:REG().length};}
 function updateTop(){const o=overall();const el=$('#topProg');if(el)el.innerHTML=`<span class="tp-n">${o.d}/${o.t}</span><div class="pbar" role="progressbar" aria-valuenow="${o.d}" aria-valuemax="${o.t}"><i style="width:${o.d/o.t*100}%"></i></div>`;}
 const stars=n=>'★'.repeat(n)+'☆'.repeat(3-n);
 const lvStars=lv=>`<span class="lv" title="Schwierigkeit">${'★'.repeat(lv)}<span>${'★'.repeat(3-lv)}</span></span>`;
@@ -105,34 +108,37 @@ function go(view,arg,noPush){stopAudio();
 window.addEventListener('popstate',ev=>{const st=ev.state;if(!st||st.view==='home')go('home',null,true);else if(st.view==='lesson'&&CHMAP[st.arg])go('lesson',st.arg,true);else go('home',null,true);});
 window.APPGO=(v,a)=>go(v,a);
 
-function nextChapter(){const c=CHAPTERS.find(c=>!chapterStatus(c).done);return c||null;}
+function nextChapter(){const c=REG().find(c=>!chapterStatus(c).done);return c||null;}
 
 /* ---------- Erklär-Kasten (Anfang der Lektion / des Kapitels) ---------- */
-function introBox(x,lesson){if(!x)return '';
+function introBody(x,part){
  const F=(t,w)=>`<span class="fr">${t}</span>${spk(strip(t),w||'')}`;
- const body=`${x.was?`<p class="in-p"><b>Worum geht’s?</b> ${x.was}</p>`:''}${x.warum?`<p class="in-p"><b>Wozu brauchst du das?</b> ${x.warum}</p>`:''}
- ${x.schritte&&x.schritte.length?`<div class="rulebox"><div class="bx-h">📏 Die Regel – Schritt für Schritt</div><ol>${x.schritte.map(t=>`<li>${t}</li>`).join('')}</ol>${x.tab||''}</div>`:''}
+ return `${x.was?`<p class="in-p"><b>${part?'Was ist das?':'Worum geht’s?'}</b> ${x.was}</p>`:''}${x.warum?`<p class="in-p"><b>${part?'Warum macht man das so?':'Wozu brauchst du das?'}</b> ${x.warum}</p>`:''}
+ ${x.schritte&&x.schritte.length?`<div class="rulebox"><div class="bx-h">${part?'👣 So gehst du vor – Schritt für Schritt':'📏 Die Regel – Schritt für Schritt'}</div><ol>${x.schritte.map(t=>`<li>${t}</li>`).join('')}</ol>${x.tab||''}</div>`:''}
  ${x.bsp&&x.bsp.length?`<div class="bspbox"><div class="bx-h">🔎 Beispiele <span class="legend">– tippe auf 🔊 und sprich nach</span></div><table class="bsptab"><tbody>${x.bsp.map(b=>`<tr><td class="bf">${F(b[0],b[2])}</td><td class="bd">${b[1]}</td></tr>`).join('')}</tbody></table></div>`:''}
  ${x.merk?`<div class="merkbox"><span class="mb-ic">📌</span><div><b>Merksatz</b><br>${x.merk}</div></div>`:''}
  ${x.fallen&&x.fallen.length?`<div class="fallbox"><div class="bx-h">⚠️ Achtung, Falle!</div><ul>${x.fallen.map(t=>`<li>${t}</li>`).join('')}</ul></div>`:''}
- ${x.check&&x.check.length?`<div class="checkbox"><div class="bx-h">✅ So gehst du vor</div><ol>${x.check.map(t=>`<li>${t}</li>`).join('')}</ol></div>`:''}`;
+ ${x.check&&x.check.length?`<div class="checkbox"><div class="bx-h">✅ So gehst du vor</div><ol>${x.check.map(t=>`<li>${t}</li>`).join('')}</ol></div>`:''}`;}
+function introBox(x,lesson){if(!x)return '';
+ const body=introBody(x,false)+(x.parts||[]).map((p,i)=>`<section class="inpart"><h3 class="inpart-h"><span class="inpart-n">${i+1}</span>${p.h}</h3>${introBody(p,true)}</section>`).join('')+(x.ende?`<div class="tip"><span class="tip-ic">💡</span><div>${x.ende}</div></div>`:'');
  return `<details class="intro${lesson?' lesson-intro':''}" open><summary><span class="in-ic">📖</span><span>${lesson?'Erklärung: ':'Erklärung: '}${x.t||''}</span><span class="in-tg" aria-hidden="true"></span></summary><div class="intro-body">${body}</div></details>`;}
 function home(){
  const o=overall(),nc=nextChapter(),RI=H.runInfo();
  let h=`<section class="lhero" style="--c:${L.color}"><div class="lh-txt"><div class="kicker"><span class="flag"><i></i><i></i><i></i></span>Französisch · Klassenarbeit 30.10.</div>
  <h1>${L.title}</h1><div class="lh-fr">${L.fr}</div><p>${L.intro}</p>
- <div class="lh-btns">${nc?`<button class="btn big" data-open="${nc.id}">▶ ${o.d?'Weiter mit Kapitel '+(nc.idx+1):'Los geht’s: Kapitel 1'}</button>`:`<button class="btn big red" data-test="1">🏆 Abschlusstest</button>`}</div></div>
+ <div class="lh-btns">${nc?`<button class="btn big" data-open="${nc.id}">▶ ${o.d?'Weiter mit Kapitel '+(nc.idx+1):'Los geht’s: Kapitel 1'}</button>`:`<button class="btn big red" data-test="1">🏆 Abschlusstest</button>`}${EXTRA().filter(c=>!chapterStatus(c).done).map(c=>`<button class="btn big extra-btn" data-open="${c.id}">🧡 Extra-Übung: ${c.title}</button>`).join('')}</div></div>
  <div class="lh-art">${window.HERO[L.slug]||''}</div></section>
  <div class="soundtip"><span class="st-ic">🔊</span><div><b>Mit Ton lernen:</b> Tippe auf einen Lautsprecher, dann hörst du den Satz (nochmal tippen = Stopp). <b>Kein Ton auf dem iPhone?</b> Stummschalter an der Seite aus und lauter stellen.</div></div>
  ${introBox(L.explain,true)}
- <div class="section-title"><div class="bar"></div><h2>Deine Kapitel</h2><span class="sct-n">${o.d}/${o.t} geschafft</span></div><p class="legend runinfo">📏 Ein Durchgang: <b>≈ ${RI.n} Aufgaben · ca. ${RI.min} Min.</b> (${RI.n-H.TEST_N} in den Kapiteln + ${H.TEST_N} im Abschlusstest) – am besten auf 2 kurze Lernzeiten à 15–20 Min. verteilen.</p><ol class="path">`;
- CHAPTERS.forEach((c,i)=>{const s=chapterStatus(c);const pct=s.p.best||0;
+ <div class="section-title"><div class="bar"></div><h2>Deine Kapitel</h2><span class="sct-n">${o.d}/${o.t} geschafft</span></div><p class="legend runinfo">📏 Ein Durchgang: <b>≈ ${RI.n} Aufgaben · ca. ${RI.min} Min.</b> (${RI.n-H.TEST_N} in den Kapiteln + ${H.TEST_N} im Abschlusstest) – am besten auf 2 kurze Lernzeiten à 15–20 Min. verteilen.${EXTRA().length?' Die <b>Extra-Übung</b> nach dem Test ist zusätzlich und zählt hier nicht mit.':''}</p><ol class="path">`;
+ const stepHTML=(c,i)=>{const s=chapterStatus(c);const pct=s.p.best||0;let h='';
   if(c.block)h+=`<li class="pblock" style="--c:${c.c}"><span>${c.block}</span></li>`;
-  h+=`<li><button class="pstep${s.done?' done':''}" style="--c:${c.c}" data-open="${c.id}"><span class="pnum">${s.done?'✓':i+1}</span><span class="pbody"><span class="pk">${c.kind||'Kapitel '+(i+1)}</span><span class="pt"><span class="pic">${c.icon||''}</span>${c.title}</span><span class="ps">${c.sub||''}</span>
-  <span class="pst"><span class="mini"><i style="width:${pct}%"></i></span>${s.n} Aufgaben${s.p.best?` · Bestwert ${s.p.best} %`:''}</span></span></button></li>`;});
+  h+=`<li><button class="pstep${s.done?' done':''}${c.extra?' extra':''}" style="--c:${c.c}" data-open="${c.id}"><span class="pnum">${s.done?'✓':c.num}</span><span class="pbody"><span class="pk">${c.extra?`<span class="xbadge">🧡 Extra-Übung</span> Kapitel ${c.num}`:c.kind||'Kapitel '+(i+1)}</span><span class="pt"><span class="pic">${c.icon||''}</span>${c.title}</span><span class="ps">${c.sub||''}</span>
+  <span class="pst"><span class="mini"><i style="width:${pct}%"></i></span>${s.n} Aufgaben${s.p.best?` · Bestwert ${s.p.best} %`:''}</span></span></button></li>`;return h;};
+ REG().forEach((c,i)=>{h+=stepHTML(c,i);});
  const t=P.test;
  h+=`<li><button class="pstep test${t.stars>=2?' done':''}" data-test="1"><span class="pnum">🏆</span><span class="pbody"><span class="pk">Finale</span><span class="pt">Abschlusstest</span><span class="ps">${testSize()} Aufgaben auf Klassenarbeitsniveau – mit Punkten, Medaille und „Das solltest du noch einmal üben“</span>
- <span class="pst">${t.best!==null?`Bestwert ${t.best} % · <span class="stars-s">${stars(t.stars)}</span> · ${t.runs}× gemacht`:'Noch nicht gemacht'}</span></span></button></li></ol>
+ <span class="pst">${t.best!==null?`Bestwert ${t.best} % · <span class="stars-s">${stars(t.stars)}</span> · ${t.runs}× gemacht`:'Noch nicht gemacht'}</span></span></button></li>${EXTRA().length?`<li class="pblock xblock"><span>🧡 Extra – Nachholbedarf (zusätzlich, zählt nicht zum Durchgang)</span></li>`+EXTRA().map(c=>stepHTML(c,c.idx)).join(''):''}</ol>
  <div class="merk blue"><h3>🧭 So lernst du am besten</h3><ul><li>Gehe die Kapitel <b>der Reihe nach</b> durch: erst lesen und anhören, dann <b>„Jetzt üben“</b>.</li><li>Jedes Kapitel hat nur <b>wenige Aufgaben pro Durchgang</b>. Übst du es noch einmal, kommen bevorzugt <b>neue Aufgaben</b> dran.</li><li>Ein Kapitel bekommt seinen Haken ✓ ab <b>70 %</b> in einem Durchgang. Für die Punkte zählt immer der <b>erste Versuch</b> – mit „Nochmal versuchen“ kannst du aber jede Aufgabe wiederholen.</li><li>Die Aufgaben kommen jedes Mal <b>neu gemischt</b>.</li><li>Zum Schluss: <b>Abschlusstest</b>. Danach siehst du genau, was du noch üben solltest.</li></ul></div>
  <div class="toolbar"><button class="btn" data-mix="1">🔀 Gemischt üben (8 Aufgaben)</button><a class="btn ghost" href="../">📋 Alle Lektionen</a></div>
  <div class="resetbox"><div><h3>↺ Neu anfangen</h3><p>Löscht in dieser Lektion <b>alle</b> Haken, Bestwerte und Test-Ergebnisse. Einzelne Kapitel setzt du im Kapitel selbst zurück.</p></div><button class="btn red" data-reset="1">↺ Gesamten Fortschritt zurücksetzen</button></div>
@@ -144,10 +150,10 @@ function lessonNav(){const LS=window.LESSONS||[];if(!LS.length)return '';
 
 function lesson(id){
  const c=CHMAP[id];const p=chp(id);p.seen=true;save();
- let h=`<div class="crumb"><button class="btn ghost small" data-home="1">← Übersicht</button><span class="crumb-n">Kapitel ${c.idx+1} von ${CHAPTERS.length}</span></div>
- <header class="chead" style="--c:${c.c}"><span class="cic">${c.icon||'📘'}</span><div><div class="ck">${c.kind||'Kapitel '+(c.idx+1)}</div><h1>${c.title}</h1>${c.sub?`<div class="cs">${c.sub}</div>`:''}</div></header>
+ let h=`<div class="crumb"><button class="btn ghost small" data-home="1">← Übersicht</button><span class="crumb-n">${c.extra?`<span class="xbadge">🧡 Extra-Übung</span> Kapitel ${c.num}`:`Kapitel ${c.num} von ${REG().length}`}</span></div>
+ <header class="chead" style="--c:${c.c}"><span class="cic">${c.icon||'📘'}</span><div><div class="ck">${c.extra?'<span class="xbadge">🧡 Extra-Übung</span> ':''}${c.kind||'Kapitel '+(c.idx+1)}</div><h1>${c.title}</h1>${c.sub?`<div class="cs">${c.sub}</div>`:''}</div></header>
  ${introBox(c.intro)}${c.intro&&c.html?'<div class="lb-h">📚 Material zum Kapitel</div>':''}<div class="lesson-body">${c.html||''}</div>`;
- h+=chResetBar(id)+`<div class="toolbar center"><button class="btn green big" data-practice="${id}">✏️ Jetzt üben (${take(c)} Aufgaben)</button>${c.idx<CHAPTERS.length-1?`<button class="btn ghost" data-open="${CHAPTERS[c.idx+1].id}">Nächstes Kapitel →</button>`:`<button class="btn red" data-test="1">🏆 Zum Abschlusstest</button>`}</div>`;
+ h+=chResetBar(id)+`<div class="toolbar center"><button class="btn green big" data-practice="${id}">✏️ Jetzt üben (${take(c)} Aufgaben)</button>${nextReg(c)?`<button class="btn ghost" data-open="${nextReg(c).id}">Nächstes Kapitel →</button>`:c.extra?'<button class="btn ghost" data-home="1">Zur Übersicht</button>':`<button class="btn red" data-test="1">🏆 Zum Abschlusstest</button>`}</div>`;
  main.innerHTML=h;mountWidgets(main,c);
 }
 function chResetBar(id){const c=CHMAP[id],s=chapterStatus(c);
@@ -197,9 +203,11 @@ function pickFrom(pool,n,pre=[]){const sel=pre.slice();const rest=shuffle(pool.f
  while(sel.length<n&&rest.length){let best=0,bs=Infinity;rest.forEach((e,k)=>{const tc=sel.filter(x=>tkey(x)===tkey(e)).length;const sc=(P.asked[e.id]||0)*100+tc*3+Math.random()*2;if(sc<bs){bs=sc;best=k;}});sel.push(rest.splice(best,1)[0]);}
  return sel;}
 function markAsked(list){list.forEach(e=>{P.asked[e.id]=(P.asked[e.id]||0)+1;});save();}
-function startChapter(id){const c=CHMAP[id];const n=take(c);const sel=pickFrom(c.ex,n,c.ex.filter(e=>e.must).slice(0,n));markAsked(sel);
+function startChapter(id){const c=CHMAP[id];const n=take(c);let sel;
+ if(c.plan){sel=[];Object.entries(c.plan).forEach(([g,k])=>{const pool=c.ex.filter(e=>e.grp===g);sel.push(...pickFrom(pool,Math.min(k,pool.length),pool.filter(e=>e.must).slice(0,k)));});}
+ else sel=pickFrom(c.ex,n,c.ex.filter(e=>e.must).slice(0,n));markAsked(sel);
  const l=c.keepOrder?c.ex.filter(e=>sel.includes(e)):[1,2,3].flatMap(lv=>shuffle(sel.filter(e=>e.lv===lv)));go('practice',{mode:'chapter',ch:id,list:l});}
-function startMix(){go('practice',{mode:'mix',list:shuffle(ALLEX.filter(e=>e.ch!=='test')).slice(0,8)});}
+function startMix(){go('practice',{mode:'mix',list:shuffle(ALLEX.filter(e=>e.ch!=='test'&&!(CHMAP[e.ch]||{}).extra)).slice(0,8)});}
 function testSize(){return H.TEST_N;}
 function startTest(){
  const n=testSize();const least=arr=>arr.slice().sort((a,b)=>((P.asked[a.id]||0)-(P.asked[b.id]||0))||(Math.random()-.5))[0];
@@ -262,9 +270,10 @@ function feedback(e,r,a){
  // Diagnose typischer Fehler
  const close=(a,b)=>{a=DN(a);b=DN(b);let p=0;while(p<a.length&&p<b.length&&a[p]===b[p])p++;let q=0;while(q<a.length-p&&q<b.length-p&&a[a.length-1-q]===b[b.length-1-q])q++;return p+q>=Math.min(3,Math.min(a.length,b.length));};
  const allP=(r.pairs||[]).filter(p=>p&&p[0]!=null&&p[1]!=null&&DN(p[0])!==DN(p[1]));
- const dg=[];allP.forEach(p=>dg.push(...diagnose(p[0],p[1],p[2]||'')));
- const pairs=allP.filter(p=>!/^(vrai|faux)$/.test(p[0])&&(close(p[0],p[1])||diagnose(p[0],p[1],p[2]||'').length));
- const seen=new Set();const D=dg.filter(x=>!seen.has(x.t)&&seen.add(x.t)).slice(0,3);
+ let own=[];if(!r.ok&&typeof e.dx==='function'){try{own=e.dx(r.raw!=null?String(r.raw):strip(String(r.given||'')),r,e)||[];}catch(err){own=[];}}
+ const dg=own.slice();if(!own.length)allP.forEach(p=>dg.push(...diagnose(p[0],p[1],p[2]||'')));
+ const pairs=allP.filter(p=>!/^(vrai|faux)$/.test(p[0])&&(own.length||close(p[0],p[1])||diagnose(p[0],p[1],p[2]||'').length));
+ const seen=new Set();const D=dg.filter(x=>!seen.has(x.t)&&seen.add(x.t)).slice(0,own.length?4:3);
  const why=e.why||'';const sw=DN(strip(r.sol||''));const dw=DN(why);const quote=/^\s*«/.test(strip(why));const weak=!quote&&strip(why).length<45||!quote&&(sw.length>8&&(dw===sw||dw.startsWith(sw.slice(0,Math.min(40,sw.length)))&&dw.length<sw.length+25));
  const ovl=(x,y)=>{const A=new Set(DN(x).split(' ').filter(w=>w.length>2)),B=DN(y).split(' ').filter(w=>w.length>2);if(!B.length)return 1;return B.filter(w=>A.has(w)).length/B.length;};const dtxt=D.map(x=>x.t).join(' ');const showWhy=why&&!(D.length&&(weak||ovl(dtxt,why)>0.5));
  const merk=(D[0]&&D[0].m)||e.merk||c.merk||L.merk||'';
@@ -297,7 +306,7 @@ RENDER.mc=(e,el)=>{
  el.innerHTML=(e.img?`<div class="ex-img">${e.img}</div>`:'')+(e.prompt?`<div class="prompt"><span class="fr">${e.prompt}</span>${e.promptSay===false?'':spk(e.prompt,e.promptWho||'')}</div>`:'')+`<div class="opts${e.o.every(o=>strip(o).length<14)?' short':''}">`+opts.map((o,k)=>`<button class="opt" data-k="${k}">${o.t}</button>`).join('')+'</div>';
  $$('.opt',el).forEach(b=>b.onclick=()=>{if(b.disabled)return;$$('.opt',el).forEach(x=>x.classList.remove('sel'));b.classList.add('sel');sel=opts[+b.dataset.k].i;ready(true);});
  return {check(){if(sel==null)return null;const ok=sel===0;$$('.opt',el).forEach(b=>{b.disabled=true;const i=opts[+b.dataset.k].i;if(i===0)b.classList.add('ok');else if(i===sel)b.classList.add('bad');});
-  return {ok,pts:ok?1:0,max:1,sol:e.o[0],given:e.o[sel],pairs:ok?[]:[[strip(e.o[sel]),strip(e.o[0]),e.prompt||'']],say:sayOf(e,e.fr?strip(e.o[0]):null)};}};};
+  return {ok,pts:ok?1:0,max:1,sol:e.o[0],given:e.o[sel],raw:strip(e.o[sel]),pairs:ok?[]:[[strip(e.o[sel]),strip(e.o[0]),e.prompt||'']],say:sayOf(e,e.fr?strip(e.o[0]):null)};}};};
 RENDER.pick=(e,el)=>{
  const opts=shuffle(e.cards.map((c,i)=>({c,i})));let sel=null;
  el.innerHTML=`<div class="cards">`+opts.map((o,k)=>`<button class="pcard" data-k="${k}" aria-label="Bild ${k+1}">${o.c[0]}${e.labels?`<span class="pl">${o.c[1]}</span>`:''}</button>`).join('')+'</div>';
@@ -312,7 +321,7 @@ const givenFill=(t,vals)=>t.replace(/\{(\d+)\}/g,(m,k)=>{const v=vals[k];if(!v)r
 function bindGaps(el){$$('select.gapsel',el).forEach(s=>s.onchange=()=>ready($$('select.gapsel',el).every(x=>x.value)));}
 const fill=(e,t,u=true)=>t.replace(/\{(\d+)\}/g,(m,k)=>u?'<u>'+e.gaps[+k][0]+'</u>':e.gaps[+k][0]);
 RENDER.gap=(e,el)=>{el.innerHTML=`<div class="ex-sub">${e.sub||'Wähle in jeder Lücke das passende Wort.'}</div><div class="gaptext${e.table?' tbl':''}">${gapSelects(e,e.text)}</div>`;bindGaps(el);
- return {check(){const r=gapCheck(e,el);if(r==null)return null;return {ok:r.n===r.max,pts:r.n,max:r.max,sol:fill(e,e.text),pairs:r.pairs,given:givenFill(e.text,r.vals),say:sayOf(e,e.table?null:strip(fill(e,e.text,false)))};}};};
+ return {check(){const r=gapCheck(e,el);if(r==null)return null;return {ok:r.n===r.max,pts:r.n,max:r.max,sol:fill(e,e.text),pairs:r.pairs,given:givenFill(e.text,r.vals),raw:strip(e.text.replace(/\{(\d+)\}/g,(m,k)=>(r.vals[k]||[''])[0])),say:sayOf(e,e.table?null:strip(fill(e,e.text,false)))};}};};
 RENDER.gapw=(e,el)=>{
  el.innerHTML=`<div class="ex-sub">${e.sub||'Schreibe die fehlenden Wörter in die Lücken.'}</div><div class="gaptext">${e.text.replace(/\{(\d+)\}/g,(m,k)=>{const len=Math.max(...[].concat(e.ans[+k]).map(x=>x.length));return `<input class="gapin" data-g="${k}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Lücke ${+k+1}" style="width:${Math.max(3.2,len*0.72+1.4)}em">`;})}</div>
  <div class="acc">${['é','è','ê','à','ç','’'].map(c=>`<button type="button" data-c="${c}">${c}</button>`).join('')}</div>`;
@@ -337,7 +346,7 @@ RENDER.order=(e,el)=>{
  const upd=()=>{zone.classList.toggle('empty',!zone.children.length);ready(pool.children.length===0);};
  el.addEventListener('click',ev=>{const b=ev.target.closest('.tok');if(!b||b.disabled)return;(b.parentElement===pool?zone:pool).appendChild(b);upd();});
  return {check(){if(pool.children.length)return null;const got=$$('.tok',zone).map(b=>b.textContent);$$('.tok',el).forEach(b=>{b.disabled=true;});
-  const r=compare(joinTok(got),[joinTok(e.tok),...e.alts]);zone.classList.add(r.ok?'ok':'bad');return {ok:r.ok,pts:r.ok?1:0,max:1,sol:joinTok(e.tok),given:esc(joinTok(got)),orderHint:!r.ok,say:sayOf(e,joinTok(e.tok))};}};};
+  const r=compare(joinTok(got),[joinTok(e.tok),...e.alts]);zone.classList.add(r.ok?'ok':'bad');return {ok:r.ok,pts:r.ok?1:0,max:1,sol:joinTok(e.tok),given:esc(joinTok(got)),raw:joinTok(got),orderHint:!r.ok,say:sayOf(e,joinTok(e.tok))};}};};
 RENDER.write=(e,el)=>{
  el.innerHTML=(e.img?`<div class="ex-img">${e.img}</div>`:'')+(e.prompt?`<div class="prompt">${e.prompt}</div>`:'')+`<input class="inp" id="inp" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="${e.ph||'Schreibe hier auf Französisch …'}" aria-label="Antwort">
  <div class="acc">${['é','è','ê','à','ç','’'].map(c=>`<button type="button" data-c="${c}">${c}</button>`).join('')}</div>
@@ -346,7 +355,7 @@ RENDER.write=(e,el)=>{
  inp.addEventListener('keydown',ev=>{if(ev.key==='Enter'&&inp.value.trim().length>0)$('#checkBtn').click();});
  $$('.acc button',el).forEach(b=>b.onclick=()=>{const s=inp.selectionStart??inp.value.length,t=inp.selectionEnd??s;inp.value=inp.value.slice(0,s)+b.dataset.c+inp.value.slice(t);inp.focus();inp.setSelectionRange(s+1,s+1);ready(inp.value.trim().length>0);});
  return {check(){if(!inp.value.trim())return null;const r=compare(inp.value,e.ans);if(r.acc&&e.strict)r.ok=false;inp.classList.add(r.ok?'ok':'bad');inp.disabled=true;$$('.acc button',el).forEach(b=>b.disabled=true);
-  const best=r.acc||closest(inp.value,e.ans);return {ok:r.ok,pts:r.ok?1:0,max:1,acc:r.acc,sol:r.ok?e.ans[0]:best,showSol:!!r.acc,given:esc(inp.value),pairs:r.ok?[]:[[inp.value,best,e.prompt||'']],say:sayOf(e,strip(r.ok?e.ans[0]:best))};}};};
+  const best=r.acc||closest(inp.value,e.ans);return {ok:r.ok,pts:r.ok?1:0,max:1,acc:r.acc,sol:r.ok?e.ans[0]:best,showSol:!!r.acc,given:esc(inp.value),raw:inp.value,pairs:r.ok?[]:[[inp.value,best,e.prompt||'']],say:sayOf(e,strip(r.ok?e.ans[0]:best))};}};};
 const PCOL=['#2563eb','#c8102e','#16a34a','#d97706','#7c3aed','#0891b2'];
 RENDER.match=(e,el)=>{
  const Ls=shuffle(e.pairs.map((p,i)=>({t:p[0],i}))),Rs=shuffle(e.pairs.map((p,i)=>({t:p[1],i})));
@@ -401,7 +410,7 @@ RENDER.detect=(e,el)=>{
  return {check(){if(!sel.size)return null;let hit=0,fp=0;$$('.dw',el).forEach(b=>{const p=parts[+b.dataset.i];b.disabled=true;const on=sel.has(+b.dataset.i);
   if(p.err){if(on)hit++;b.classList.add(on?'ok':'miss');b.innerHTML=`<s>${p.t}</s> <ins>${p.r}</ins>`;}else if(on){fp++;b.classList.add('bad');}});
   const fixed=parts.map(p=>p.err?p.r:p.t).join(' ');const dpairs=parts.map((p,i)=>p.err?[p.t,p.r,i>0?parts[i-1].t:'']:null).filter(Boolean);const fps=parts.filter((p,i)=>!p.err&&sel.has(i)).map(p=>p.t);
-  return {ok:hit===errs&&fp===0,pts:Math.max(0,hit-fp),max:errs,pairs:dpairs,detect:true,given:`${hit} von ${errs} Fehlern gefunden${fps.length?` · ohne Fehler waren: ${fps.map(esc).join(', ')}`:''}`,sol:parts.map(p=>p.err?`<u>${p.r}</u>`:p.t).join(' '),showSol:true,say:sayOf(e,e.speak===false?null:fixed)};}};};
+  return {ok:hit===errs&&fp===0,pts:Math.max(0,hit-fp),max:errs,pairs:dpairs,detect:true,raw:parts.map(p=>p.t).join(' '),given:`${hit} von ${errs} Fehlern gefunden${fps.length?` · ohne Fehler waren: ${fps.map(esc).join(', ')}`:''}`,sol:parts.map(p=>p.err?`<u>${p.r}</u>`:p.t).join(' '),showSol:true,say:sayOf(e,e.speak===false?null:fixed)};}};};
 
 /* ---------- Ergebnis ---------- */
 function medal(col,label){return `<svg class="medal" viewBox="0 0 120 120" aria-hidden="true"><path d="M40,4 L60,48 L80,4 Z" fill="#c8102e"/><path d="M48,4 L60,32 L72,4Z" fill="#2563eb"/><circle cx="60" cy="74" r="38" fill="${col}" stroke="#fff" stroke-width="5"/><circle cx="60" cy="74" r="28" fill="none" stroke="#ffffff88" stroke-width="3"/><text x="60" y="82" text-anchor="middle" font-family="FredokaApp,sans-serif" font-size="${label.length>4?17:22}" font-weight="700" fill="#fff">${label}</text></svg>`;}
@@ -422,8 +431,8 @@ function result(){
  main.innerHTML=`<div class="ex-wrap"><div class="ex-card result fade">${S.mode==='test'?`<div class="kick-red">ABSCHLUSSTEST · ${L.title}</div>`:''}
  ${badge}<div class="stars">${[0,1,2].map(i=>`<span class="s ${i<st?'on':''}" style="animation-delay:${i*.2}s">★</span>`).join('')}</div>
  <div class="score">${pts} / ${max} Punkte</div><div class="score-sub">${pct} % · ${title}</div>
- ${S.mode==='chapter'?`<div class="legend" style="margin-top:8px">${pct>=70?'✓ Kapitel geschafft! Der Haken ist gesetzt.':'Für den Haken brauchst du mindestens 70 %.'}</div>`:''}${S.mode==='test'?`<div class="legend" style="margin-top:8px">${res.length} Aufgaben · gezählt wird der erste Versuch</div>`:''}${rev}
- <div class="toolbar center">${S.mode==='test'?'<button class="btn red" data-test="1">↻ Neuer Test</button>':S.mode==='chapter'?`<button class="btn" data-practice="${S.ch}">↻ Noch einmal (neue Aufgaben)</button>${CHMAP[S.ch].idx<CHAPTERS.length-1?`<button class="btn green" data-open="${CHAPTERS[CHMAP[S.ch].idx+1].id}">Nächstes Kapitel →</button>`:'<button class="btn red" data-test="1">🏆 Abschlusstest</button>'}`:S.mode==='mix'?'<button class="btn" data-mix="1">↻ Neue Mischung</button>':''}<button class="btn ghost" data-home="1">Zur Übersicht</button></div>
+ ${S.mode==='chapter'?`<div class="legend" style="margin-top:8px">${pct>=70?'✓ Kapitel geschafft! Der Haken ist gesetzt.':'Für den Haken brauchst du mindestens 70 %.'}</div>`:''}${S.mode==='test'?`<div class="legend" style="margin-top:8px">${res.length} Aufgaben · gezählt wird der erste Versuch</div>`:''}${rev}${S.mode==='test'&&EXTRA().length?`<div class="tip xtip"><span class="tip-ic">🧡</span><div><b>Extra-Übung:</b> Deine typischen Fehler gezielt üben – mit Erklärung. ${EXTRA().map(c=>`<button class="btn small extra-btn" data-open="${c.id}">${c.title}</button>`).join(' ')}</div></div>`:''}
+ <div class="toolbar center">${S.mode==='test'?'<button class="btn red" data-test="1">↻ Neuer Test</button>':S.mode==='chapter'?`<button class="btn" data-practice="${S.ch}">↻ Noch einmal (neue Aufgaben)</button>${nextReg(CHMAP[S.ch])?`<button class="btn green" data-open="${nextReg(CHMAP[S.ch]).id}">Nächstes Kapitel →</button>`:CHMAP[S.ch].extra?'':'<button class="btn red" data-test="1">🏆 Abschlusstest</button>'}`:S.mode==='mix'?'<button class="btn" data-mix="1">↻ Neue Mischung</button>':''}<button class="btn ghost" data-home="1">Zur Übersicht</button></div>
  ${S.mode==='test'?`<div class="chreset"><span class="legend" id="testBest">Test-Bestwert: <b>${P.test.best??0} %</b> · ${stars(P.test.stars)} · ${P.test.runs}× gemacht</span><button class="btn ghost small" data-testreset="1">🗑 Test-Bestwerte löschen</button></div>`:S.mode==='chapter'?`<div class="chreset"><span class="legend">Ganz von vorn beginnen?</span><button class="btn ghost small" data-chreset="${S.ch}">↺ Kapitel zurücksetzen</button></div>`:''}</div></div>`;
  if(st>=2&&S.mode!=='single')confetti();
 }

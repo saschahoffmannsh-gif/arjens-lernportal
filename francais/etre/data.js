@@ -1,6 +1,41 @@
 /* Lektion: Das Verb être */
 const {F,G,conj,dlg,merk,attn,tip,hoer,card,reveal,tabs,track,steps,grp,ob,spk,spkLines}=H;
 const {mc,pick,gap,gapw,ord,wr,mt,dl,clk,mark,mul,seg,tf,det}=X;
+/* ---------- Fehler-Erkenner für die Extra-Übung „Nachholbedarf 1“ (Arjens typische Fehler) ---------- */
+const NH=(()=>{
+ const N=s=>window.DN(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/^m /,'monsieur ').trim();
+ const E=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+ const BE=/^(est|sont|suis|es|sommes|etes)$/;const PR=['il','elle','ils','elles'];const PV={il:'est',elle:'est',ils:'sont',elles:'sont'};
+ const M_ORD='Wer? → Verb (être) → Rest. Das Verb kommt direkt nach dem Subjekt – nie ans Ende.';
+ const M_ERS='Ersetzen = Person (mit Artikel) raus, il / elle / ils / elles rein, Verb anpassen – der Rest bleibt Wort für Wort gleich.';
+ const M_PR='ein Junge / Mann → il · ein Mädchen / eine Frau → elle · mehrere Mädchen → elles · Jungen oder gemischt → ils';
+ return function(raw,r,e){const out=[];const add=(t,m)=>out.push({t,m});
+  const sol=window.strip(String(r.sol||'')).trim();const g=N(raw),s=N(sol);if(!g||g===s)return out;
+  const gw=g.split(' '),sw=s.split(' '),sol_w=sol.split(/\s+/);
+  if(/(^| )(mr|mrs|mister|miss|ms)( |$)/.test(g))add('«Mr» ist <b>Englisch</b> (Mister). Auf Französisch heißt „Herr“ <b>Monsieur</b> – abgekürzt <b>M.</b> „Frau“ heißt <b>Madame</b> (abgekürzt Mme). In der Arbeit zählt «Mr» als Fehler.','Herr = Monsieur (M.) · Frau = Madame (Mme) – nie Mr / Mrs.');
+  if(/(^| )la professeur/.test(g)&&/(^| )le professeur/.test(s))add('Monsieur Martel ist ein <b>Mann</b> → <b>le</b> professeur (der Lehrer). <i>la professeur</i> sagt man nur bei einer <b>Lehrerin</b> (Madame …). Bei Personen richtet sich der Artikel danach, ob es ein Mann oder eine Frau ist.','Monsieur … → le professeur · Madame … → la professeur');
+  else if(/(^| )(les|l') professeur/.test(g)&&/(^| )le professeur/.test(s))add('Es ist <b>ein</b> Mann → <b>le</b> professeur. <i>les</i> ist für mehrere, <i>l’</i> nur vor a, e, i, o, u.','Monsieur … → le professeur');
+  if(/(^| )monsieur/.test(g)&&/(^| )madame/.test(s)||/(^| )madame/.test(g)&&/(^| )monsieur/.test(s))add('<b>Monsieur</b> = Herr (Mann) · <b>Madame</b> = Frau.','Herr = Monsieur · Frau = Madame');
+  const lastG=gw[gw.length-1],lastS=sw[sw.length-1];
+  if(gw.length>2&&BE.test(lastG)&&!BE.test(lastS))add(`Bei dir steht das Verb <b>${lastG}</b> ganz am <b>Ende</b> – so wie in einem deutschen Nebensatz („…, weil Herr Martel der Lehrer <b>ist</b>“). Im Französischen kommt das Verb aber <b>direkt nach dem Subjekt</b> (wer?): wer → <b>Verb</b> → Rest. Genau wie im deutschen Hauptsatz: „Herr Martel <b>ist</b> der Lehrer.“`,M_ORD);
+  else if(gw.length>2&&BE.test(gw[0])&&!BE.test(sw[0]))add(`Bei dir steht das Verb <b>${gw[0]}</b> am <b>Anfang</b>. Im normalen Satz gilt: erst <b>wer</b> (Subjekt), dann das <b>Verb</b>, dann der Rest.`,M_ORD);
+  else if(gw.length>2&&gw.slice().sort().join(' ')===sw.slice().sort().join(' '))add('Alle Wörter sind richtig – nur die <b>Reihenfolge</b> stimmt nicht. Bau den Satz so: 1. <b>Wer?</b> (Subjekt) 2. <b>Verb</b> (est, sont …) 3. der <b>Rest</b> (wo? was? woher?).',M_ORD);
+  if(e.noun){const nn=N(e.noun),core=nn.replace(/^(les|le|la|l') /,'').replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+   if(new RegExp('(^| )'+core+'( |$)').test(g)||(!PR.includes(gw[0])&&PR.includes(sw[0])&&gw[0]===nn.split(' ')[0]))add(`Du hast <b>«${e.noun}»</b> stehen lassen. „<b>Ersetze</b> durch ein Pronomen“ heißt <b>austauschen</b>: «${e.noun}» (mit dem Artikel!) kommt <b>raus</b>, das Pronomen <b>${sol_w[0]}</b> kommt <b>rein</b>. Wie im Deutschen: „${e.de} ${sw[1]==='sont'?'sind':'ist'} …“ → „<b>${e.deP}</b> ${sw[1]==='sont'?'sind':'ist'} …“. So muss man den Namen nicht ständig wiederholen.`,M_ERS);
+   else if(PR.includes(gw[0])&&PR.includes(sw[0])&&gw[0]!==sw[0]){const t=sw[0],w=gw[0];let why;
+    if(t==='elles')why=w==='ils'?`«${e.noun}» sind <b>nur Mädchen / Frauen</b> → <b>elles</b>. <i>ils</i> nimmst du für Jungen oder für eine gemischte Gruppe.`:`«${e.noun}» sind <b>mehrere</b> → <b>elles</b> (mit -s). <i>${w}</i> wäre nur eine Person.`;
+    else if(t==='ils')why=e.mixed?`«${e.noun}» ist eine <b>gemischte Gruppe</b> (Mädchen + Junge). Dann nimmt man immer <b>ils</b> – schon ein Junge in der Gruppe reicht.`:w==='elles'?`«${e.noun}» sind <b>Jungen</b> → <b>ils</b>. <i>elles</i> nur, wenn es lauter Mädchen sind.`:`«${e.noun}» sind <b>mehrere</b> → <b>ils</b> (mit -s).`;
+    else if(t==='il')why=`«${e.noun}» ist <b>ein Mann / ein Junge</b> → <b>il</b> (er).`;
+    else why=`«${e.noun}» ist <b>eine Frau / ein Mädchen</b> → <b>elle</b> (sie).`;
+    add(why,M_PR);}
+   else if(gw.length===1&&sw.length===1&&!PR.includes(gw[0]))add(`Gesucht ist eins der Pronomen <b>il, elle, ils, elles</b>. Für «${e.noun}» passt <b>${sol_w[0]}</b>.`,M_PR);
+   if(PR.includes(gw[0])&&BE.test(gw[1]||'')&&gw[1]!==PV[gw[0]])add(`Zu <b>${gw[0]}</b> gehört <b>${PV[gw[0]]}</b>: il / elle → <b>est</b> · ils / elles → <b>sont</b>. Nach dem Ersetzen immer das Verb prüfen!`,'il / elle → est · ils / elles → sont');
+   const vi=a=>a.findIndex(x=>BE.test(x));const ig=vi(gw),is=vi(sw);
+   if(ig>=0&&is>=0){const rg=gw.slice(ig+1).join(' '),rs=sw.slice(is+1).join(' ');
+    if(rg!==rs){const ow=String(raw).trim().split(/\s+/).slice(ig+1);const orig=ow.join(' ').replace(/[.!?]+$/,'');const aw=ow.find(x=>/^(a|à)$/i.test(x));const right=sol_w.slice(is+1).join(' ').replace(/[.!?]+$/,'');
+     if(/(^| )dans( |$)/.test(rs)&&!/(^| )dans( |$)/.test(rg)&&/(^| )a( |$)/.test(rg))add(`Du hast <b>dans</b> in «${E(aw||'a')}» geändert. Beim Ersetzen bleibt der <b>Rest des Satzes genau gleich</b> – du tauschst nur die Person aus und schreibst den Rest Wort für Wort ab. Außerdem heißt „auf dem Schulhof / in der Klasse“ immer <b>dans</b> la cour / <b>dans</b> la classe. <b>à</b> (mit Akzent!) steht vor Städten: à Strasbourg, à Berlin.`,'Ersetzen: nur die Person austauschen – der Rest bleibt Wort für Wort gleich (dans la cour bleibt dans la cour).');
+     else add(`Hinter dem Verb hast du etwas verändert: «${E(orig)}» statt «${E(right)}». Beim Ersetzen bleibt der <b>Rest genau gleich</b> – schreib ihn Wort für Wort ab.`,M_ERS);}}}
+  return out;};})();
 window.LESSON={slug:'etre',title:'Das Verb être',fr:'je suis, tu es, il est …',icon:'🙋',color:'#ea580c',testN:18,
  intro:'<b>être</b> heißt <b>sein</b> und ist das wichtigste Verb im Französischen. Es ist <b>unregelmäßig</b> – du musst die sechs Formen auswendig können. Hier lernst du sie mit Dialogen, Bildern und vielen Aufgaben (Hörübungen kommen am Ende im Teil „Hörverstehen“).'};
 const D1=[
@@ -169,6 +204,51 @@ ex:[
  wr('Verbessere den Satz: «Vous etes nouveaux?»',['Vous êtes nouveaux?'],'vous → êtes mit Accent circonflexe.'),
  mc('Jemand schreibt: «Je es Clara.» Was ist der Fehler?',['Zu je gehört suis: Je suis Clara.','Es fehlt ein Akzent: Je ès Clara.','Es muss heißen: Je est Clara.','Da ist kein Fehler.'],'je → <b>suis</b>. «es» gehört zu tu.'),
 ]},
+/* ---------------- 10 · Extra-Übung: Nachholbedarf 1 (Arjens Fehler aus dem Abschlusstest) */
+{id:'nachholbedarf',kind:'Nachholbedarf',icon:'🎯',title:'Nachholbedarf 1',sub:'Satzbau · „Ersetze durch ein Pronomen“ · le professeur / Monsieur',lv:1,extra:true,c:'#f97316',
+plan:{A1:1,A2:2,A3:1,B1:2,B2:2,B3:2,C1:1,C2:1,C3:1},
+html:attn(`<table class="t"><tr><th>✗ So war es im Test</th><th>✓ So ist es richtig</th><th>Warum?</th></tr>
+ <tr><td><s>Monsieur Martel le professeur de français est.</s></td><td>${F('Monsieur Martel est le professeur de français.','Martel')}</td><td>Wer? → <b>Verb</b> → Rest. Das Verb steht direkt nach dem Subjekt, nie am Ende.</td></tr>
+ <tr><td><s>les filles sont a la cour</s></td><td>${F('Elles sont dans la cour.')}</td><td><b>Ersetzen</b> = les filles raus, <b>elles</b> rein. Der Rest (<b>dans</b> la cour) bleibt gleich.</td></tr>
+ <tr><td><s>Mr Martel est la professeur</s></td><td>${F('Monsieur Martel est le professeur.','Martel')}</td><td>Herr = <b>Monsieur</b> (Mr ist Englisch). Ein Mann → <b>le</b> professeur.</td></tr></table>`,'Deine 3 Stolpersteine aus dem Test')
+ +tip('<b>So übst du:</b> Erst kommen ganz leichte Aufgaben (antippen, auswählen), dann Bausteine ordnen, zum Schluss schreibst du selbst. Nach jeder Aufgabe steht direkt, <b>warum</b> etwas richtig oder falsch ist.','🧡'),
+ex:[
+ /* A · Satzbau */
+ mc('Welcher Satz ist richtig gebaut?',['Monsieur Martel est le professeur de français.','Monsieur Martel le professeur de français est.','Est Monsieur Martel le professeur de français.','Le professeur de français Monsieur Martel est.'],'Erst <b>wer</b> (Monsieur Martel), dann gleich das <b>Verb</b> (est), dann der Rest (le professeur de français).',{grp:'A1',lv:1,dx:NH,say:[['Martel','Monsieur Martel est le professeur de français.']]}),
+ mc('Welcher Satz ist richtig gebaut?',['Clara est en sixième A.','Clara en sixième A est.','En sixième A Clara est.','Est Clara en sixième A.'],'<b>Clara</b> (wer?) → <b>est</b> (Verb) → <b>en sixième A</b> (Rest). Das Verb kommt direkt nach dem Subjekt.',{grp:'A1',lv:1,dx:NH,say:'Clara est en sixième A.'}),
+ mc('Was steht im französischen Satz <b>direkt nach dem Subjekt</b> (wer?)?',['das Verb (z. B. est, sont)','der Rest des Satzes – das Verb kommt ans Ende','der Artikel le / la','ein Komma'],'Wer? → <b>Verb</b> → Rest. Das Verb ist der „Motor“ des Satzes und steht gleich hinter dem Subjekt – wie im deutschen Satz „Clara <b>ist</b> in der 6A“.',{grp:'A1',lv:1}),
+ ord('Bring die Bausteine in die richtige Reihenfolge.',['Monsieur Martel','est','le professeur','de français.'],'Monsieur Martel (wer?) → <b>est</b> (Verb) → le professeur de français (Rest).',['M. Martel est le professeur de français.'],{grp:'A2',lv:2,must:true,dx:NH,say:[['Martel','Monsieur Martel est le professeur de français.']]}),
+ ord('Bring die Bausteine in die richtige Reihenfolge.',['Jade et Yasmine','sont','dans la cour.'],'Jade et Yasmine (wer? – zwei Mädchen) → <b>sont</b> → dans la cour (wo?).',[],{grp:'A2',lv:2,dx:NH}),
+ ord('Bring die Bausteine in die richtige Reihenfolge.',['Je','suis','de Berlin.'],'Je (wer?) → <b>suis</b> (Verb) → de Berlin (woher?).',[],{grp:'A2',lv:2,dx:NH}),
+ ord('Bring die Bausteine in die richtige Reihenfolge.',['Madame Fournier','est','la surveillante.'],'Madame Fournier (wer?) → <b>est</b> (Verb) → la surveillante (was ist sie?).',[],{grp:'A2',lv:2,dx:NH,say:[['Fournier','Madame Fournier est la surveillante.']]}),
+ wr('Bau einen richtigen Satz aus den Wörtern und schreibe ihn auf: <span class="fr">nouveau · Karim · est</span>',['Karim est nouveau.'],'Karim (wer?) → <b>est</b> (Verb) → nouveau (wie?). = Karim ist neu.',{grp:'A3',lv:3,dx:NH,ph:'Karim …'}),
+ wr('Übersetze: „Herr Martel ist der Französischlehrer.“',['Monsieur Martel est le professeur de français.','M. Martel est le professeur de français.'],'Herr = <b>Monsieur</b>, dann direkt das Verb <b>est</b>, dann <b>le professeur de français</b> (ein Mann → le).',{grp:'A3',lv:3,must:true,dx:NH}),
+ wr('Übersetze: „Clara ist in der 6A.“',['Clara est en sixième A.','Clara est en 6e A.','Clara est en sixième.'],'Clara → <b>est</b> → en sixième A. Das Verb kommt gleich nach dem Namen.',{grp:'A3',lv:3,dx:NH}),
+ /* B · Ersetzen durch ein Pronomen */
+ mc('«<u>Les filles</u> sont dans la cour.» – Welches Pronomen ersetzt <b>Les filles</b>?',['Elles','Ils','Elle','Il'],'Les filles = <b>mehrere Mädchen</b> → <b>elles</b>. Damit sagst du „sie“, ohne „die Mädchen“ zu wiederholen.',{grp:'B1',lv:1,dx:NH,noun:'Les filles',de:'Die Mädchen',deP:'Sie',say:'Elles sont dans la cour.'}),
+ mc('«<u>Monsieur Martel</u> est dans la classe.» – Welches Pronomen ersetzt <b>Monsieur Martel</b>?',['Il','Elle','Ils','Elles'],'Monsieur Martel ist <b>ein Mann</b> → <b>il</b> (er).',{grp:'B1',lv:1,dx:NH,noun:'Monsieur Martel',de:'Herr Martel',deP:'Er',say:'Il est dans la classe.'}),
+ mc('«<u>Théo et Karim</u> sont de Berlin.» – Welches Pronomen ersetzt <b>Théo et Karim</b>?',['Ils','Elles','Il','Nous'],'Théo et Karim = <b>zwei Jungen</b> → <b>ils</b>.',{grp:'B1',lv:1,dx:NH,noun:'Théo et Karim',de:'Théo und Karim',deP:'Sie',say:'Ils sont de Berlin.'}),
+ mc('«<u>Clara et Théo</u> sont amis.» – Ein Mädchen und ein Junge. Welches Pronomen passt?',['Ils','Elles','Il','Elle'],'Clara et Théo ist eine <b>gemischte Gruppe</b> → <b>ils</b>. Sobald ein Junge dabei ist, nimmt man ils.',{grp:'B1',lv:1,dx:NH,noun:'Clara et Théo',mixed:true,de:'Clara und Théo',deP:'Sie',say:'Ils sont amis.'}),
+ mc('In der Aufgabe steht: „<b>Ersetze</b> durch ein Pronomen.“ Was sollst du tun?',['Die Person (mit Artikel) gegen il / elle / ils / elles austauschen – der Rest bleibt gleich.','Den Satz noch einmal genau abschreiben.','Den Satz ins Deutsche übersetzen.','Die Wörter am Ende des Satzes ändern.'],'<b>Ersetzen = austauschen.</b> Les filles → Elles. Nur die Person wird ausgetauscht (und das Verb passend gemacht), alles andere bleibt gleich.',{grp:'B1',lv:1}),
+ mc('Ersetze durch ein Pronomen: «<u>Les filles</u> sont dans la cour.» Welcher Satz ist richtig?',['Elles sont dans la cour.','Les filles sont à la cour.','Elles est dans la cour.','Elles sont à la cour.'],'Les filles → <b>Elles</b>, das Verb bleibt <b>sont</b> (mehrere), und der Rest <b>dans la cour</b> bleibt genau gleich.',{grp:'B1',lv:1,dx:NH,noun:'Les filles',de:'Die Mädchen',deP:'Sie',say:'Elles sont dans la cour.'}),
+ gap('Ersetze durch ein Pronomen: «<u>Théo et Karim</u> sont dans la classe.»','{0} {1} dans la classe.',[['Ils','Elles','Il'],['sont','est','sommes']],'Théo et Karim (zwei Jungen) → <b>Ils</b> → Verb <b>sont</b>. „dans la classe“ bleibt.',{grp:'B2',lv:2,dx:NH,noun:'Théo et Karim',de:'Théo und Karim',deP:'Sie'}),
+ gap('Ersetze durch ein Pronomen: «<u>Jade et Yasmine</u> sont amies.»','{0} {1} amies.',[['Elles','Ils','Elle'],['sont','est','es']],'Jade et Yasmine (zwei Mädchen) → <b>Elles</b> → <b>sont</b>. „amies“ bleibt.',{grp:'B2',lv:2,dx:NH,noun:'Jade et Yasmine',de:'Jade und Yasmine',deP:'Sie'}),
+ gap('Ersetze durch ein Pronomen: «<u>Le professeur</u> est dans la classe.»','{0} est {1} la classe.',[['Il','Elle','Le'],['dans','à','de']],'Le professeur (ein Mann) → <b>Il</b>. Und <b>dans</b> la classe bleibt dans – der Rest ändert sich nicht.',{grp:'B2',lv:2,dx:NH,noun:'Le professeur',de:'Der Lehrer',deP:'Er'}),
+ gap('Ersetze durch ein Pronomen: «<u>Clara et Léo</u> sont dans la cour.»','{0} {1} dans la cour.',[['Ils','Elles','Elle'],['sont','est','êtes']],'Clara et Léo = gemischt (Mädchen + Junge) → <b>Ils</b> → <b>sont</b>.',{grp:'B2',lv:2,dx:NH,noun:'Clara et Léo',mixed:true,de:'Clara und Léo',deP:'Sie'}),
+ wr('Ersetze das Unterstrichene durch ein Pronomen und schreibe den ganzen Satz: «<u>Les filles</u> sont dans la cour.»',['Elles sont dans la cour.'],'Les filles = mehrere Mädchen → <b>Elles</b>. Verb: <b>sont</b>. Rest Wort für Wort: <b>dans la cour</b>.',{grp:'B3',lv:3,must:true,dx:NH,noun:'Les filles',de:'Die Mädchen',deP:'Sie',ph:'… sont dans la cour.'}),
+ wr('Ersetze das Unterstrichene durch ein Pronomen: «<u>Monsieur Martel</u> est dans la classe.»',['Il est dans la classe.'],'Monsieur Martel = ein Mann → <b>Il</b> → <b>est</b>. Der Rest „dans la classe“ bleibt.',{grp:'B3',lv:3,dx:NH,noun:'Monsieur Martel',de:'Herr Martel',deP:'Er'}),
+ wr('Ersetze das Unterstrichene durch ein Pronomen: «<u>Théo et Clara</u> sont dans la cour.»',['Ils sont dans la cour.'],'Théo et Clara = gemischte Gruppe → <b>Ils</b> → <b>sont</b>. Rest gleich: dans la cour.',{grp:'B3',lv:3,dx:NH,noun:'Théo et Clara',mixed:true,de:'Théo und Clara',deP:'Sie'}),
+ wr('Ersetze das Unterstrichene durch ein Pronomen: «<u>Madame Fournier</u> est la surveillante.»',['Elle est la surveillante.'],'Madame Fournier = eine Frau → <b>Elle</b> → <b>est</b>. Rest gleich: la surveillante.',{grp:'B3',lv:3,dx:NH,noun:'Madame Fournier',de:'Frau Fournier',deP:'Sie'}),
+ wr('Ersetze das Unterstrichene durch ein Pronomen: «<u>Les garçons</u> sont de Berlin.»',['Ils sont de Berlin.'],'Les garçons = mehrere Jungen → <b>Ils</b> → <b>sont</b>. Rest gleich: de Berlin.',{grp:'B3',lv:3,dx:NH,noun:'Les garçons',de:'Die Jungen',deP:'Sie'}),
+ /* C · le professeur / Monsieur */
+ mc('Monsieur Martel ist ein <b>Mann</b>. Welcher Satz ist richtig?',['Monsieur Martel est le professeur de français.','Monsieur Martel est la professeur de français.','Monsieur Martel est les professeur de français.','Monsieur Martel est l’professeur de français.'],'Ein Mann → <b>le</b> professeur (der Lehrer).',{grp:'C1',lv:1,dx:NH,say:[['Martel','Monsieur Martel est le professeur de français.']]}),
+ mc('Wie schreibt man „<b>Herr</b> Martel“ auf Französisch?',['Monsieur Martel','Mr Martel','Mister Martel','Madame Martel'],'Herr = <b>Monsieur</b> (abgekürzt M.). „Mr“ und „Mister“ sind Englisch, „Madame“ heißt Frau.',{grp:'C1',lv:1,dx:NH,say:'Monsieur Martel'}),
+ mc('Wie sagt man „<b>Frau</b> Fournier“ auf Französisch?',['Madame Fournier','Mrs Fournier','Monsieur Fournier','Miss Fournier'],'Frau = <b>Madame</b> (abgekürzt Mme). „Mrs“ und „Miss“ sind Englisch.',{grp:'C1',lv:1,dx:NH,say:'Madame Fournier'}),
+ gap('Wähle die richtigen Wörter.','{0} Martel est {1} professeur de français.',[['Monsieur','Mr','Madame'],['le','la','les']],'Herr = <b>Monsieur</b>; ein Mann → <b>le</b> professeur.',{grp:'C2',lv:2,dx:NH}),
+ det('Fehlerdetektiv: Finde die 2 Fehler.','[Mr|Monsieur] Martel est [la|le] professeur de français.','Mr ist Englisch → <b>Monsieur</b>. Ein Mann → <b>le</b> professeur.',{grp:'C2',lv:2,dx:NH}),
+ wr('Verbessere den Satz: «Mr Martel est la professeur de français.»',['Monsieur Martel est le professeur de français.','M. Martel est le professeur de français.'],'Zwei Sachen: Herr = <b>Monsieur</b> (nicht Mr) und Monsieur Martel ist ein Mann → <b>le</b> professeur.',{grp:'C3',lv:3,dx:NH}),
+ wr('Übersetze: „Frau Fournier ist die Aufsicht.“',['Madame Fournier est la surveillante.','Mme Fournier est la surveillante.'],'Frau = <b>Madame</b>, dann direkt <b>est</b>, dann <b>la surveillante</b> (eine Frau → la).',{grp:'C3',lv:3,dx:NH}),
+]},
 ];
 window.TEST_EX=[
  gapw('Ergänze die Formen von être.','1. Je {0} élève. 2. Tu {1} de Berlin? 3. Yasmine {2} en sixième A. 4. Nous {3} dans la cour. 5. Vous {4} nouveaux? 6. Lucas et Karim {5} amis.',[['suis'],['es'],['est'],['sommes'],['êtes'],['sont']],'suis · es · est · sommes · êtes · sont.',{ref:'formen',tag:'Formen von être'}),
@@ -178,7 +258,7 @@ window.TEST_EX=[
  wr('Setze in den Plural: «Elle est nouvelle.»',['Elles sont nouvelles.'],'elle est → elles sont; nouvelle → nouvelles.',{ref:'schwer',tag:'Plural'}),
 ];
 /* Pro Durchgang: so viele Aufgaben je Kapitel (Rest = Reserve-Pool); Pflichtaufgaben zu den Heftfehlern */
-H.setRun({entdecken:2,formen:3,pronomen:2,szenen:2,leicht:4,mittel:4,schwer:4,fehler:3},{fehler:[0],test:[3]});
+H.setRun({entdecken:2,formen:3,pronomen:2,szenen:2,leicht:4,mittel:4,schwer:4,fehler:3,nachholbedarf:13},{fehler:[0],test:[3]});
 /* INTRO */
 H.setIntro({
 _lesson:{t:'être – das Verb „sein“',
@@ -245,5 +325,34 @@ fehler:{rule:"Bei jeder Form von être prüfen: Passt sie zum Pronomen davor? Na
  bsp:[['je suis','nicht: <s>je es</s> – zu je gehört suis'],['tu es','nicht: <s>tu est</s> – bei tu kein t'],['ils sont','nicht: <s>ils est</s> – mehrere → sont'],['on est','nicht: <s>on sommes</s> – nach on immer est']],
  merk:'Bei jedem Verb fragen: Wer? – Passt die Form dazu?',
  fallen:['<b>on sommes</b> klingt richtig, ist aber falsch → <b>on est</b>.','<b>vous etes</b> → vous <b>ê</b>tes.'],
- check:['Satz lesen.','Pronomen + Verb prüfen.','Fehler antippen.']}
+ check:['Satz lesen.','Pronomen + Verb prüfen.','Fehler antippen.']},
+nachholbedarf:{t:'Nachholbedarf 1 – deine drei Stolpersteine aus dem Test',rule:'Wer? → Verb → Rest. Ersetzen: Person mit Artikel raus, il / elle / ils / elles rein, Verb anpassen (est / sont), Rest gleich. Monsieur … → le professeur.',
+ was:'Im Abschlusstest sind dir drei Sachen passiert. Das ist ganz normal – genau dafür gibt es diese <b>Extra-Übung</b>. Wir schauen uns jeden Fehler in Ruhe an: <b>was</b> die Regel ist, <b>warum</b> man es im Französischen so macht und <b>wie</b> du Schritt für Schritt vorgehst.',
+ warum:'Alle drei Sachen kommen in der Klassenarbeit sicher wieder dran: Sätze bauen, „Ersetze durch ein Pronomen“ und Herr Martel als Lehrer. Wenn du die drei Regeln kannst, sind das sichere Punkte.',
+ merk:'1. Wer? → Verb → Rest. 2. Ersetzen = austauschen, der Rest bleibt gleich. 3. Monsieur Martel → le professeur, nie Mr.',
+ parts:[
+ {h:'Satzbau: Das Verb steht direkt nach dem Subjekt',
+  was:'Ein französischer Satz ist wie eine Kette aus drei Gliedern: <b>Wer?</b> (das Subjekt: <i>Monsieur Martel, je, Clara …</i>) → <b>Verb</b> (hier eine Form von être: <i>est, sont …</i>) → <b>Rest</b> (was? wo? woher?).',
+  warum:'Das Verb ist der „Motor“ des Satzes. Im Französischen steht es <b>immer gleich hinter dem Subjekt</b> – egal, wie lang der Rest ist. Im deutschen Hauptsatz ist das genauso: „Herr Martel <b>ist</b> der Französischlehrer.“ Nur im deutschen <b>Nebensatz</b> rutscht das Verb ans Ende („…, weil Herr Martel der Lehrer <b>ist</b>“). Das gibt es im Französischen nicht – deshalb gehört das Verb dort <b>nie ans Ende</b>.',
+  schritte:['<b>Wer?</b> Such zuerst das Subjekt: <i>Monsieur Martel</i>.','<b>Verb direkt dahinter</b>: <i>Monsieur Martel <b>est</b> …</i>','<b>Rest danach</b>: <i>… le professeur de français.</i>','<b>Kontrolle:</b> Steht das Verb gleich hinter dem „Wer“? Steht am Ende ein Punkt?'],
+  tab:'<table class="cj"><tr><th>Wer?</th><th>Verb</th><th>Rest</th></tr><tr><td>Monsieur Martel</td><td><b>est</b></td><td>le professeur de français.</td></tr><tr><td>Jade et Yasmine</td><td><b>sont</b></td><td>dans la cour.</td></tr><tr><td>Je</td><td><b>suis</b></td><td>de Berlin.</td></tr></table>',
+  bsp:[['Monsieur Martel est le professeur de français.','Herr Martel ist der Französischlehrer.','Martel'],['Jade et Yasmine sont dans la cour.','Jade und Yasmine sind auf dem Schulhof.'],['Je suis de Berlin.','Ich bin aus Berlin.'],['Madame Fournier est la surveillante.','Frau Fournier ist die Aufsicht.','Fournier']],
+  merk:'Wer? → Verb → Rest. Das Verb (est, sont …) steht direkt nach dem Subjekt – nie am Ende.',
+  fallen:['Im Test stand: <s>Monsieur Martel le professeur de français est.</s> – da steht <b>est</b> am Ende wie in einem deutschen Nebensatz. Richtig: <b>Monsieur Martel est le professeur de français.</b>']},
+ {h:'„Ersetze durch ein Pronomen“ – was heißt das?',
+  was:'<b>Ersetzen</b> heißt <b>austauschen</b>. Du nimmst die Person oder die Personen <b>mit ihrem Artikel</b> aus dem Satz heraus (z. B. <i>Les filles</i>) und setzt dafür ein kleines Wort ein: <b>il, elle, ils</b> oder <b>elles</b>. Alles andere im Satz bleibt <b>genau gleich</b>.',
+  warum:'Damit man Namen nicht ständig wiederholen muss. Das machst du im Deutschen auch: „Die Mädchen sind auf dem Schulhof. <b>Sie</b> lachen.“ – niemand sagt zweimal „die Mädchen“. Im Französischen gibt es dafür vier Wörter, weil man unterscheidet: <b>eine</b> Person oder <b>mehrere</b>? <b>Junge</b> oder <b>Mädchen</b>?',
+  schritte:['<b>Finde, wer gemeint ist</b> – das ist das Subjekt vor dem Verb: <i><u>Les filles</u> sont dans la cour.</i>','<b>Frag dich: einer oder mehrere? Junge oder Mädchen?</b> → les filles = mehrere Mädchen.','<b>Wähle das Pronomen:</b> ein Junge / Mann → <b>il</b> · ein Mädchen / eine Frau → <b>elle</b> · mehrere Mädchen → <b>elles</b> · mehrere Jungen <b>oder gemischt</b> → <b>ils</b>.','<b>Verb anpassen:</b> il / elle → <b>est</b> · ils / elles → <b>sont</b>.','<b>Den Rest Wort für Wort abschreiben</b> – nichts ändern: <i>dans la cour</i> bleibt <i>dans la cour</i>.'],
+  tab:'<table class="cj"><tr><th>Wer ist gemeint?</th><th>Pronomen</th><th>être</th></tr><tr><td>ein Junge / Mann (Monsieur Martel, le garçon)</td><td><b>il</b></td><td>est</td></tr><tr><td>ein Mädchen / eine Frau (Clara, Madame Fournier)</td><td><b>elle</b></td><td>est</td></tr><tr><td>mehrere Jungen (Théo et Karim, les garçons)</td><td><b>ils</b></td><td>sont</td></tr><tr><td>gemischt (Clara et Théo)</td><td><b>ils</b></td><td>sont</td></tr><tr><td>mehrere Mädchen (les filles, Jade et Yasmine)</td><td><b>elles</b></td><td>sont</td></tr></table>',
+  bsp:[['Elles sont dans la cour.','aus: <i>Les filles sont dans la cour.</i> – Sie sind auf dem Schulhof.'],['Il est dans la classe.','aus: <i>Monsieur Martel est dans la classe.</i> – Er ist in der Klasse.'],['Elle est la surveillante.','aus: <i>Madame Fournier est la surveillante.</i> – Sie ist die Aufsicht.'],['Ils sont amis.','aus: <i>Clara et Théo sont amis.</i> – Sie sind Freunde. (gemischt → ils)']],
+  merk:'Ersetzen = Person mit Artikel raus, Pronomen rein (il, elle, ils, elles), Verb anpassen (est / sont) – der Rest bleibt gleich.',
+  fallen:['Im Test stand: <s>les filles sont a la cour</s>. Zwei Fehler: 1. <b>les filles</b> ist stehen geblieben – es sollte durch <b>Elles</b> ersetzt werden. 2. Aus <b>dans</b> wurde „a“ – beim Ersetzen bleibt der Rest aber gleich. Richtig: <b>Elles sont dans la cour.</b>','Gemischte Gruppe (Clara et Théo) → immer <b>ils</b>, auch wenn mehr Mädchen dabei sind.','„auf dem Schulhof“ = <b>dans</b> la cour. <b>à</b> (mit Akzent) steht vor Städten: à Strasbourg, à Berlin.']},
+ {h:'le professeur, Monsieur und Madame',
+  was:'Herr Martel ist ein Mann – also ist er <b>le professeur</b> (der Lehrer). Als Anrede sagt man auf Französisch <b>Monsieur</b> (Herr) und <b>Madame</b> (Frau).',
+  warum:'Bei Personen richtet sich der Artikel danach, ob es ein Mann oder eine Frau ist: <i>le professeur</i> für einen Lehrer, <i>la professeur</i> für eine Lehrerin (so steht es auch in deinem Vokabelheft: le / la professeur). <b>Mr</b> und <b>Mrs</b> sind <b>Englisch</b> – auf Französisch gibt es sie nicht. Mehr zu le, la, l’, les übst du in Lektion 2.',
+  schritte:['<b>Mann oder Frau?</b> Monsieur Martel → Mann → <b>le</b> professeur.','<b>Anrede auf Französisch:</b> <b>Monsieur</b> (abgekürzt M.) oder <b>Madame</b> (abgekürzt Mme).','<b>Kontrolle:</b> Steht da irgendwo Mr oder Mrs? → durch Monsieur / Madame ersetzen.'],
+  bsp:[['Monsieur Martel est le professeur de français.','Herr Martel ist der Französischlehrer.','Martel'],['Bonjour, Monsieur!','Guten Tag! (zu einem Mann)'],['Bonjour, Madame!','Guten Tag! (zu einer Frau)','Fournier'],['Madame Fournier est la surveillante.','Frau Fournier ist die Aufsicht.','Fournier']],
+  merk:'Monsieur … → le professeur. Herr = Monsieur (M.), Frau = Madame (Mme) – nie Mr / Mrs.',
+  fallen:['Im Test stand: <s>la professeur</s> und <s>Mr</s>. Monsieur Martel ist ein Mann → <b>le professeur</b>. „Mr“ ist Englisch → <b>Monsieur</b>.']}],
+ ende:'<b>Tipp:</b> Die Extra-Übung zählt nicht zum normalen Durchgang. Mach sie so oft, bis du sie <b>zweimal hintereinander mit über 90 %</b> schaffst – dann sitzt es wirklich und ist nicht geraten.'}
 });

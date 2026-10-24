@@ -488,3 +488,17 @@ table.t th{background:#eff6ff;color:var(--navy);font-family:'FredokaApp',sans-se
 .readbox{background:#f8fafc;border:1px solid #e2e8f0;border-left:5px solid #0d9488;border-radius:12px;padding:10px 12px;margin:10px 0;line-height:1.55}
 .readbox .rb-h{font-weight:800;margin-bottom:4px}.readbox .tl{margin:3px 0}
 .ov-part{grid-column:1/-1;font-weight:800;color:#1e3a8a;margin:10px 2px 0;font-size:.95rem;text-transform:uppercase;letter-spacing:.03em}
+/* Extra-Übung (Nachholbedarf) */
+.xbadge{display:inline-block;background:#f97316;color:#fff;font-weight:800;font-size:.72rem;letter-spacing:.02em;padding:2px 8px;border-radius:999px;vertical-align:middle;margin-right:4px;text-transform:none}
+.pstep.extra{border:2px dashed #f97316;background:#fff7ed}
+.pstep.extra .pnum{background:#f97316;color:#fff}
+.pblock.xblock span{color:#c2410c}
+.btn.extra-btn{background:#f97316;border-color:#ea580c;color:#fff}
+.btn.extra-btn:hover{background:#ea580c}
+.xtip{margin-top:14px;background:#fff7ed;border-color:#fdba74}
+.xtip .btn{margin:6px 6px 0 0}
+.inpart{margin:18px 0 6px;padding:12px 12px 4px;border:2px solid #fed7aa;border-radius:16px;background:#fffbf5}
+.inpart-h{display:flex;align-items:center;gap:10px;margin:0 0 8px;font-size:1.08rem;color:#9a3412}
+.inpart-n{flex:none;display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#f97316;color:#fff;font-weight:800}
+.inpart table.cj th{background:#ffedd5;padding:4px 6px;text-align:left}
+.ov-extra{display:inline-block;margin-top:6px;background:#fff7ed;border:1px solid #fdba74;color:#9a3412;border-radius:999px;padding:2px 10px;font-size:.82rem;font-weight:700}

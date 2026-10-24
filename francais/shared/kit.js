@@ -80,7 +80,7 @@ H.setRun=(takes,must={})=>{(W.CHAPTERS||[]).forEach(c=>{c.take=Math.min(c.ex.len
  (must.test||[]).forEach(i=>{W.TEST_EX[i].must=true;});};
 H.TEST_N=8;
 /** Aufgaben pro Durchgang einer Lektion (Kapitel + Abschlusstest) und geschätzte Minuten */
-H.runInfo=()=>{const n=(W.CHAPTERS||[]).reduce((a,c)=>a+(c.take||4),0)+H.TEST_N;return {n,min:Math.round(n*1.1/5)*5};};
+H.runInfo=()=>{const n=(W.CHAPTERS||[]).filter(c=>!c.extra).reduce((a,c)=>a+(c.take||4),0)+H.TEST_N;return {n,min:Math.round(n*1.1/5)*5};};
 /* ---------- Fehler-Diagnose: erkennt typische Fehler und erklärt sie kindgerecht ---------- */
 const DN=s=>strip(String(s)).toLowerCase().replace(/[’`´ʼ]/g,"'").replace(/[«»"“”„?!.,:;–—…()]/g,' ').replace(/'\s+/g,"'").replace(/\s+/g,' ').trim();
 const DEACC=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
