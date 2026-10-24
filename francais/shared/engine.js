@@ -188,7 +188,9 @@ function mountWriter(el,w,id){if(!w)return;const sk=WKEY+'_w_'+id;let txt='';try
 
 /* ---------- Übungs-Sitzung ---------- */
 let S=null;
-function practice(cfg){S={mode:cfg.mode,ch:cfg.ch||null,list:cfg.list,i:0,res:[]};renderEx();}
+function practice(cfg){S={mode:cfg.mode,ch:cfg.ch||null,list:cfg.list,i:0,res:[],att:[],t0:Date.now(),tt:[]};
+ if(S.mode==='chapter')S.run=(chp(S.ch).runs||0)+1;else if(S.mode==='test')S.run=(P.test.runs||0)+1;
+ renderEx();}
 /* Auswahl pro Durchgang: Pflichtaufgaben + bevorzugt noch nicht gestellte Aufgaben, Aufgabentypen gemischt */
 const tkey=e=>e.au?'au':e.type;
 function pickFrom(pool,n,pre=[]){const sel=pre.slice();const rest=shuffle(pool.filter(e=>!sel.includes(e)));
@@ -223,7 +225,7 @@ function renderEx(){
  <div class="legend retrynote" id="retryNote" hidden></div></div>
  ${S.mode==='chapter'?`<div class="chreset slim"><button class="btn ghost small" data-chreset="${S.ch}">↺ Kapitel zurücksetzen</button></div>`:''}</div>`;
  const btn=$('#checkBtn'),rb=$('#retryBtn');
- btn.onclick=()=>{if(btn.dataset.next){next();return;}const r=cur.check();if(r==null)return;stopAudio();feedback(e,r,a);btn.textContent=S.i<S.list.length-1?'Weiter →':'Ergebnis ansehen';btn.dataset.next='1';btn.disabled=false;btn.classList.add(r.ok?'green':'red');
+ btn.onclick=()=>{if(btn.dataset.next){next();return;}const r=cur.check();if(r==null)return;stopAudio();const first=!S.res[S.i];feedback(e,r,a);logAnswer(e,r,first);btn.textContent=S.i<S.list.length-1?'Weiter →':'Ergebnis ansehen';btn.dataset.next='1';btn.disabled=false;btn.classList.add(r.ok?'green':'red');
   rb.hidden=false;rb.classList.toggle('hot',!r.ok);
   if(!r.ok&&(S.mode==='test'||S.mode==='chapter')){const n=$('#retryNote');n.hidden=false;n.textContent='Du kannst es nochmal versuchen – für die Punkte zählt aber dein erster Versuch.';}
   setTimeout(()=>{const f=$('#fb');if(f&&f.getBoundingClientRect().bottom>window.innerHeight)f.scrollIntoView({behavior:'smooth',block:'center'});},60);};
@@ -236,10 +238,20 @@ function mountEx(e){
  const fb=$('#fb');fb.className='fb';fb.innerHTML='';
  const btn=$('#checkBtn');btn.textContent='Prüfen';delete btn.dataset.next;btn.disabled=true;btn.classList.remove('green','red');
  const rb=$('#retryBtn');rb.hidden=true;rb.classList.remove('hot');const n=$('#retryNote');if(n)n.hidden=true;
- cur=RENDER[e.type](e,body);
+ cur=RENDER[e.type](e,body);if(S)S.tt[S.i]=Date.now();
 }
 function ready(v){const b=$('#checkBtn');if(b&&!b.dataset.next)b.disabled=!v;}
 const PRAISE=['Super, richtig!','Très bien!','Genau!','Bravo!','Parfait!','Klasse!','Excellent!'];
+
+/* ---------- Protokoll ---------- */
+const LG=window.LOG;
+function lg(ev){if(!LG)return;try{LG.event(L.slug,ev);}catch(err){}}
+function promptOf(e){const t=e.prompt||e.text||(e.lines?e.lines.map(l=>(window.NAMES[l[0]]||l[0])+': '+l[1]).join(' / '):'')||(e.rows?e.rows.map(r=>r[0]).join(' / '):'')||(e.pairs?e.pairs.map(p=>p[0]).join(' / '):'');
+ return strip(String(e.q||''))+(t?' | '+strip(String(t)).replace(/\{\d+\}/g,'___').replace(/\[([^\]|]+)\|[^\]]+\]/g,'$1'):'');}
+function logAnswer(e,r,first){if(!S)return;S.att[S.i]=(S.att[S.i]||0)+1;const C=LG?LG.clip:(x=>x);
+ lg({kind:'answer',mode:S.mode,ch:e.ref||e.ch,chIn:e.ch,run:S.run||null,task:e.id,type:e.type,lv:e.lv,
+  prompt:C(promptOf(e),240),given:C(strip(String(r.given!=null?r.given:'').replace(/<br\s*\/?>/g,' / ')),240),correct:C(strip(String(r.sol||'').replace(/<br\s*\/?>/g,' / ')),240),
+  ok:!!r.ok,pts:r.pts,max:r.max,accent:r.acc?true:undefined,attempt:S.att[S.i],first,pos:S.i+1,of:S.list.length,ms:Math.min(600000,Date.now()-(S.tt[S.i]||Date.now()))});}
 function feedback(e,r,a){
  const fb=$('#fb');const first=!S.res[S.i];
  if(first)S.res[S.i]={e,ok:r.ok,pts:r.pts,max:r.max};
@@ -398,6 +410,7 @@ function result(){
  const st=pct>=90?3:pct>=70?2:pct>=50?1:0;
  if(S.mode==='chapter'){const p=chp(S.ch);p.best=Math.max(p.best||0,pct);p.runs=(p.runs||0)+1;save();}
  if(S.mode==='test'){P.test.runs++;P.test.best=Math.max(P.test.best??0,pct);P.test.stars=Math.max(P.test.stars,st);P.test.last=pct;save();}
+ if(!S.logged){S.logged=1;const fr=res.filter(x=>x.ok).length;lg({kind:S.mode==='test'?'test_end':S.mode==='chapter'?'chapter_end':S.mode+'_end',mode:S.mode,ch:S.mode==='chapter'?S.ch:S.mode==='test'?'test':null,run:S.run||null,pct,pts,max,stars:st,tasks:res.length,firstRight:fr,done:S.mode==='chapter'?pct>=70:undefined,best:S.mode==='chapter'?chp(S.ch).best:S.mode==='test'?P.test.best:undefined,wrongTasks:res.filter(x=>!x.ok).map(x=>x.e.id),ms:Date.now()-S.t0,flush:true});}
  const badge=st===3?medal('#f59e0b','GOLD'):st===2?medal('#94a3b8','SILBER'):st===1?medal('#b45309','BRONZE'):'';
  const title=st===3?'Excellent! Das sitzt!':st===2?'Très bien! Schon richtig gut.':st===1?'Pas mal! Noch ein bisschen üben.':'Courage! Schau dir die Kapitel noch einmal an.';
  const wrong=res.filter(r=>!r.ok);const by={};wrong.forEach(r=>{const k=r.e.ref||r.e.ch;(by[k]=by[k]||[]).push(r.e);});
@@ -418,12 +431,13 @@ function result(){
 document.addEventListener('click',ev=>{const b=ev.target.closest('[data-open],[data-practice],[data-test],[data-home],[data-mix],[data-reset],[data-quit],[data-chreset],[data-testreset]');if(!b)return;
  if(b.dataset.open)go('lesson',b.dataset.open);else if(b.dataset.practice)startChapter(b.dataset.practice);else if(b.dataset.test)startTest();else if(b.dataset.home)go('home');else if(b.dataset.mix)startMix();
  else if(b.dataset.quit){if(S&&S.res.filter(Boolean).length&&S.mode!=='single'&&!confirm('Übung abbrechen? Dein Ergebnis wird nicht gespeichert.'))return;if(S&&S.mode==='chapter')go('lesson',S.ch);else go('home');}
- else if(b.dataset.reset){if(confirm('Willst du wirklich den ganzen Fortschritt dieser Lektion löschen? Alle Haken, gelösten Aufgaben, eigenen Texte und Test-Bestwerte werden gelöscht.')){P=blank();save();try{Object.keys(localStorage).filter(k=>k.startsWith(WKEY+'_w_')).forEach(k=>localStorage.removeItem(k));}catch(e){}go('home');toast('Fortschritt zurückgesetzt.');}}
+ else if(b.dataset.reset){if(confirm('Willst du wirklich den ganzen Fortschritt dieser Lektion löschen? Alle Haken, gelösten Aufgaben, eigenen Texte und Test-Bestwerte werden gelöscht.')){lg({kind:'reset_lesson',flush:true});P=blank();save();try{Object.keys(localStorage).filter(k=>k.startsWith(WKEY+'_w_')).forEach(k=>localStorage.removeItem(k));}catch(e){}go('home');toast('Fortschritt zurückgesetzt.');}}
  else if(b.dataset.chreset){const id=b.dataset.chreset,c=CHMAP[id];if(!confirm(`Kapitel „${strip(c.title)}“ zurücksetzen?\nHaken und Bestwert dieses Kapitels werden gelöscht. Beim nächsten Üben kommen bevorzugt Aufgaben, die du noch nicht hattest.`))return;
-  const inLesson=!!b.closest('#chReset');delete P.ch[id];save();
+  const inLesson=!!b.closest('#chReset');lg({kind:'reset_chapter',ch:id,before:P.ch[id]?{runs:P.ch[id].runs||0,best:P.ch[id].best||0}:null,flush:true});delete P.ch[id];save();
   if(inLesson){chp(id).seen=true;save();$('#chReset').outerHTML=chResetBar(id);updateTop();}else startChapter(id);
   toast('Kapitel zurückgesetzt – neue Aufgaben!');}
- else if(b.dataset.testreset){if(confirm('Test-Bestwerte wirklich löschen?')){P.test=blank().test;save();const t=$('#testBest');if(t)t.innerHTML='Test-Bestwerte gelöscht.';b.disabled=true;toast('Test-Bestwerte gelöscht.');}}});
+ else if(b.dataset.testreset){if(confirm('Test-Bestwerte wirklich löschen?')){lg({kind:'reset_test',before:{runs:P.test.runs,best:P.test.best},flush:true});P.test=blank().test;save();const t=$('#testBest');if(t)t.innerHTML='Test-Bestwerte gelöscht.';b.disabled=true;toast('Test-Bestwerte gelöscht.');}}});
 const logo=$('#logo');if(logo)logo.onclick=()=>go('home');
+if(LG){LG.attach(L.slug);try{LG.backfill(L.slug,P,CHAPTERS);}catch(err){}}
 go('home');
 })();

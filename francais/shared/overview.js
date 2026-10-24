@@ -25,5 +25,35 @@ h+=`</ul></div><div class="section-title"><div class="bar"></div><h2>Lernplan bi
 PLAN.forEach(([d,t,k])=>{h+=`<tr><th>${d}</th><td>${k?`<a href="${k}/">${t}</a>`:t}</td></tr>`;});
 h+=`</table><p class="legend">Pro Tag ca. 35 Minuten – am besten in 2 Portionen à 15–20 Minuten. Lieber jeden Tag ein bisschen als alles am Donnerstag!</p></div>`;
 $('#main').innerHTML=h;
+
+/* ---------- Bericht für Eltern ---------- */
+const esc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function stats(m,events){const C={};const ch=id=>C[id]=C[id]||{runs:0,bfRuns:0,best:null,first:0,firstOk:0,ans:0,ms:0,err:{},last:null};
+ for(const e of events){const c=e.ch||'?';
+  if(e.kind==='backfill_chapter'){const x=ch(c);x.bfRuns=Math.max(x.bfRuns,e.runs||0);x.best=Math.max(x.best??0,e.best||0);}
+  else if(e.kind==='backfill_test'){const x=ch('test');x.bfRuns=Math.max(x.bfRuns,e.runs||0);x.best=Math.max(x.best??0,e.best||0);}
+  else if(e.kind==='chapter_end'||e.kind==='test_end'){const x=ch(c);x.runs++;x.best=Math.max(x.best??0,e.pct||0);x.last=e.ts;}
+  else if(e.kind==='answer'&&(e.mode==='chapter'||e.mode==='test')){const x=ch(e.mode==='test'?'test':c);x.ans++;x.ms+=e.ms||0;x.last=e.ts;
+   if(e.first){x.first++;if(e.ok)x.firstOk++;}
+   if(!e.ok){const k=e.task+'|'+e.given;const r=x.err[k]=x.err[k]||{n:0,prompt:e.prompt,given:e.given,correct:e.correct};r.n++;}}}
+ return C;}
+const fmtMin=ms=>ms<60000?'< 1 Min.':Math.round(ms/60000)+' Min.';
+function berichtHTML(data){let h='';
+ LS.forEach((m,i)=>{const d=data[m.slug]||{events:[]};const C=stats(m,d.events);const ids=m.chapters.concat(['test']);
+  const any=ids.some(id=>C[id]);
+  h+=`<div class="card rp-l"><h3>${m.icon} Lektion ${i+1}: ${esc(m.title)} <span class="legend">(${d.src}, ${d.events.length} Einträge)</span></h3>`;
+  if(!any){h+='<p class="legend">Noch keine Daten.</p></div>';return;}
+  h+='<div class="rp-scroll"><table class="rp"><tr><th>Kapitel</th><th>Durchgänge</th><th>Bestwert</th><th>1. Versuch richtig</th><th>Zeit</th><th>Häufigste Fehler</th></tr>';
+  ids.forEach((id,k)=>{const x=C[id];if(!x)return;const t=id==='test'?'🏆 Abschlusstest':esc((m.chTitles||[])[k]||id);
+   const fe=Object.values(x.err).sort((a,b)=>b.n-a.n).slice(0,3);
+   h+=`<tr><td>${t}</td><td>${x.runs+x.bfRuns}${x.bfRuns?` <span class="legend">(${x.bfRuns} vor Protokoll)</span>`:''}</td><td>${x.best!=null?x.best+' %':'–'}</td><td>${x.first?Math.round(x.firstOk/x.first*100)+' % <span class="legend">('+x.firstOk+'/'+x.first+')</span>':'–'}</td><td>${x.ms?fmtMin(x.ms):'–'}</td>
+   <td>${fe.length?'<ul>'+fe.map(f=>`<li><span class="legend">${esc(f.prompt).slice(0,90)}</span><br><s>${esc(f.given)}</s> → <b>${esc(f.correct)}</b>${f.n>1?` (${f.n}×)`:''}</li>`).join('')+'</ul>':'–'}</td></tr>`;});
+  h+='</table></div></div>';});
+ return h;}
+h=`<div class="section-title" id="bericht"><div class="bar"></div><h2>📊 Bericht für Eltern</h2></div><div class="card"><p class="legend">Zeigt pro Kapitel: Durchgänge, Bestwert, wie viel beim <b>ersten Versuch</b> richtig war, Übungszeit und die häufigsten Fehler. Die Daten werden zentral gespeichert (nur Vorname, keine Anmeldung).</p><button class="btn" id="rpBtn">📊 Bericht anzeigen</button><div id="rpOut"></div></div>`;
+$('#main').insertAdjacentHTML('beforeend',h);
+async function showReport(){const o=$('#rpOut');o.innerHTML='<p class="legend">Lade …</p>';
+ const data=window.LOG?await window.LOG.fetchAll(LS.map(m=>m.slug)):{};o.innerHTML=berichtHTML(data);}
+$('#rpBtn').onclick=showReport;if(location.hash==='#bericht')showReport();
 document.querySelectorAll('.ov-check input').forEach(i=>i.onchange=()=>{ck[i.dataset.k]=i.checked;set('fr_ka_check_v1',ck);});
 })();

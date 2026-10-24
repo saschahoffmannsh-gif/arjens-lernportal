@@ -476,3 +476,12 @@ table.t th{background:#eff6ff;color:var(--navy);font-family:'FredokaApp',sans-se
 .rulebox .cj td{padding:6px 10px;border-top:1px solid #dbeafe}.rulebox .cj tr:first-child td{border-top:0}
 .rulebox .cj td:first-child{font-weight:600;color:#0f2a5c}.rulebox .cj td:last-child{color:#475569}
 .rulebox .cj b{color:#c8102e}
+/* ---------- Bericht ---------- */
+.rp-l{margin:12px 0}.rp-l h3{margin:0 0 8px;font-size:1.05rem}
+.rp-scroll{overflow-x:auto}
+.rp{border-collapse:collapse;width:100%;font-size:.9rem;min-width:640px}
+.rp th,.rp td{border-top:1px solid #e2e8f0;padding:6px 8px;text-align:left;vertical-align:top}
+.rp th{background:#f1f5f9;font-weight:800}
+.rp ul{margin:0;padding-left:1.1em}.rp li{margin:2px 0}
+.rp s{color:#b91c1c}
+#rpOut{margin-top:10px}
