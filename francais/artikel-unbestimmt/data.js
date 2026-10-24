@@ -33,18 +33,14 @@ const LEUN=`<table class="gtab"><tr><th class="h">bestimmt</th><th class="h"></t
 window.CHAPTERS=[
 /* 1 */
 {id:'entdecken',kind:'Einstieg',icon:'🔎',title:'Entdecken: Qu’est-ce qu’il y a?',sub:'Noah erzählt Yasmine von seinem Zimmer',lv:1,
-html:card('Hör zu und lies mit','🎧','<p>Yasmine ist neugierig: Was gibt es in Noahs Zimmer? Achte auf die kleinen Wörter vor den Sachen.</p>'+dlg('Au téléphone',D1,{bg:'maison'}))
+html:card('Lies mit','📖','<p>Yasmine ist neugierig: Was gibt es in Noahs Zimmer? Achte auf die kleinen Wörter vor den Sachen.</p>'+dlg('Au téléphone',D1,{bg:'maison'}))
  +card('Noahs Zimmer','🛏️',`<div class="roomwrap">${ROOMS.noah.svg}</div><p class="legend">Im Zimmer gibt es: ${G('un','lit','m')} ${G('une','table','f')} ${G('une','chaise','f')} ${G('un','ordinateur','m')} ${G('des','livres','p')} ${G('des','posters','p')} ${G('une','guitare','f')} ${G('un','hamac','m')}</p>`)
  +reveal('🔍 Was fällt dir auf? Was bedeuten un, une und des?',`<ul><li><b class="c-m">un</b> = <b>ein</b> – vor männlichen Nomen: un lit, un ordinateur.</li><li><b class="c-f">une</b> = <b>eine</b> – vor weiblichen Nomen: une table, une chaise.</li><li><b class="c-p">des</b> = Plural – das übersetzt man <b>nicht</b>: des livres = Bücher.</li><li><span class="fr">il y a</span> = es gibt. <span class="fr">Qu’est-ce qu’il y a?</span> = Was gibt es?</li></ul>`),
 ex:[
- mul('Was gibt es in Noahs Zimmer? Hör dir den Dialog an und tippe alles an, was Noah nennt.',[['un lit',1],['une table',1],['un ordinateur',1],['des livres',1],['un hamac',1],['une armoire',0],['un globe',0],['une lampe',0]],'Noah nennt: un lit, une table, une chaise, un ordinateur, des livres, des posters, une guitare, un hamac. Eine armoire, einen globe und eine lampe nennt er nicht.',{au:L2(D1)}),
  mc('Was bedeutet «Il y a un ordinateur.»?',['Es gibt einen Computer.','Das ist der Computer.','Da ist der Computer von Noah.','Es gibt Computer.'],'il y a = es gibt · un ordinateur = einen Computer.',{say:'Il y a un ordinateur.'}),
  mc('Was bedeutet «Il y a des livres.»?',['Es gibt Bücher.','Es gibt die Bücher.','Es gibt ein Buch.','Das sind Bücher von Noah.'],'des wird nicht übersetzt: des livres = Bücher.',{say:'Il y a des livres.'}),
  mc('Was fragt Yasmine mit «Qu’est-ce qu’il y a dans ta chambre?»',['Was gibt es in deinem Zimmer?','Wo ist dein Zimmer?','Wie ist dein Zimmer?','Wer ist in deinem Zimmer?'],'Qu’est-ce qu’il y a …? = Was gibt es …?',{say:'Qu’est-ce qu’il y a dans ta chambre?'}),
- clk('Hör zu und tippe im Bild an, was du hörst.','noah','hamac','«Il y a un hamac.» – un hamac = eine Hängematte (im Französischen männlich).',{au:[['Noah','Il y a un hamac.']]}),
- clk('Hör zu und tippe im Bild an, was du hörst.','noah','guitare','«Il y a une guitare.» – une guitare = eine Gitarre.',{au:[['Noah','Il y a une guitare.']]}),
  seg('un oder une? Schau auf die Farbe!',['un','une'],[[`<span class="c-m">lit</span>`,'un'],[`<span class="c-f">table</span>`,'une'],[`<span class="c-f">chaise</span>`,'une'],[`<span class="c-m">ordinateur</span>`,'un']],'Blau = männlich → un · Rot = weiblich → une.'),
- tf('Hör dir den Dialog an. Richtig oder falsch?',[['Dans la chambre de Noah, il y a un ordinateur.',true],['Il y a une armoire.',false],['Il y a un hamac.',true]],'Eine Armoire nennt Noah nicht. Ordinateur und hamac gibt es.',{au:L2(D1)}),
 ]},
 /* 2 */
 {id:'regel',kind:'Regel',icon:'📐',title:'Die Regel: un, une, des',sub:'ein, eine – und der Plural ohne Übersetzung',lv:1,
@@ -64,7 +60,6 @@ ex:[
  wr('Schreibe mit unbestimmtem Artikel: <b>ein Buch</b>',['un livre'],'un livre (m.).'),
  wr('Schreibe mit unbestimmtem Artikel: <b>ein Regal</b>',['une étagère'],'une étagère (f.) – mit é und è!',{lv:2}),
  wr('Schreibe mit unbestimmtem Artikel: <b>Bücher</b> (mehrere)',['des livres'],'des livres – des wird im Deutschen nicht übersetzt.',{lv:2}),
- pick('Hör zu: Welches Bild passt?',[[ob('livre',3),'des livres'],[ob('livre'),'un livre'],[ob('photo'),'une photo'],[ob('photo',3),'des photos']],'Du hörst «Il y a des livres.» – des = mehrere.',{au:'Il y a des livres.',lv:2}),
 ]},
 /* 3 */
 {id:'le-un',kind:'Regel',icon:'⚖️',title:'le oder un? bestimmt oder unbestimmt?',sub:'Wann sagt man „der“ und wann „ein“?',lv:2,
@@ -86,20 +81,10 @@ ex:[
  mc('«Regarde … globe de Théo!» – Welcher Artikel?',['le','un','une','des'],'Ein bestimmter Globus (der von Théo) → le globe.',{fr:true,say:'Regarde le globe de Théo!'}),
 ]},
 /* 4 */
-{id:'szenen',kind:'Szenen & Hören',icon:'🎭',title:'Szenen & Hören: un oder une?',sub:'Genau hinhören: [œ̃] oder [yn]?',lv:2,
-html:card('In der Klasse','🏫','<p>Monsieur Martel stellt das Klassenzimmer vor. Welche Sachen gibt es?</p>'+dlg('Dans la classe',D2,{bg:'classe'}))
- +hoer(`<p>So unterscheidest du beim Hören:</p><ul><li>${F('un livre')} – nasal, ohne n: [œ̃]</li><li>${F('une lampe')} – mit hörbarem n: [yn]</li><li>${F('des livres')} – [de]: mehrere. Das -s am Nomen hörst du nicht, nur das <b>des</b>!</li><li>Liaison: ${F('un‿ordinateur')} – hier hörst du ein n, aber es ist trotzdem <b>un</b> (Nasal + Bindung).</li></ul>`)
- +tip('<b>Hör-Strategie:</b> Konzentriere dich nur auf das kleine Wort vor dem Nomen. Du darfst so oft hören, wie du willst – in der Klassenarbeit meistens zweimal.','🎧'),
+{id:'szenen',kind:'Szenen',icon:'🎭',title:'Szenen: Was gibt es in der Klasse?',sub:'un, une, des im Klassenzimmer',lv:2,
+html:card('In der Klasse','🏫','<p>Monsieur Martel stellt das Klassenzimmer vor. Welche Sachen gibt es?</p>'+dlg('Dans la classe',D2,{bg:'classe'})),
 ex:[
- seg('Hör zu: un, une oder des?',ART,[['Satz 1','une','Il y a une lampe.'],['Satz 2','un','Il y a un poster.'],['Satz 3','des','Il y a des photos.'],['Satz 4','une','Il y a une chaise.'],['Satz 5','un','Il y a un ordinateur.']],'une lampe · un poster · des photos · une chaise · un‿ordinateur.',{sub:'Tippe auf 🔊 und wähle.'}),
- seg('Hör zu: un, une oder des?',ART,[['Satz 1','des','Il y a des figurines.'],['Satz 2','une','Il y a une armoire.'],['Satz 3','un','Il y a un globe.'],['Satz 4','des','Il y a des CD.']],'des figurines · une‿armoire · un globe · des CD.',{sub:'Tippe auf 🔊 und wähle.'}),
- pick('Hör zu: Welches Bild passt?',[[ob('poster',3),'des posters'],[ob('poster'),'un poster'],[ob('lampe'),'une lampe'],[ob('cd',3),'des CD']],'«Il y a des posters.» – des = mehrere Poster.',{au:'Il y a des posters.'}),
- pick('Hör zu: Welches Bild passt?',[[ob('figurine'),'une figurine'],[ob('figurine',3),'des figurines'],[ob('globe'),'un globe'],[ob('pierre',3),'des pierres']],'«Il y a une figurine.» – une = eine.',{au:'Il y a une figurine.'}),
- mark('Hör zu: Was gibt es in Noahs Zimmer? Markiere alles, was du hörst.','noah',['lit','armoire','guitare','livre'],'Du hörst: un lit, une armoire, une guitare und des livres.',{au:[['Noah','Dans ma chambre, il y a un lit et une armoire. Il y a aussi une guitare et des livres.']]}),
- tf('Hör dir Monsieur Martel an. Richtig oder falsch?',[['Dans la classe, il y a des tables et des chaises.',true],['Il y a un hamac.',false],['Dans l’étagère, il y a des livres et des B.D.',true],['Il y a une guitare.',false]],'In der Klasse gibt es Tische, Stühle, einen Computer, einen Globus und ein Regal mit Büchern und Comics. Keine Hängematte und keine Gitarre!',{au:L2(D2)}),
- gapw('Hör zu und schreibe den Artikel.','Dans la classe, il y a {0} ordinateur, {1} étagère et {2} chaises.',[['un'],['une'],['des']],'un ordinateur · une étagère · des chaises.',{au:'Dans la classe, il y a un ordinateur, une étagère et des chaises.'}),
  dl('Ergänze den Dialog mit un, une oder des.',[['Samira','Qu’est-ce qu’il y a dans ta chambre, Léo?'],['Léo','Il y a {0} lit, {1} table et {2} posters.'],['Samira','Il y a aussi {3} ordinateur?'],['Léo','Oui. Et il y a {4} étagère.']],[['un','une','des'],['une','un','des'],['des','un','une'],['un','une','des'],['une','un','des']],'un lit · une table · des posters · un ordinateur · une étagère.'),
- mc('Hör zu: Was hat Léo in seinem Zimmer?',['un globe et des pierres','une guitare et un hamac','des CD et une minichaîne','des figurines et des B.D.'],'Léo sagt: «Il y a un globe et des pierres.»',{au:[['Léo','Dans ma chambre, il y a un globe et des pierres.']]}),
 ]},
 /* 5 */
 {id:'leicht',kind:'Training ★',icon:'🌱',title:'Training: leicht',sub:'un, une, des sicher zuordnen',lv:1,
@@ -114,7 +99,6 @@ ex:[
  gap('Setze ein.','Dans ma chambre, il y a {0} lampe et {1} poster.',[['une','un','des'],['un','une','des']],'une lampe · un poster.'),
  gap('Setze ein.','Il y a {0} livres et {1} ordinateur.',[['des','un','une'],['un','une','des']],'des livres · un ordinateur.'),
  mc('Was bedeutet «Il y a une pierre.»?',['Es gibt einen Stein.','Es gibt Steine.','Da ist der Stein.','Es gibt eine Pierre.'],'une pierre = ein Stein (im Französischen weiblich).',{say:'Il y a une pierre.'}),
- pick('Hör zu: Welches Bild passt?',[[ob('cahier'),'un cahier'],[ob('cahier',3),'des cahiers'],[ob('regle'),'une règle'],[ob('stylo',3),'des stylos']],'«un cahier» = ein Heft.',{au:'un cahier'}),
 ]},
 /* 6 */
 {id:'mittel',kind:'Training ★★',icon:'🌿',title:'Training: mittel',sub:'Artikel schreiben und Sätze mit il y a bilden',lv:2,
@@ -144,7 +128,6 @@ ex:[
  wr('Übersetze: „Es gibt ein Regal.“',['Il y a une étagère.'],'das Regal = l’étagère (f.) → une étagère.'),
  mc('Welcher Satz ist richtig?',['Il y a un ordinateur. L’ordinateur est super.','Il y a l’ordinateur. Un ordinateur est super.','Il y a une ordinateur. L’ordinateur est super.','Il y a un’ordinateur. Le ordinateur est super.'],'Erst un ordinateur (neu), dann l’ordinateur (bekannt).',{fr:true}),
  mt('Deutsch → Französisch',[['ein Schrank','une armoire'],['ein Computer','un ordinateur'],['ein Regal','une étagère'],['eine CD','un CD'],['Fotos','des photos']],'Das Geschlecht ist oft anders als im Deutschen!',{say:[['','une armoire, un ordinateur, une étagère, un CD, des photos']]}),
- seg('Hör zu: Welchen Artikel hörst du?',['un','une','le','la','les','des'],[['Satz 1','une','Il y a une minichaîne.'],['Satz 2','la','Voilà la minichaîne de Jade.'],['Satz 3','des','Il y a des pierres.'],['Satz 4','les','Regarde les pierres!']],'une · la · des · les.',{sub:'Tippe auf 🔊 und wähle.'}),
 ]},
 /* 8 */
 {id:'fehler',kind:'Fehlerdetektiv',icon:'🕵️',title:'Fehlerdetektiv',sub:'Typische Fehler mit un, une, des',lv:2,
@@ -169,14 +152,12 @@ ex:[
 ];
 window.TEST_EX=[
  gapw('Setze un, une oder des ein.','1. {0} lit 2. {1} lampe 3. {2} livres 4. {3} armoire 5. {4} ordinateur 6. {5} photos 7. {6} étagère 8. {7} poster',[['un'],['une'],['des'],['une'],['un'],['des'],['une'],['un']],'un lit · une lampe · des livres · une armoire · un ordinateur · des photos · une étagère · un poster.',{ref:'regel',tag:'un, une, des einsetzen',say:false}),
- seg('Hör zu: un, une oder des?',ART,[['Satz 1','une','Il y a une table.'],['Satz 2','des','Il y a des B.D.'],['Satz 3','un','Il y a un hamac.'],['Satz 4','une','Il y a une étagère.']],'une table · des B.D. · un hamac · une étagère.',{ref:'szenen',tag:'Hören: un/une/des',sub:'Tippe auf 🔊 und wähle.'}),
  wr('Wandle um: <b>l’étagère</b> → unbestimmter Artikel',['une étagère'],'une étagère (f.).',{ref:'le-un',tag:'le → un'}),
  wr('Übersetze: „Es gibt einen Computer und Bücher.“',['Il y a un ordinateur et des livres.'],'Il y a un ordinateur et des livres.',{ref:'schwer',tag:'Übersetzen'}),
  det('Fehlerdetektiv: Finde die 4 Fehler.','Dans ma chambre, il y a [une|un] lit et [un|une] chaise. Il y a [photos|des photos] et [une|un] globe.','un lit · une chaise · des photos · un globe.',{ref:'fehler',tag:'Fehler finden'}),
- mark('Hör zu und markiere im Bild, was es in Noahs Zimmer gibt.','noah',['hamac','ordinateur','lampe','cd'],'Du hörst: un hamac, un ordinateur, une lampe et des CD.',{au:[['Noah','Il y a un hamac, un ordinateur, une lampe et des CD.']],ref:'szenen',tag:'Hören: Bild markieren'}),
 ];
 /* Pro Durchgang: so viele Aufgaben je Kapitel (Rest = Reserve-Pool); Pflichtaufgaben zu den Heftfehlern */
-H.setRun({entdecken:2,regel:3,'le-un':2,szenen:2,leicht:4,mittel:4,schwer:4,fehler:3},{fehler:[0],test:[4]});
+H.setRun({entdecken:2,regel:3,"le-un":3,szenen:2,leicht:4,mittel:4,schwer:4,fehler:3},{fehler:[0],test:[3]});
 /* INTRO */
 H.setIntro({
 _lesson:{t:'Der unbestimmte Artikel: un, une, des',
@@ -190,11 +171,11 @@ _lesson:{t:'Der unbestimmte Artikel: un, une, des',
  check:['Eins oder mehrere?','Männlich oder weiblich?','Plural-s nicht vergessen.']},
 entdecken:{rule:"Plural → des. Männlich → un, weiblich → une. Nie ein Apostroph (un ordinateur, une armoire).",t:'Dialog: Was gibt es im Zimmer?',
  was:'Yasmine fragt Noah am Telefon: <i>Qu’est-ce qu’il y a dans ta chambre?</i> (Was gibt es in deinem Zimmer?) Achte auf die kleinen Wörter vor den Sachen.',
- schritte:['Hör den Dialog.','Such alle un, une und des.','Überlege: Was bedeuten sie auf Deutsch?'],
+ schritte:['Lies den Dialog (🔊 = Aussprache).','Such alle un, une und des.','Überlege: Was bedeuten sie auf Deutsch?'],
  bsp:[['Qu’est-ce qu’il y a dans ta chambre?','Was gibt es in deinem Zimmer?','Yasmine'],['Il y a un lit et une table.','Es gibt ein Bett und einen Tisch.','Noah'],['Il y a aussi des posters.','Es gibt auch Poster.','Noah']],
  merk:'il y a = es gibt. Danach steht meistens un, une oder des.',
  fallen:['<b>des</b> übersetzt man nicht: des posters = Poster.'],
- check:['Hören.','Artikel suchen.','Fragen beantworten.']},
+ check:['Lesen.','Artikel suchen.','Fragen beantworten.']},
 regel:{rule:"Plural → des. Männlich → un, weiblich → une. Nie ein Apostroph (un ordinateur, une armoire).",t:'Die Regel: un, une, des',
  was:'Welcher unbestimmte Artikel passt zu welchem Nomen? Es ist wie bei le / la – nur mit un / une.',
  schritte:['Männlich (le …) → <b>un</b>: le lit → un lit.','Weiblich (la …) → <b>une</b>: la lampe → une lampe.','Plural → <b>des</b>: des lits, des lampes.','Kein l’ und kein Apostroph: l’armoire → <b>une armoire</b>, l’ordinateur → <b>un ordinateur</b>.'],
@@ -209,13 +190,13 @@ regel:{rule:"Plural → des. Männlich → un, weiblich → une. Nie ein Apostro
  merk:'Neu → un / une / des. Bekannt → le / la / l’ / les.',
  fallen:['„Il y a le lit“ ist meistens falsch → <b>Il y a un lit.</b>','Wenn es auf Deutsch „der / die / das“ heißt → le / la / l’ / les; bei „ein / eine“ → un / une.'],
  check:['Deutsch denken: ein oder der?','Neu oder bekannt?','Artikel wählen.']},
-szenen:{rule:"Plural → des. Männlich → un, weiblich → une. Nie ein Apostroph (un ordinateur, une armoire).",t:'Szenen & Hören: un oder une?',
- was:'Monsieur Martel zeigt das Klassenzimmer. Hör genau hin: <b>un</b> [œ̃] klingt nasal, <b>une</b> [yn] hat ein deutliches n am Ende.',
- schritte:['Hör zu.','Achte auf den Klang: un oder une?','Wähle die richtige Antwort.'],
+szenen:{rule:"Plural → des. Männlich → un, weiblich → une. Nie ein Apostroph (un ordinateur, une armoire).",t:'Szenen: Was gibt es in der Klasse?',
+ was:'Monsieur Martel zeigt das Klassenzimmer. Lies, was es gibt, und setze selbst un, une oder des ein. (Das Hören von un / une übst du später im Teil „Hörverstehen“.)',
+ schritte:['Lies den Text.','Bestimme bei jedem Nomen: männlich, weiblich oder Plural?','Wähle un, une oder des.'],
  bsp:[['Dans la classe, il y a des tables et des chaises.','In der Klasse gibt es Tische und Stühle.','Martel'],['Il y a un ordinateur.','Es gibt einen Computer.','Martel'],['Il y a une étagère.','Es gibt ein Regal.','Martel']],
- merk:'un klingt wie „öh“ (durch die Nase), une hat ein klares n.',
- fallen:['un‿ordinateur: Man hört ein n, weil es gebunden wird – trotzdem <b>un</b>!'],
- check:['Hören.','Klang erkennen.','Antwort wählen.']},
+ merk:'un (m.) · une (f.) · des (Plural) – nach il y a fast immer.',
+ fallen:['<b>un ordinateur</b> ist männlich – auch wenn man es zusammen spricht.','des + Nomen mit -s.'],
+ check:['Lesen.','Geschlecht bestimmen.','Antwort wählen.']},
 leicht:{rule:"Plural → des. Männlich → un, weiblich → une. Nie ein Apostroph (un ordinateur, une armoire).",t:'Training ★: un, une, des wählen',
  was:'Wähle zu jedem Nomen un, une oder des.',
  schritte:['Plural? → des.','Männlich → un, weiblich → une.','Kein Apostroph!'],

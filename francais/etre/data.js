@@ -2,7 +2,7 @@
 const {F,G,conj,dlg,merk,attn,tip,hoer,card,reveal,tabs,track,steps,grp,ob,spk,spkLines}=H;
 const {mc,pick,gap,gapw,ord,wr,mt,dl,clk,mark,mul,seg,tf,det}=X;
 window.LESSON={slug:'etre',title:'Das Verb être',fr:'je suis, tu es, il est …',icon:'🙋',color:'#ea580c',testN:18,
- intro:'<b>être</b> heißt <b>sein</b> und ist das wichtigste Verb im Französischen. Es ist <b>unregelmäßig</b> – du musst die sechs Formen auswendig können. Hier lernst du sie mit Dialogen, Hörübungen und vielen Aufgaben.'};
+ intro:'<b>être</b> heißt <b>sein</b> und ist das wichtigste Verb im Französischen. Es ist <b>unregelmäßig</b> – du musst die sechs Formen auswendig können. Hier lernst du sie mit Dialogen, Bildern und vielen Aufgaben (Hörübungen kommen am Ende im Teil „Hörverstehen“).'};
 const D1=[
  ['Martel','Bonjour! Je suis Monsieur Martel. Je suis le professeur de français.','Guten Tag! Ich bin Herr Martel. Ich bin der Französischlehrer.'],
  ['Clara','Bonjour, Monsieur! Moi, je suis Clara. Et voilà Théo.','Guten Tag! Ich bin Clara. Und das ist Théo.'],
@@ -32,18 +32,16 @@ const pron=(p,g,de,ex)=>`<div class="objc ${g}"><b class="fr" style="font-size:2
 window.CHAPTERS=[
 /* ---------------- 1 */
 {id:'entdecken',kind:'Einstieg',icon:'🔎',title:'Entdecken: Bonjour, la 6e A!',sub:'Erster Schultag in Straßburg – finde die Formen von être',lv:1,
-html:card('Hör zu und lies mit','🎧','<p>Erster Schultag am Collège in Straßburg. Monsieur Martel begrüßt die neue Klasse. Tippe auf 🔊 – oben spielst du den ganzen Dialog ab, neben jeder Sprechblase einen einzelnen Satz.</p>'+dlg('Premier jour au collège',D1,{bg:'cour'}))
+html:card('Lies mit','📖','<p>Erster Schultag am Collège in Straßburg. Monsieur Martel begrüßt die neue Klasse. Tippe auf 🔊 – oben spielst du den ganzen Dialog ab, neben jeder Sprechblase einen einzelnen Satz.</p>'+dlg('Premier jour au collège',D1,{bg:'cour'}))
  +reveal('🔍 Was fällt dir auf? Welche Wörter bedeuten „bin, bist, ist, sind, seid“?',`<p>Das sind alles Formen von <b>être</b> (sein):</p><p><span class="fr">je <span class="hl">suis</span></span> · <span class="fr">nous <span class="hl">sommes</span></span> · <span class="fr">vous <span class="hl">êtes</span></span> · <span class="fr">Jade et Yasmine <span class="hl">sont</span></span> · <span class="fr">elles <span class="hl">sont</span></span></p><p>Jede Person hat eine <b>eigene</b> Form, und sie sehen ganz verschieden aus. Darum heißt être <b>unregelmäßig</b>.</p>`)
  +tip('<b>Übrigens:</b> In <span class="fr">c’est</span> (das ist) steckt auch être: <span class="fr">ce + est = c’est</span>. Das kennst du schon aus <span class="fr">C’est moi.</span> und <span class="fr">C’est qui?</span>'),
 ex:[
  mul('Welche Wörter aus dem Dialog sind Formen von <b>être</b>? Tippe alle an.',[['suis',1],['sommes',1],['êtes',1],['sont',1],['est',1],['voilà',0],['regarde',0],['nouveau',0]],'suis, es, est, sommes, êtes, sont sind die Formen von être. <i>voilà</i> (das ist / da ist), <i>regarde</i> (schau) und <i>nouveau</i> (neu) gehören nicht dazu.',{sub:'Mehrere sind richtig.'}),
  mc('Was bedeutet «Je suis de Berlin.»?',['Ich bin aus Berlin.','Ich wohne in Berlin.','Er ist aus Berlin.','Wir sind aus Berlin.'],'<i>je suis</i> = ich bin, <i>de</i> = aus. Karim sagt das, denn er ist neu und kommt aus Berlin.',{say:'Je suis de Berlin.'}),
  mc('Was bedeutet «Vous êtes la classe de sixième A.»?',['Ihr seid die Klasse 6A.','Wir sind die Klasse 6A.','Sie ist die Klasse 6A.','Du bist in der 6A.'],'<i>vous êtes</i> = ihr seid. Monsieur Martel spricht mit der ganzen Klasse.',{say:'Vous êtes la classe de sixième A.'}),
- mc('Hör zu: Wer sagt das?',['Karim','Théo','Monsieur Martel','Clara'],'Karim sagt: «Je suis nouveau. Je suis de Berlin.» – Er ist neu in der Klasse.',{au:[['Karim','Je suis nouveau. Je suis de Berlin.']]}),
  mt('Was gehört zusammen?',[['je suis','ich bin'],['tu es','du bist'],['il est','er ist'],['nous sommes','wir sind']],'Lerne die Formen immer mit dem Pronomen zusammen: je suis, tu es, il est, nous sommes …'),
  mt('Und die anderen Formen:',[['vous êtes','ihr seid'],['elle est','sie ist'],['ils sont','sie sind (Jungen)'],['elles sont','sie sind (nur Mädchen)']],'vous êtes = ihr seid · elle est = sie ist · ils sont / elles sont = sie sind.'),
  mc('Monsieur Martel fragt: «Vous êtes la classe de sixième A?» Warum sagt er <b>vous</b>?',['Er spricht mit mehreren Kindern (ihr).','Er spricht mit einem Kind (du).','Er spricht über sich selbst.','Er spricht über Jade und Yasmine.'],'<i>vous</i> = ihr (mehrere Personen). Zu einem einzelnen Kind würde er <i>tu</i> sagen.'),
- tf('Hör dir den Dialog an. Richtig oder falsch?',[['Monsieur Martel est le professeur de français.',true],['Karim est de Strasbourg.',false],['Clara et Théo sont en sixième A.',true],['Jade et Yasmine sont dans la classe.',false]],'Karim ist aus <b>Berlin</b>. Jade und Yasmine sind <b>dans la cour</b> (auf dem Schulhof), nicht in der Klasse.',{au:L2(D1)}),
  mc('Was bedeutet «C’est moi.»?',['Ich bin’s. / Das bin ich.','Das ist meins.','Wer ist das?','Ich heiße …'],'<i>C’est moi.</i> = Ich bin’s. In <i>c’est</i> steckt <i>est</i> von être.',{say:'C’est moi.'}),
 ]},
 /* ---------------- 2 */
@@ -97,21 +95,12 @@ ex:[
  wr('Ersetze durch ein Pronomen und schreibe den ganzen Satz: «Les filles sont dans la cour.»',['Elles sont dans la cour.'],'<i>les filles</i> = nur Mädchen → <b>Elles</b> sont dans la cour.',{lv:2}),
 ]},
 /* ---------------- 4 */
-{id:'szenen',kind:'Szenen & Hören',icon:'🎭',title:'Szenen: C’est qui?',sub:'être im Alltag – zuhören, verstehen, mitreden',lv:2,
-html:card('Auf dem Schulhof','💬','<p>Léo und Samira sehen zwei Kinder. Hör gut zu: Welche Formen von être hörst du?</p>'+dlg('Dans la cour',D2,{bg:'cour'}))
+{id:'szenen',kind:'Szenen',icon:'🎭',title:'Szenen: C’est qui?',sub:'être im Alltag – lesen, verstehen, mitreden',lv:2,
+html:card('Auf dem Schulhof','💬','<p>Léo und Samira sehen zwei Kinder. Lies mit: Welche Formen von être findest du? (🔊 = Aussprache)</p>'+dlg('Dans la cour',D2,{bg:'cour'}))
  +merk('⭐ C’est … oder il / elle est …?',`<ul><li><b>Wer ist das?</b> → ${F('C’est Lucas.')} ${F('C’est Yasmine.')} (c’est + Name)</li><li><b>Mehr über die Person</b> → ${F('Il est en cinquième.')} ${F('Elle est de Strasbourg.')}</li></ul>`)
- +card('Im Klassenzimmer','🏫',dlg('En classe',D3,{bg:'classe'}))
- +hoer(`<ul><li>${F('il est')} [ilɛ] und ${F('ils sont')} [ilsɔ̃] klingen ganz verschieden – beim Hören verrät dir das <b>Verb</b>, ob es einer oder mehrere sind.</li><li>${F('elle est')} [ɛlɛ] und ${F('elles sont')} [ɛlsɔ̃] genauso.</li><li>Aber: ${F('tu es')} und ${F('il est')} klingen gleich – hier hilft nur der Zusammenhang.</li></ul>`),
+ +card('Im Klassenzimmer','🏫',dlg('En classe',D3,{bg:'classe'})),
 ex:[
- seg('Hör zu: Welche Form von être hörst du?',['suis','es / est','sommes','êtes','sont'],[['Satz 1','sommes','Nous sommes en sixième.'],['Satz 2','sont','Ils sont dans la cour.'],['Satz 3','êtes','Vous êtes de Berlin?'],['Satz 4','suis','Je suis Jade.'],['Satz 5','es / est','Elle est très cool.']],'Satz 1: nous <b>sommes</b> · Satz 2: ils <b>sont</b> · Satz 3: vous <b>êtes</b> · Satz 4: je <b>suis</b> · Satz 5: elle <b>est</b>.',{sub:'Tippe auf 🔊 und wähle dann die Form.'}),
- seg('Hör zu: Ist es <b>einer</b> (il) oder sind es <b>mehrere</b> (ils)?',['il','ils'],[['Satz 1','ils','Ils sont en cinquième.'],['Satz 2','il','Il est nouveau.'],['Satz 3','ils','Ils sont de Strasbourg.'],['Satz 4','il','Il est dans la classe.']],'Du hörst es am Verb: <b>il est</b> [ilɛ] – <b>ils sont</b> [ilsɔ̃].',{sub:'Tippe auf 🔊 und entscheide.'}),
- mc('Hör zu: In welcher Klasse ist Lucas?',['in der 7. Klasse (en cinquième)','in der 6. Klasse (en sixième)','in der 6A','Das wird nicht gesagt.'],'Samira sagt: «C’est Lucas. Il est <b>en cinquième</b>.» – en cinquième = in der 7. Klasse.',{au:[['Samira','C’est Lucas. Il est en cinquième.']]}),
- tf('Hör dir den Dialog „Dans la cour“ an. Richtig oder falsch?',[['Lucas est en sixième.',false],['Yasmine est de Strasbourg.',true],['Lucas et Yasmine sont amis.',true],['La fille avec Lucas, c’est Samira.',false]],'Lucas ist <b>en cinquième</b>. Die Freundin von Lucas ist <b>Yasmine</b> – Samira erzählt Léo von ihr.',{au:L2(D2)}),
  dl('Ergänze den Dialog mit être.',[['Clara','Salut! Je {0} Clara. Et toi?'],['Karim','Moi, c’est Karim. Je {1} de Berlin.'],['Clara','Tu {2} nouveau?'],['Karim','Oui. Noah et moi, nous {3} en sixième B.']],[['suis','es','est'],['suis','es','sommes'],['es','est','êtes'],['sommes','sont','êtes']],'je suis · je suis · tu es · nous sommes.'),
- gapw('Hör zu und schreibe die Form von être.','Madame Fournier {0} la surveillante.',[['est']],'Madame Fournier = elle → <b>est</b>.',{au:[['Fournier','Madame Fournier est la surveillante.']]}),
- gapw('Hör zu und schreibe die Formen von être.','Vous {0} en sixième A? – Oui, nous {1} en sixième A.',[['êtes'],['sommes']],'vous <b>êtes</b> (mit ê!) · nous <b>sommes</b>.',{au:[['Fournier','Vous êtes en sixième A?'],['Noah','Oui, nous sommes en sixième A.']]}),
- pick('Hör zu: Wer ist gemeint? Tippe das passende Bild an.',[[grp('ff'),'elles – nur Mädchen'],[grp('mf'),'ils – Junge und Mädchen'],[grp('f'),'elle – ein Mädchen'],[grp('m'),'il – ein Junge']],'Du hörst «<b>Elles sont</b> dans la cour.» – elles sont = mehrere, nur Mädchen.',{au:'Elles sont dans la cour.',labels:false,say:false}),
- pick('Hör zu: Wer ist gemeint? Tippe das passende Bild an.',[[grp('m'),'il – ein Junge'],[grp('mm'),'ils – zwei Jungen'],[grp('f'),'elle – ein Mädchen'],[grp('ff'),'elles – zwei Mädchen']],'Du hörst «<b>Il est</b> dans la classe.» – il est = ein Junge oder Mann.',{au:'Il est dans la classe.',labels:false,say:false}),
  mc('Jemand fragt dich: «C’est qui?» und zeigt auf Clara. Was antwortest du?',['C’est Clara. Elle est en sixième A.','Il est Clara.','C’est Clara. Il est en sixième A.','Elle sont Clara.'],'Wer? → <b>C’est</b> Clara. Mehr über sie → <b>Elle est</b> en sixième A.',{fr:true}),
 ]},
 /* ---------------- 5 */
@@ -183,15 +172,13 @@ ex:[
 ];
 window.TEST_EX=[
  gapw('Ergänze die Formen von être.','1. Je {0} élève. 2. Tu {1} de Berlin? 3. Yasmine {2} en sixième A. 4. Nous {3} dans la cour. 5. Vous {4} nouveaux? 6. Lucas et Karim {5} amis.',[['suis'],['es'],['est'],['sommes'],['êtes'],['sont']],'suis · es · est · sommes · êtes · sont.',{ref:'formen',tag:'Formen von être'}),
- seg('Hör zu: Welches Pronomen hörst du?',['il','ils','elle','elles'],[['Satz 1','elles','Elles sont dans la classe.'],['Satz 2','il','Il est de Strasbourg.'],['Satz 3','ils','Ils sont en cinquième.'],['Satz 4','elle','Elle est très cool.']],'elles sont · il est · ils sont · elle est – das Verb hilft dir beim Hören.',{ref:'szenen',tag:'Hören: il/ils, elle/elles',sub:'Tippe auf 🔊 und wähle.'}),
  wr('Übersetze: „Wir sind in der 6A.“',['Nous sommes en sixième A.','On est en sixième A.','Nous sommes en 6e A.','On est en 6e A.','Nous sommes en sixième.','On est en sixième.'],'„Wir sind“ = <b>nous sommes</b> (oder <b>on est</b> – beides richtig). „in der 6A“ = <b>en sixième A</b>.',{ref:'formen',tag:'Übersetzen'}),
  wr('Übersetze: „Herr Martel ist der Französischlehrer.“',['Monsieur Martel est le professeur de français.','M. Martel est le professeur de français.'],'Monsieur Martel est le professeur de français.',{ref:'schwer',tag:'Übersetzen'}),
  det('Fehlerdetektiv: Finde die 4 Fehler.','Bonjour! Je [suit|suis] Jade. Yasmine et moi, nous [somme|sommes] en sixième A. Clara [es|est] là. Karim et Noah [est|sont] dans la cour.','suis · sommes · est · sont.',{ref:'fehler',tag:'Fehler finden'}),
- tf('Hör dir die Szene an. Richtig oder falsch?',[['Noah et Karim sont en sixième A.',true],['Madame Fournier est le professeur de français.',false],['Monsieur Martel est dans la classe.',true]],'Madame Fournier ist <b>la surveillante</b> (die Aufsicht). Monsieur Martel ist in der Klasse.',{au:L2(D3),ref:'szenen',tag:'Hörverstehen'}),
  wr('Setze in den Plural: «Elle est nouvelle.»',['Elles sont nouvelles.'],'elle est → elles sont; nouvelle → nouvelles.',{ref:'schwer',tag:'Plural'}),
 ];
 /* Pro Durchgang: so viele Aufgaben je Kapitel (Rest = Reserve-Pool); Pflichtaufgaben zu den Heftfehlern */
-H.setRun({entdecken:2,formen:3,pronomen:2,szenen:2,leicht:4,mittel:4,schwer:4,fehler:3},{fehler:[0],test:[4]});
+H.setRun({entdecken:2,formen:3,pronomen:2,szenen:2,leicht:4,mittel:4,schwer:4,fehler:3},{fehler:[0],test:[3]});
 /* INTRO */
 H.setIntro({
 _lesson:{t:'être – das Verb „sein“',
@@ -204,12 +191,12 @@ _lesson:{t:'être – das Verb „sein“',
  fallen:['<b>on</b> heißt oft „wir“, bekommt aber die Form von il / elle: <b>on est</b> (nie „on sommes“!).','<b>tu es</b> ohne t – <b>il est</b> mit t.','Mehrere Personen (Clara et Jade) → <b>sont</b>, nicht est.','Akzent nicht vergessen: vous <b>ê</b>tes.'],
  check:['Wer ist es? → Pronomen finden (bei Namen: il, elle, ils oder elles).','Passende Form aus dem Merksatz nehmen.','Schreibweise prüfen: t bei est? s bei sommes? Akzent bei êtes?']},
 entdecken:{rule:"Vor jeder Form von être steht ein Pronomen oder Name: je suis, tu es, il / elle / on est, nous sommes, vous êtes, ils / elles sont.",t:'Dialog: Formen von être entdecken',
- was:'Im Dialog stellen sich die Kinder am ersten Schultag vor. Dabei kommt <b>être</b> ganz oft vor. Hör zu und achte auf die kleinen Wörter <i>suis, es, est …</i>',
- schritte:['Hör den Dialog einmal ganz.','Lies mit und such alle Formen von être (suis, es, est, sommes, êtes, sont).','Schau, welches Pronomen oder welcher Name davor steht.'],
+ was:'Im Dialog stellen sich die Kinder am ersten Schultag vor. Dabei kommt <b>être</b> ganz oft vor. Lies mit und achte auf die kleinen Wörter <i>suis, es, est …</i> (🔊 = Aussprache)',
+ schritte:['Lies den Dialog einmal ganz (tippe auf 🔊, wenn du die Aussprache hören willst).','Such alle Formen von être (suis, es, est, sommes, êtes, sont).','Schau, welches Pronomen oder welcher Name davor steht.'],
  bsp:[['Je suis le professeur de français.','Ich bin der Französischlehrer.','Martel'],['Tu es Clara?','Bist du Clara?','Martel'],['Oui, c’est moi.','Ja, das bin ich.','Clara'],['Il est de Berlin.','Er ist aus Berlin.','Théo']],
  merk:'Vor jeder Form von être steht ein Pronomen oder ein Name – das zeigt dir, welche Form passt.',
  fallen:['<i>c’est</i> = das ist (c’ + est). Auch hier steckt <b>est</b> drin!'],
- check:['Dialog anhören.','Formen von être suchen.','Fragen beantworten – im Zweifel nochmal hören.']},
+ check:['Dialog lesen.','Formen von être suchen.','Fragen beantworten – im Zweifel nochmal nachlesen.']},
 formen:{rule:"être ist unregelmäßig – jede Person hat ihre eigene Form: je suis, tu es, il / elle / on est, nous sommes, vous êtes, ils / elles sont.",t:'Die sechs Formen von être',
  was:'Hier lernst du die sechs Formen von être auswendig. Sie sind unregelmäßig – es gibt keinen Bauplan, du musst sie einfach können.',
  schritte:['Sprich jede Form laut mit Pronomen: <i>je suis, tu es …</i>','Achte auf die Schreibweise: <b>es</b> (tu) und <b>est</b> (il) klingen gleich, werden aber anders geschrieben.','Lerne die Formen in der Reihenfolge: je – tu – il/elle/on – nous – vous – ils/elles.'],
@@ -225,12 +212,12 @@ pronomen:{rule:"Ein Name = il oder elle → est. Mehrere Personen = ils oder ell
  fallen:['Clara et Jade <b>sont</b> – nicht est! (zwei Personen)','Clara, Jade et Léo → <b>ils</b> (ein Junge reicht).','Théo et moi → <b>nous sommes</b>.'],
  check:['Personen zählen.','Junge/Mädchen prüfen → Pronomen.','Form von être dazu nehmen.']},
 szenen:{rule:"Achte auf das Pronomen oder den Namen vor dem Verb: einer → est, mehrere → sont, „wir“ → nous sommes oder on est.",t:'Szenen: être im Gespräch',
- was:'Jetzt hörst du kurze Gespräche auf dem Schulhof. Du sollst verstehen, wer wer ist, und die richtigen Formen von être erkennen.',
- schritte:['Lies zuerst die Aufgabe.','Hör das Gespräch – achte auf Namen und auf die Formen von être.','Antworte. Du darfst so oft hören, wie du willst.'],
+ was:'Hier liest du kurze Gespräche auf dem Schulhof und in der Klasse. Du sollst verstehen, wer wer ist, und selbst die richtigen Formen von être einsetzen. (Hör-Aufgaben dazu kommen später im Teil „Hörverstehen“.)',
+ schritte:['Lies zuerst die Aufgabe.','Lies das Gespräch – achte auf Namen und auf die Formen von être.','Antworte – Pronomen bestimmen, dann die Form.'],
  bsp:[['C’est qui?','Wer ist das?','Samira'],['C’est Karim. Il est nouveau.','Das ist Karim. Er ist neu.','Léo'],['Ils sont en cinquième.','Sie sind in der 7. Klasse.','Léo'],['On est ensemble!','Wir sind zusammen!','Samira']],
  merk:'C’est qui? – C’est … (Das ist …). Danach: il est / elle est / ils sont.',
  fallen:['<i>en cinquième</i> ist die 7. Klasse (in Frankreich wird rückwärts gezählt), <i>en sixième</i> die 6.','<b>on est</b> = wir sind (umgangssprachlich).'],
- check:['Aufgabe lesen.','Hören, auf Namen achten.','Antwort wählen, dann Erklärung lesen.']},
+ check:['Aufgabe lesen.','Gespräch lesen, auf Namen achten.','Antwort wählen, dann Erklärung lesen.']},
 leicht:{rule:"Erst das Pronomen suchen, dann die passende Form: je suis, tu es, il / elle / on est, nous sommes, vous êtes, ils / elles sont.",t:'Training ★: Formen auswählen',
  was:'Hier wählst du die richtige Form von être aus. So prägst du dir die Formen ein.',
  schritte:['Such das Pronomen (oder den Namen) vor der Lücke.','Ersetze einen Namen im Kopf durch il / elle / ils / elles.','Wähle die passende Form.'],

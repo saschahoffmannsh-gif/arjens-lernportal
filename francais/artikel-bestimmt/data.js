@@ -2,7 +2,7 @@
 const {F,G,conj,dlg,merk,attn,tip,hoer,card,reveal,tabs,track,steps,grp,ob,room,spk,spkLines}=H;
 const {mc,pick,gap,gapw,ord,wr,mt,dl,clk,mark,mul,seg,tf,det}=X;
 window.LESSON={slug:'artikel-bestimmt',title:'Der bestimmte Artikel',fr:'le · la · l’ · les',icon:'🏷️',color:'#0d9488',testN:18,
- intro:'Im Französischen ist jedes Nomen <b>männlich</b> oder <b>weiblich</b>. Das zeigt dir der Artikel: <b class="c-m">le</b> lit, <b class="c-f">la</b> chaise, <b>l’</b>armoire, <b class="c-p">les</b> posters. Hier lernst du, wann du welchen Artikel nimmst – mit Bildern, Farben und Hörübungen.'};
+ intro:'Im Französischen ist jedes Nomen <b>männlich</b> oder <b>weiblich</b>. Das zeigt dir der Artikel: <b class="c-m">le</b> lit, <b class="c-f">la</b> chaise, <b>l’</b>armoire, <b class="c-p">les</b> posters. Hier lernst du, wann du welchen Artikel nimmst – mit Bildern und Farben (Hörübungen kommen am Ende im Teil „Hörverstehen“).'};
 const ROOM=room('theo','La chambre de Théo',[
  ['poster',20,14,52,'le poster'],['armoire',332,100,68,'l’armoire'],['lit',4,112,108,'le lit'],['etagere',118,80,88,'l’étagère'],['minichaine',128,46,38,'la minichaîne'],
  ['table',214,112,80,'la table'],['ordinateur',220,78,44,'l’ordinateur'],['globe',264,82,40,'le globe'],['chaise',280,128,52,'la chaise'],['guitare',176,164,50,'la guitare'],['lampe',236,168,48,'la lampe']],{wx:100});
@@ -30,7 +30,7 @@ const TAB=`<table class="gtab"><tr><th class="h"></th><th class="m">♂ männlic
 window.CHAPTERS=[
 /* 1 */
 {id:'entdecken',kind:'Einstieg',icon:'🔎',title:'Entdecken: Voilà ma chambre!',sub:'Théo zeigt Clara sein Zimmer – le, la, l’ oder les?',lv:1,
-html:card('Hör zu und lies mit','🎧','<p>Clara besucht Théo. Hör genau hin: Vor jedem Gegenstand steht ein kleines Wort – der <b>Artikel</b>.</p>'+dlg('La chambre de Théo',D1,{bg:'chambre'}))
+html:card('Lies mit','📖','<p>Clara besucht Théo. Lies genau: Vor jedem Gegenstand steht ein kleines Wort – der <b>Artikel</b>.</p>'+dlg('La chambre de Théo',D1,{bg:'chambre'}))
  +card('Théos Zimmer','🛏️',`<div class="roomwrap">${ROOM}</div><div class="objrow">${G('le','lit','m')}${G('le','globe','m')}${G('le','poster','m')}${G('la','guitare','f')}${G('la','chaise','f')}${G('la','lampe','f')}${G('l’','ordinateur','m')}${G('l’','étagère','f')}${G('les','posters','p')}</div>`)
  +reveal('🔍 Was fällt dir auf? Wann steht le, la, l’ oder les?',`<ul><li><b class="c-m">le</b> steht vor <b>männlichen</b> Nomen: le lit, le globe.</li><li><b class="c-f">la</b> steht vor <b>weiblichen</b> Nomen: la guitare, la chaise.</li><li><b>l’</b> steht vor einem <b>Vokal</b> (a, e, i, o, u, é …): l’ordinateur, l’étagère.</li><li><b class="c-p">les</b> steht vor allem, was <b>mehrere</b> sind: les posters.</li></ul><p>In dieser App sind männliche Wörter immer <b class="c-m">blau</b>, weibliche <b class="c-f">rot</b> und der Plural <b class="c-p">lila</b>.</p>`),
 ex:[
@@ -38,10 +38,6 @@ ex:[
  mc('Was bedeutet «Le lit est super!»?',['Das Bett ist super!','Ein Bett ist super!','Die Betten sind super!','Das Zimmer ist super!'],'<i>le lit</i> = das Bett. le ist ein bestimmter Artikel (der, die, das).',{say:'Le lit est super!'}),
  mc('Warum heißt es <b>les</b> posters?',['Weil es mehrere Poster sind.','Weil poster weiblich ist.','Weil poster mit p anfängt.','Weil Théo es so mag.'],'les steht im Plural – bei männlichen <i>und</i> weiblichen Nomen.'),
  mc('Warum heißt es <b>l’</b>ordinateur und nicht „le ordinateur“?',['Weil ordinateur mit einem Vokal anfängt.','Weil ordinateur weiblich ist.','Weil es mehrere Computer sind.','Weil ordinateur ein langes Wort ist.'],'Vor einem Vokal wird le/la zu <b>l’</b>. Das klingt flüssiger: [lɔʁdinatœʁ].'),
- clk('Hör zu und tippe den Gegenstand im Bild an.','theo','guitare','Du hörst «Regarde la guitare!» – la guitare = die Gitarre.',{au:[['Théo','Regarde la guitare!']]}),
- clk('Hör zu und tippe den Gegenstand im Bild an.','theo','globe','Du hörst «Voilà le globe.» – le globe = der Globus.',{au:[['Théo','Voilà le globe.']]}),
- clk('Hör zu und tippe den Gegenstand im Bild an.','theo','armoire','Du hörst «L’armoire est là.» – l’armoire = der Schrank (im Französischen weiblich!).',{au:[['Clara','L’armoire est là.']]}),
- tf('Hör dir den Dialog an. Richtig oder falsch?',[['Le lit est super.',true],['L’étagère, c’est l’étagère de Clara.',false],['Les posters sont partout.',true]],'Das Regal ist von <b>Lucas</b>: «l’étagère, c’est l’étagère de Lucas».',{au:L2(D1)}),
 ]},
 /* 2 */
 {id:'regel',kind:'Regel',icon:'📐',title:'Die Regel: le, la, l’, les',sub:'männlich, weiblich, vor Vokal, Plural',lv:1,
@@ -70,36 +66,22 @@ ex:[
 {id:'plural',kind:'Regel',icon:'👯',title:'Der Plural: les',sub:'les + Nomen + s – und warum man das s nicht hört',lv:1,
 html:card('Aus eins mach viele','🔢',`<div class="bau"><span class="blk b-m">le<small>m.</small></span><span class="op">/</span><span class="blk b-f">la<small>f.</small></span><span class="op">/</span><span class="blk" style="background:#64748b">l’<small>vor Vokal</small></span><span class="op">→</span><span class="blk b-pl">les<small>Plural</small></span></div>
  <div class="objrow"><div class="objc m">${ob('livre')}${G('le','livre','m')}</div><div class="objc p">${ob('livre',3)}${G('les','livres','p')}</div><div class="objc f">${ob('photo')}${G('la','photo','f')}</div><div class="objc p">${ob('photo',3)}${G('les','photos','p')}</div><div class="objc f">${ob('armoire')}${G('l’','armoire','f')}</div><div class="objc p">${ob('armoire',3)}${G('les‿','armoires','p')}</div></div>`)
- +merk('⭐ Merkkasten: der Plural',`<ul><li>Im Plural heißt der Artikel <b>immer les</b> – egal ob männlich oder weiblich.</li><li>Das Nomen bekommt meistens ein <b>-s</b>: la photo → les photos. Dieses s <b>hört man nicht</b>!</li><li>Ohne -s bleiben: ${G('les','CD','p')} ${G('les','B.D.','p')}</li></ul>`)
- +hoer(`<ul><li>Weil man das -s nicht hört, erkennst du den Plural beim Hören am <b>Artikel</b>: ${F('le livre')} [lə] – ${F('les livres')} [le].</li><li>Vor einem Vokal wird <b>les</b> gebunden (Liaison): ${F('les‿élèves')} [lezelɛv], ${F('les‿amis')} [lezami]. Das s klingt dann wie ein weiches <b>s</b> [z].</li></ul>`),
+ +merk('⭐ Merkkasten: der Plural',`<ul><li>Im Plural heißt der Artikel <b>immer les</b> – egal ob männlich oder weiblich.</li><li>Das Nomen bekommt meistens ein <b>-s</b>: la photo → les photos. Dieses s <b>hört man nicht</b>!</li><li>Ohne -s bleiben: ${G('les','CD','p')} ${G('les','B.D.','p')}</li></ul>`),
 ex:[
  wr('Setze in den Plural: <b>la fille</b>',['les filles'],'la → les, und ein stummes -s: les filles.'),
  wr('Setze in den Plural: <b>le garçon</b>',['les garçons'],'les garçons – mit ç!'),
  wr('Setze in den Plural: <b>l’élève</b>',['les élèves'],'les‿élèves – mit Liaison [lezelɛv].'),
  wr('Setze in den Plural: <b>le CD</b>',['les CD'],'les CD – ohne s!'),
  wr('Setze in den Plural: <b>la B.D.</b>',['les B.D.','les BD','les bédés','les bédé'],'les B.D. – ohne s!'),
- seg('Hör zu: Hörst du <b>le</b> oder <b>les</b>?',['le','les'],[['Satz 1','les','Regarde les livres!'],['Satz 2','le','Voilà le livre.'],['Satz 3','les','Les CD sont là.'],['Satz 4','le','Le poster est cool.']],'Den Plural hörst du nur am Artikel: le [lə] – les [le].',{sub:'Tippe auf 🔊 und entscheide.'}),
- seg('Hör zu: Hörst du <b>la</b> oder <b>les</b>?',['la','les'],[['Satz 1','la','Voilà la photo.'],['Satz 2','les','Voilà les photos.'],['Satz 3','les','Les chaises sont là.'],['Satz 4','la','La lampe est super.']],'la [la] – les [le]. Das -s von photos hört man nicht!',{sub:'Tippe auf 🔊 und entscheide.'}),
- pick('Hör zu: Welches Bild passt?',[[ob('livre',3),'les livres'],[ob('livre'),'le livre'],[ob('cahier'),'le cahier'],[ob('cahier',3),'les cahiers']],'Du hörst «les livres» – les = mehrere.',{au:'les livres'}),
- pick('Hör zu: Welches Bild passt?',[[ob('photo'),'la photo'],[ob('photo',3),'les photos'],[ob('poster'),'le poster'],[ob('poster',3),'les posters']],'Du hörst «la photo» – la = eine (weiblich).',{au:'la photo'}),
  mc('Welcher Plural ist richtig?',['les élèves','les élève','le élèves','les élévés'],'les + élève + s = les élèves.',{fr:true,lv:2}),
  mc('Wie spricht man «les amis» aus?',['[lezami] – mit Liaison','[leami] – ohne Bindung','[lesami] – mit scharfem s','[lami] – wie l’ami'],'Vor Vokal bindet man: les‿amis [lezami].',{say:'les amis',lv:2}),
 ]},
 /* 4 */
-{id:'szenen',kind:'Szenen & Hören',icon:'🎭',title:'Szenen: C’est le stylo de Karim',sub:'In der Klasse: Wem gehört was?',lv:2,
+{id:'szenen',kind:'Szenen',icon:'🎭',title:'Szenen: C’est le stylo de Karim',sub:'In der Klasse: Wem gehört was?',lv:2,
 html:card('Wem gehört was?','✏️','<p>Nach der Stunde liegen überall Sachen herum. Jade fragt Lucas. Achte auf <b>le, la, l’, les</b> – und auf <span class="fr">de</span> = von.</p>'+dlg('Dans la classe',D2,{bg:'classe'}))
- +merk('⭐ Wann nimmt man den bestimmten Artikel?',`<ul><li>Wenn man <b>eine bestimmte</b> Sache meint: ${F('le stylo de Karim')} (der Kuli von Karim).</li><li>Wenn die Sache <b>schon bekannt</b> ist: ${F('Regarde la guitare!')}</li><li>Bei Fächern und Sprachen: ${F('le français')}</li></ul>`)
- +hoer(`<p>Diese Paare klingen verschieden – hör genau hin:</p><ul><li>${F('le')} [lə] – ${F('la')} [la] – ${F('les')} [le]</li><li>${F('l’ami')} und ${F('l’amie')} klingen <b>gleich</b>! Ob männlich oder weiblich, hörst du nur am Zusammenhang.</li></ul>`),
+ +merk('⭐ Wann nimmt man den bestimmten Artikel?',`<ul><li>Wenn man <b>eine bestimmte</b> Sache meint: ${F('le stylo de Karim')} (der Kuli von Karim).</li><li>Wenn die Sache <b>schon bekannt</b> ist: ${F('Regarde la guitare!')}</li><li>Bei Fächern und Sprachen: ${F('le français')}</li></ul>`),
 ex:[
- seg('Hör zu: le, la, l’ oder les?',ART,[['Satz 1','la','Voilà la règle de Samira.'],['Satz 2','le','C’est le stylo de Karim.'],['Satz 3','l’','C’est l’effaceur de Clara.'],['Satz 4','les','Regarde les crayons de couleur!']],'la règle · le stylo · l’effaceur · les crayons de couleur.',{sub:'Tippe auf 🔊 und wähle den Artikel.'}),
- seg('Hör zu: le, la, l’ oder les?',ART,[['Satz 1','les','Les élèves sont dans la cour.'],['Satz 2','l’','L’école est cool.'],['Satz 3','le','Le professeur est là.'],['Satz 4','la','La fille est nouvelle.']],'Les élèves · L’école · Le professeur · La fille.',{sub:'Tippe auf 🔊 und wähle den Artikel.'}),
- tf('Hör dir den Dialog an. Richtig oder falsch?',[['Le stylo, c’est le stylo de Noah.',false],['La règle, c’est la règle de Samira.',true],['L’effaceur, c’est l’effaceur de Clara.',true],['Le cahier, c’est le cahier de Théo.',false]],'Der Kuli gehört <b>Karim</b>. Beim Heft sagt Lucas: «Je ne sais pas.» – das wissen wir also nicht.',{au:L2(D2)}),
- mc('Hör zu: Wem gehört der Tintenkiller?',['Clara','Samira','Karim','Théo'],'«L’effaceur? C’est l’effaceur de Clara?» – «Oui.»',{au:[['Jade','Et l’effaceur? C’est l’effaceur de Clara?'],['Lucas','Oui.']]}),
  dl('Ergänze den Dialog mit le, la, l’ oder les.',[['Jade','C’est {0} règle de Lucas?'],['Samira','Non, c’est {1} règle de Noah.'],['Jade','Et {2} ordinateur?'],['Samira','C’est {3} ordinateur de Monsieur Martel.']],[['la','le','l’'],['la','le','les'],['l’','le','la'],['l’','le','la']],'la règle · la règle · l’ordinateur · l’ordinateur.'),
- gapw('Hör zu und ergänze den Artikel.','Voilà {0} classe de sixième A. {1} élèves sont dans {2} cour.',[['la'],['Les'],['la']],'la classe · Les élèves · la cour.',{au:'Voilà la classe de sixième A. Les élèves sont dans la cour.'}),
- clk('Hör zu und tippe den Gegenstand an.','theo','minichaine','«Voilà la minichaîne.» – die Mini-Stereoanlage.',{au:[['Théo','Voilà la minichaîne.']]}),
- clk('Hör zu und tippe den Gegenstand an.','theo','etagere','«L’étagère est super.» – das Regal (weiblich).',{au:[['Clara','L’étagère est super.']]}),
- clk('Hör zu und tippe den Gegenstand an.','theo','ordinateur','«Regarde l’ordinateur!» – der Computer (männlich).',{au:[['Théo','Regarde l’ordinateur!']]}),
  mc('Was bedeutet «C’est le cahier de Théo.»?',['Das ist das Heft von Théo.','Das ist ein Heft von Théo.','Das sind die Hefte von Théo.','Théo hat kein Heft.'],'le cahier = das Heft, de = von.',{say:'C’est le cahier de Théo.'}),
 ]},
 /* 5 */
@@ -146,7 +128,6 @@ ex:[
  gapw('Ergänze den bestimmten Artikel.','Voilà {0} chambre de Jade. {1} lit est dans {2} coin. Et voilà {3} hamac. {4} hamac est trop cool! Et {5} posters? Ils sont partout. {6} ordinateur est là.',[['la'],['Le'],['le'],['le'],['Le'],['les'],['L’',"L'"]],'la chambre · Le lit · le coin · le hamac · Le hamac · les posters · L’ordinateur.'),
  mt('Deutsch → Französisch: Was gehört zusammen?',[['der Stuhl','la chaise'],['das Regal','l’étagère'],['die CD','le CD'],['das Foto','la photo'],['der Comic','la B.D.']],'Das Geschlecht ist oft anders als im Deutschen!',{say:[['','la chaise, l’étagère, le CD, la photo, la B.D.']]}),
  mc('Welcher Satz ist richtig?',['L’élève est dans la classe.','Le élève est dans la classe.','La élève est dans le classe.','Les élève est dans la classe.'],'L’élève (Vokal) · la classe (f.).',{fr:true}),
- seg('Hör zu: Ist es <b>einer</b> oder sind es <b>mehrere</b>?',['einer','mehrere'],[['Satz 1','mehrere','Regarde les posters!'],['Satz 2','einer','Voilà le poster.'],['Satz 3','mehrere','Les élèves sont là.'],['Satz 4','einer','L’élève est là.']],'les [le] / les‿élèves [lez…] = mehrere · le [lə] / l’élève = einer.',{sub:'Tippe auf 🔊 und entscheide.'}),
 ]},
 /* 8 */
 {id:'fehler',kind:'Fehlerdetektiv',icon:'🕵️',title:'Fehlerdetektiv',sub:'Typische Artikel-Fehler finden und verbessern',lv:2,
@@ -172,14 +153,13 @@ ex:[
 ];
 window.TEST_EX=[
  gapw('Setze den bestimmten Artikel ein (le, la, l’, les).','1. {0} chaise 2. {1} lit 3. {2} armoire 4. {3} posters 5. {4} garçon 6. {5} école 7. {6} hamac 8. {7} B.D. (Plural)',[['la'],['le'],['l’',"l'"],['les'],['le'],['l’',"l'"],['le'],['les']],'la chaise · le lit · l’armoire · les posters · le garçon · l’école · le hamac · les B.D.',{ref:'regel',tag:'Artikel einsetzen',say:false}),
- seg('Hör zu: le, la, l’ oder les?',ART,[['Satz 1','les','Les figurines sont là.'],['Satz 2','la','Regarde la photo!'],['Satz 3','l’','L’ami de Karim est là.'],['Satz 4','le','Le livre est dans l’étagère.']],'Les figurines · la photo · L’ami · Le livre.',{ref:'szenen',tag:'Hören: Artikel erkennen',sub:'Tippe auf 🔊 und wähle.'}),
  wr('Setze in den Plural: «l’élève»',['les élèves'],'les élèves.',{ref:'plural',tag:'Plural'}),
  wr('Setze in den Plural: «le CD»',['les CD'],'les CD – ohne s.',{ref:'plural',tag:'Plural'}),
  wr('Übersetze: „Die Lampe ist im Zimmer.“',['La lampe est dans la chambre.'],'La lampe est dans la chambre.',{ref:'schwer',tag:'Übersetzen'}),
  det('Fehlerdetektiv: Finde die 4 Fehler.','Voilà [le|la] classe de sixième A. [Le|Les] élèves sont dans la cour. [La|L’] étagère est dans [la|le] coin.','la classe · Les élèves · L’étagère · le coin.',{ref:'fehler',tag:'Fehler finden'}),
 ];
 /* Pro Durchgang: so viele Aufgaben je Kapitel (Rest = Reserve-Pool); Pflichtaufgaben zu den Heftfehlern */
-H.setRun({entdecken:2,regel:3,plural:2,szenen:2,leicht:4,mittel:4,schwer:4,fehler:3},{fehler:[0],test:[5]});
+H.setRun({entdecken:2,regel:3,plural:2,szenen:2,leicht:4,mittel:4,schwer:4,fehler:3},{fehler:[0],test:[4]});
 /* INTRO */
 H.setIntro({
 _lesson:{t:'Der bestimmte Artikel: le, la, l’, les',
@@ -193,11 +173,11 @@ _lesson:{t:'Der bestimmte Artikel: le, la, l’, les',
  check:['Eins oder mehrere?','Männlich oder weiblich? (Lerne jedes Nomen mit Artikel!)','Vokal am Anfang? → l’']},
 entdecken:{rule:"Plural → les. Vokal am Anfang → l’. Sonst männlich → le, weiblich → la.",t:'Dialog: Artikel entdecken',
  was:'Théo zeigt Clara sein Zimmer. Vor jedem Gegenstand steht ein kleines Wort – der <b>Artikel</b>. Finde heraus, wann le, la, l’ oder les steht.',
- schritte:['Hör den Dialog.','Such alle Artikel (le, la, l’, les).','Überlege: Was haben die Wörter mit le gemeinsam? Und die mit la?'],
+ schritte:['Lies den Dialog (🔊 = Aussprache).','Such alle Artikel (le, la, l’, les).','Überlege: Was haben die Wörter mit le gemeinsam? Und die mit la?'],
  bsp:[['Voilà ma chambre.','Das ist mein Zimmer.','Théo'],['Le lit est super!','Das Bett ist super!','Clara'],['La lampe est cool.','Die Lampe ist cool.','Clara'],['Les posters sont super!','Die Poster sind super!','Clara']],
  merk:'Vor jedem Nomen steht ein Artikel – lerne ihn immer mit!',
  fallen:['Deutsches Geschlecht hilft nicht immer: der Stuhl = <b>la</b> chaise.'],
- check:['Dialog anhören.','Artikel suchen.','Fragen beantworten.']},
+ check:['Dialog lesen.','Artikel suchen.','Fragen beantworten.']},
 regel:{rule:"Plural → les. Vokal am Anfang → l’. Sonst männlich → le, weiblich → la.",t:'Die Regel: le, la, l’, les',
  was:'Hier lernst du die Regel genau: Welcher Artikel passt zu welchem Nomen?',
  schritte:['<b>le</b> steht vor männlichen Nomen: le lit, le livre, le poster.','<b>la</b> steht vor weiblichen Nomen: la chaise, la table, la lampe.','Vor einem Vokal oder stummen h wird le / la zu <b>l’</b>: l’armoire, l’étagère, l’ordinateur.','<b>les</b> steht vor allen Nomen im Plural – egal ob männlich oder weiblich.'],
@@ -213,12 +193,12 @@ plural:{rule:"Im Plural heißt der Artikel immer les, und das Nomen bekommt ein 
  fallen:['Das -s hört man nicht – aber du musst es schreiben!','<b>les CD</b>, <b>les B.D.</b> – ohne -s.'],
  check:['Artikel → les.','-s ans Nomen.','Ausnahme CD / B.D. beachten.']},
 szenen:{rule:"Plural → les. Vokal am Anfang → l’. Sonst männlich → le, weiblich → la.",t:'Szenen: Wem gehört was?',
- was:'Jade und Lucas räumen die Klasse auf. Du hörst, wem welche Sachen gehören: <i>C’est le stylo de Noah.</i> (Das ist der Kuli von Noah.)',
- schritte:['Hör das Gespräch.','Achte auf den Artikel vor jedem Gegenstand.','<b>de</b> + Name = „von“: le stylo de Noah = Noahs Kuli.'],
+ was:'Jade und Lucas räumen die Klasse auf. Du liest, wem welche Sachen gehören: <i>C’est le stylo de Noah.</i> (Das ist der Kuli von Noah.)',
+ schritte:['Lies das Gespräch.','Achte auf den Artikel vor jedem Gegenstand.','<b>de</b> + Name = „von“: le stylo de Noah = Noahs Kuli.'],
  bsp:[['C’est le stylo de Noah?','Ist das der Kuli von Noah?','Jade'],['Non, c’est le stylo de Karim.','Nein, das ist der Kuli von Karim.','Lucas'],['C’est la règle de Clara.','Das ist das Lineal von Clara.','Lucas'],['Voilà les crayons de Jade.','Da sind die Stifte von Jade.','Lucas']],
  merk:'le / la / l’ / les + Sache + de + Name = die Sache von …',
  fallen:['<b>la</b> règle – im Deutschen „das Lineal“.','<b>l’</b>effaceur (m.) – Vokal am Anfang.'],
- check:['Gegenstand erkennen.','Artikel bestimmen.','Besitzer heraushören.']},
+ check:['Gegenstand erkennen.','Artikel bestimmen.','Besitzer finden.']},
 leicht:{rule:"Plural → les. Vokal am Anfang → l’. Sonst männlich → le, weiblich → la.",t:'Training ★: Artikel wählen',
  was:'Wähle zu jedem Nomen den passenden Artikel. Denk an die drei Fragen.',
  schritte:['Plural? → les.','Vokal am Anfang? → l’.','Sonst le (m.) oder la (f.).'],

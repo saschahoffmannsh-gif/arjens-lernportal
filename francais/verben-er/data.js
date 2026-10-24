@@ -29,7 +29,7 @@ window.CHAPTERS=[
 /* 1 */
 {id:'entdecken',kind:'Einstieg',icon:'🔎',title:'Entdecken: Was machen sie?',sub:'Freizeit zu Hause – finde die Verben',lv:1,
 html:card('Was machen die Kinder?','🏠',`<div class="objrow">${SC('Clara','Clara regarde des photos.','Clara schaut Fotos an.')}${SC('Théo','Théo écoute un CD.','Théo hört eine CD.')}${SC('Jade','Jade téléphone à Yasmine.','Jade telefoniert mit Yasmine.')}${SC('Karim','Noah et Karim parlent français.','Noah und Karim sprechen Französisch.')}${SC('Martel','Monsieur Martel présente la classe.','Herr Martel stellt die Klasse vor.')}${SC('Lucas','Lucas appelle Léo: «Léo, regarde!»','Lucas ruft Léo: „Léo, schau mal!“')}</div>`)
- +card('Hör zu und lies mit','🎧',dlg('À la maison',D1,{bg:'maison'}))
+ +card('Lies mit','📖',dlg('À la maison',D1,{bg:'maison'}))
  +reveal('🔍 Was fällt dir auf? Vergleiche: tu écout<b>es</b> – j’écout<b>e</b> – elles parl<b>ent</b> – nous regard<b>ons</b>',`<p>Der <b>vordere Teil</b> des Verbs bleibt gleich (écout-, parl-, regard-). Das nennt man den <b>Stamm</b>. Hinten ändert sich die <b>Endung</b> – je nachdem, <b>wer</b> etwas tut:</p>${BAU}<p>Und: Vor einem Vokal wird <b>je</b> zu <b>j’</b>: j’écoute.</p>`),
 ex:[
  mt('Was bedeuten die Verben?',[['regarder','anschauen'],['écouter','hören'],['parler','sprechen'],['téléphoner','telefonieren'],['présenter','vorstellen'],['appeler','rufen']],'Das sind die sechs Verben aus deinem Heft.',{say:[['','regarder, écouter, parler, téléphoner, présenter, appeler']]}),
@@ -37,8 +37,6 @@ ex:[
  mc('Was bedeutet «Jade téléphone à Yasmine.»?',['Jade telefoniert mit Yasmine.','Jade schaut Yasmine an.','Jade stellt Yasmine vor.','Jade hört Yasmine zu.'],'téléphoner à … = mit … telefonieren / … anrufen.',{say:'Jade téléphone à Yasmine.'}),
  mul('Tippe alle Formen von <b>regarder</b> an.',[['regarde',1],['regardons',1],['regardent',1],['regardes',1],['écoute',0],['parlent',0],['regard',0]],'regarde, regardes, regardons, regardent sind Formen von regarder. «regard» allein ist nur der Stamm – ohne Endung gibt es das Verb nicht.'),
  mc('Was ist der <b>Stamm</b> von <b>parler</b>?',['parl-','parle-','par-','parler-'],'Infinitiv minus -er: parl|er → <b>parl-</b>.'),
- mc('Hör zu: Wer schaut Fotos an?',['Clara','Théo','Jade','Yasmine'],'Clara sagt: «Moi, je regarde des photos.»',{au:L2(D1)}),
- tf('Hör dir den Dialog an. Richtig oder falsch?',[['Théo écoute un CD de Lucas.',true],['Jade téléphone à Clara.',false],['Clara et Théo regardent les photos ensemble.',true]],'Jade telefoniert mit <b>Yasmine</b>.',{au:L2(D1)}),
  seg('Wer macht was? Ordne zu.',['regarde','écoute','téléphone','parlent'],[[CHARS.Clara.replace('class="kid"','class="kid" style="width:34px"')+' Clara …','regarde'],[CHARS['Théo'].replace('class="kid"','class="kid" style="width:34px"')+' Théo …','écoute'],[CHARS.Jade.replace('class="kid"','class="kid" style="width:34px"')+' Jade …','téléphone'],[CHARS.Karim.replace('class="kid"','class="kid" style="width:34px"')+' Noah et Karim …','parlent']],'Clara regarde des photos · Théo écoute un CD · Jade téléphone à Yasmine · Noah et Karim parlent français.'),
 ]},
 /* 2 */
@@ -101,23 +99,7 @@ ex:[
  mc('Was bedeutet «Il s’appelle Noah.»?',['Er heißt Noah.','Er ruft Noah.','Er ruft Noah an.','Er stellt Noah vor.'],'s’appeler = heißen.',{say:'Il s’appelle Noah.'}),
 ]},
 /* 5 */
-{id:'hoeren',kind:'Hören',icon:'👂',title:'Hören: il oder ils?',sub:'Was man hört – und was nicht',lv:2,
-html:hoer(`<p>Weil -e, -es und -ent stumm sind, klingen viele Formen <b>gleich</b>. Beim Hören hilft dir:</p><ul><li><b>Konsonant am Anfang</b>: ${F('il regarde')} = ${F('ils regardent')} – kein Unterschied! Du musst den <b>Zusammenhang</b> verstehen (z. B. <span class="fr">Clara et Jade</span> regardent …).</li><li><b>Vokal am Anfang</b>: ${F('il écoute')} [ilekut] ≠ ${F('ils‿écoutent')} [ilzekut] – das <b>[z]</b> verrät den Plural.</li><li>${F('il appelle')} [ilapɛl] ≠ ${F('ils‿appellent')} [ilzapɛl]</li><li><b>nous</b> und <b>vous</b> hörst du immer: -ons [ɔ̃], -ez [e].</li></ul>`,'Hörtipp: Was hört man?')
- +card('Hör-Training','🎧',`<table class="t"><tr><th>einer</th><th>mehrere</th><th>Unterschied?</th></tr>
- <tr><td>${F('Il parle.')}</td><td>${F('Ils parlent.')}</td><td>🔇 keiner</td></tr><tr><td>${F('Elle regarde.')}</td><td>${F('Elles regardent.')}</td><td>🔇 keiner</td></tr>
- <tr><td>${F('Il écoute.')}</td><td>${F('Ils‿écoutent.')}</td><td>🔊 [z]</td></tr><tr><td>${F('Elle appelle.')}</td><td>${F('Elles‿appellent.')}</td><td>🔊 [z]</td></tr></table>`),
-ex:[
- seg('Hör zu: <b>il</b> oder <b>ils</b>? Oder hört man keinen Unterschied?',['il','ils','hört man nicht'],[['Satz 1','ils','Ils écoutent un CD.'],['Satz 2','il','Il écoute un CD.'],['Satz 3','hört man nicht','Il regarde la photo.'],['Satz 4','ils','Ils appellent Clara.']],'Satz 1: [ilzekut] → ils · Satz 2: [ilekut] → il · Satz 3: il regarde / ils regardent klingen gleich · Satz 4: [ilzapɛl] → ils.',{sub:'Tippe auf 🔊 und entscheide.'}),
- seg('Hör zu: <b>elle</b> oder <b>elles</b>? Oder hört man keinen Unterschied?',['elle','elles','hört man nicht'],[['Satz 1','hört man nicht','Elle parle français.'],['Satz 2','elles','Elles écoutent la guitare.'],['Satz 3','elle','Elle appelle Théo.'],['Satz 4','hört man nicht','Elle téléphone à Jade.']],'Nur bei Verben mit Vokal am Anfang hörst du das [z] von elles‿…',{sub:'Tippe auf 🔊 und entscheide.'}),
- seg('Hör zu: Welche Endung hörst du?',['-ons','-ez','stumm'],[['Satz 1','-ons','Nous regardons la photo.'],['Satz 2','-ez','Vous parlez français?'],['Satz 3','stumm','Tu écoutes un CD?'],['Satz 4','stumm','Ils téléphonent à Jade.'],['Satz 5','-ez','Vous appelez Léo?']],'-ons [ɔ̃] und -ez [e] hört man. -e, -es, -ent sind stumm.',{sub:'Tippe auf 🔊 und entscheide.'}),
- gapw('Diktat: Hör zu und schreibe das Verb.','Clara et Jade {0} des photos.',[['regardent']],'Clara et Jade = elles → regardent. Die Endung -ent hörst du nicht – du musst sie wissen!',{au:'Clara et Jade regardent des photos.',strict:true}),
- gapw('Diktat: Hör zu und schreibe das Verb.','Nous {0} français.',[['parlons']],'nous parlons – Endung -ons.',{au:'Nous parlons français.',strict:true}),
- gapw('Diktat: Hör zu und schreibe das Verb.','Et toi, tu {0} à Karim?',[['téléphones']],'tu téléphones – zwei Akzente und -es.',{au:'Et toi, tu téléphones à Karim?',strict:true}),
- gapw('Diktat: Hör zu und schreibe die Verben.','Jade {0} un CD. Lucas et Noah {1} Léo.',[['écoute'],['appellent']],'Jade écoute (é!) · Lucas et Noah appellent (ll, -ent).',{au:'Jade écoute un CD. Lucas et Noah appellent Léo.',strict:true,lv:3}),
- mc('Du hörst: [il paʁl fʁɑ̃sɛ]. Was kann es heißen?',['Il parle français. oder Ils parlent français.','Nur: Il parle français.','Nur: Ils parlent français.','Nous parlons français.'],'Ohne Zusammenhang kann man il parle und ils parlent beim Hören nicht unterscheiden.',{au:'Il parle français.'}),
- pick('Hör zu: Wer ist gemeint?',[[grp('mm'),'ils – mehrere'],[grp('m'),'il – einer'],[grp('f'),'elle – eine'],[grp('ff'),'elles – mehrere Mädchen']],'«Ils‿écoutent la musique.» – das [z] zeigt: mehrere.',{au:'Ils écoutent la musique.',say:false}),
-]},
-/* 6 */
+
 {id:'leicht',kind:'Training ★',icon:'🌱',title:'Training: leicht',sub:'Endungen sicher einsetzen',lv:1,
 html:merk('🔁 Kurz wiederholt',ENDT+'<p style="margin-top:8px">Stamm = Infinitiv minus -er · <b>j’</b> vor Vokal.</p>','blue'),
 ex:[
@@ -192,12 +174,11 @@ window.TEST_EX=[
  gapw('Setze die richtige Form ein (Verb in Klammern).','1. Tu {0} (regarder) des photos. 2. Nous {1} (écouter) un CD. 3. Clara {2} (parler) avec Yasmine. 4. Vous {3} (présenter) la classe. 5. Les élèves {4} (regarder) le globe. 6. Je {5} (téléphoner) à Karim.',[['regardes'],['écoutons'],['parle'],['présentez'],['regardent'],['téléphone']],'regardes · écoutons · parle · présentez · regardent · téléphone.',{strict:true,say:'Tu regardes des photos. Nous écoutons un CD. Clara parle avec Yasmine. Vous présentez la classe. Les élèves regardent le globe. Je téléphone à Karim.',ref:'heftverben',tag:'Endungen'}),
  gapw('Konjugiere <b>parler</b>.','je {0}<br>tu {1}<br>on {2}<br>nous {3}<br>vous {4}<br>elles {5}',[['parle'],['parles'],['parle'],['parlons'],['parlez'],['parlent']],'parle · parles · parle · parlons · parlez · parlent.',{strict:true,ref:'bauplan',tag:'Konjugation',say:'je parle, tu parles, on parle, nous parlons, vous parlez, elles parlent'}),
  gapw('appeler: Schreibe die Formen.','nous {0}<br>ils {1}<br>tu {2}',[['appelons'],['appellent'],['appelles']],'nous appelons (l) · ils appellent (ll) · tu appelles (ll).',{strict:true,ref:'appeler',tag:'appeler: ll/l',say:'nous appelons, ils appellent, tu appelles'}),
- seg('Hör zu: <b>il</b>, <b>ils</b> – oder hört man es nicht?',['il','ils','hört man nicht'],[['Satz 1','ils','Ils écoutent le professeur.'],['Satz 2','hört man nicht','Il présente Clara.'],['Satz 3','il','Il appelle Jade.']],'[ilzekut] → ils · il présente = ils présentent (gleicher Klang) · [ilapɛl] → il.',{ref:'hoeren',tag:'Hören: il/ils',sub:'Tippe auf 🔊 und entscheide.'}),
  det('Fehlerdetektiv: Finde die 4 Fehler.','Les élèves [écoutont|écoutent] Monsieur Martel. Tu [téléphonez|téléphones] à Léo? Nous [appellons|appelons] Samira. Vous [presentez|présentez] la classe.','écoutent · téléphones · appelons · présentez.',{ref:'fehler',tag:'Fehler finden'}),
  wr('Übersetze: „Ihr schaut die Fotos an.“',['Vous regardez les photos.'],'Vous regardez les photos.',{strict:true,ref:'schwer',tag:'Übersetzen'}),
 ];
 /* Pro Durchgang: so viele Aufgaben je Kapitel (Rest = Reserve-Pool); Pflichtaufgaben zu den Heftfehlern */
-H.setRun({entdecken:2,bauplan:2,heftverben:2,appeler:3,hoeren:2,leicht:4,mittel:4,schwer:4,fehler:3},{bauplan:[0],heftverben:[9],appeler:[0],fehler:[0,1,2],test:[2,4]});
+H.setRun({entdecken:2,bauplan:3,heftverben:3,appeler:3,leicht:4,mittel:4,schwer:4,fehler:3},{bauplan:[0],heftverben:[9],appeler:[0],fehler:[0,1,2],test:[2,3]});
 /* INTRO */
 H.setIntro({
 _lesson:{t:'Verben auf -er: Stamm + Endung',
@@ -238,13 +219,6 @@ appeler:{rule:"appeler: Endung stumm (-e, -es, -ent) → ll (j’appelle). Endun
  merk:'Endung stumm (-e, -es, -ent) → ll. Endung hörbar (-ons, -ez, -er) → l.',
  fallen:['<b>nous appellons</b> ✗ → nous appe<b>l</b>ons.','<b>appeller</b> ✗ → appe<b>l</b>er (Infinitiv mit einem l).','<b>je m’apelle</b> ✗ → je m’appe<b>ll</b>e (zwei p, zwei l).'],
  check:['Endung bestimmen.','Hörbar oder stumm?','ll oder l schreiben – und immer zwei p.']},
-hoeren:{rule:"-e, -es, -ent hört man nicht. Fängt das Verb mit Vokal an, hörst du bei ils / elles ein [z]: ils‿écoutent.",t:'Hören: il oder ils?',
- was:'Weil die Endungen -e, -es und -ent stumm sind, klingen <i>il regarde</i> und <i>ils regardent</i> gleich. Hier lernst du, woran du trotzdem hörst, wer gemeint ist.',
- schritte:['Fängt das Verb mit einem <b>Vokal</b> an, hörst du bei ils / elles ein <b>[z]</b>: ils‿écoutent [ilzekut], il écoute [ilekut].','Bei nous und vous hörst du die Endung: -ons, -ez.','Sonst hilft der Zusammenhang: Clara et Jade → mehrere.'],
- bsp:[['Il écoute un CD.','Er hört eine CD. (kein [z])'],['Ils écoutent un CD.','Sie hören eine CD. (mit [z])'],['Elle regarde la photo.','Sie schaut das Foto an.'],['Elles regardent la photo.','Sie schauen das Foto an. (klingt gleich!)']],
- merk:'Vokal am Anfang: [z] = mehrere (ils‿écoutent).',
- fallen:['Bei Konsonant am Anfang (regarde / regardent) hört man keinen Unterschied – achte auf Namen und Zusammenhang.'],
- check:['Hören.','Auf [z] und Endungen achten.','Antwort wählen.']},
 leicht:{rule:"Stamm (Infinitiv minus -er) + Endung: je -e, tu -es, il / elle / on -e, nous -ons, vous -ez, ils / elles -ent.",t:'Training ★: Endungen wählen',
  was:'Wähle die richtige Form. So lernst du die Endungen.',
  schritte:['Wer? → Pronomen (bei Namen: il, elle, ils, elles).','Endung aus dem Merksatz.','Antippen.'],

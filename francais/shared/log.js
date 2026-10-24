@@ -14,6 +14,7 @@ const local=/^(localhost|127\.0\.0\.1|0\.0\.0\.0|)$/.test(location.hostname);
 const override=get('fr_log_base',null);
 const BASE=override||(local?null:PROD);           // null → nur lokal protokollieren
 const LK=s=>'fr_log_'+s;
+const LEGACY=e=>/^backfill_(chapter|test|done)$/.test(e.kind||'')&&!e.snap;
 let dev=get('fr_log_dev',null);if(!dev){dev=Math.random().toString(36).slice(2,10);set('fr_log_dev',dev);}
 let seq=0;
 const ST={};const st=s=>ST[s]=ST[s]||{busy:false,again:false,timer:null,fails:0,unsent:get('fr_log_unsent_'+s,0),remote:null};
@@ -22,14 +23,18 @@ const clip=(t,n=220)=>{t=String(t==null?'':t).replace(/\s+/g,' ').trim();return 
 function mem(s){return get(LK(s),[]);}
 function event(slug,ev){
  const {flush:fl,...rest}=ev;const e=Object.assign({id:dev+'-'+Date.now().toString(36)+'-'+(seq++).toString(36),ts:new Date().toISOString(),who:'Arjen',lesson:slug,dev},rest);
- const L=mem(slug);L.push(e);if(L.length>5000)L.splice(0,L.length-5000);set(LK(slug),L);
+ const L=mem(slug).filter(x=>x.id!==e.id&&!(LEGACY(x)&&x.dev===dev));L.push(e);if(L.length>5000)L.splice(0,L.length-5000);set(LK(slug),L);
  const s=st(slug);s.unsent++;set('fr_log_unsent_'+slug,s.unsent);
  if(fl||s.unsent>=5)flush(slug);else sched(slug,15000);
  return e;}
 function sched(slug,ms){const s=st(slug);if(!BASE)return;clearTimeout(s.timer);s.timer=setTimeout(()=>flush(slug),ms);}
 function parse(txt){if(!txt||!txt.trim())return {events:[]};try{const d=JSON.parse(txt);if(d&&Array.isArray(d.events))return d;}catch(e){}return {events:[],corrupt:clip(txt,80)};}
-function merged(slug,remote){const have=new Set(remote.events.map(e=>e.id));const add=mem(slug).filter(e=>!have.has(e.id));
- if(!add.length)return null;const ev=remote.events.concat(add).sort((a,b)=>a.ts<b.ts?-1:a.ts>b.ts?1:0);
+function merged(slug,remote){
+ // Vereinigung nach id; bei gleicher id gewinnt die neuere Fassung (rev). Alte, fehlerhafte Nachträge dieses Geräts werden ersetzt.
+ const loc=mem(slug);const byId=new Map();let changed=false;
+ for(const e of remote.events){if(LEGACY(e)&&e.dev===dev){changed=true;continue;}byId.set(e.id,e);}
+ for(const e of loc){const r=byId.get(e.id);if(!r){byId.set(e.id,e);changed=true;}else if((e.rev||0)>(r.rev||0)){byId.set(e.id,e);changed=true;}}
+ if(!changed)return null;const ev=[...byId.values()].sort((a,b)=>a.ts<b.ts?-1:a.ts>b.ts?1:0);
  return {v:1,who:'Arjen',lesson:slug,updated:new Date().toISOString(),n:ev.length,events:ev};}
 async function flush(slug){
  if(!BASE)return 'local';const s=st(slug);
@@ -55,16 +60,23 @@ function attach(slug){SLUG=slug;
  W.addEventListener('online',()=>flush(slug));
  if(st(slug).unsent)setTimeout(()=>flush(slug),1500);else setTimeout(()=>flush(slug),4000); // Stand abgleichen (heilt verlorene Daten)
 }
-/* Einmaliger Nachtrag: alles, was im alten Fortschritt (localStorage) steckt */
-function backfill(slug,P,chapters,extra){
- if(get('fr_log_bf_'+slug,false))return false;
- const ids=new Set();(chapters||[]).forEach(c=>c.ex.forEach(e=>ids.add(e.id)));
- (chapters||[]).forEach(c=>{const p=(P.ch||{})[c.id];if(!p)return;const exIds=c.ex.map(e=>e.id);
-  event(slug,{kind:'backfill_chapter',backfill:true,ch:c.id,chTitle:clip(c.title,80),runs:p.runs||0,best:p.best||0,done:(p.runs||0)>0&&(p.best||0)>=70,seen:!!p.seen,
-   solved:Object.keys(p.solved||{}),asked:Object.fromEntries(exIds.filter(id=>(P.asked||{})[id]).map(id=>[id,P.asked[id]]))});});
- const t=P.test||{};if(t.runs)event(slug,{kind:'backfill_test',backfill:true,ch:'test',runs:t.runs,best:t.best,stars:t.stars,last:t.last});
- event(slug,{kind:'backfill_done',backfill:true,note:'Nachtrag aus dem bisherigen Fortschritt auf diesem Gerät (nur Bestwerte, Durchläufe und gelöste Aufgaben – einzelne frühere Antworten waren nicht gespeichert).',...(extra||{}),flush:true});
- set('fr_log_bf_'+slug,true);return true;}
+/* Stand-Abgleich (Snapshot): Was im gespeicherten Fortschritt steht (Durchgänge, Bestwerte, gelöste Aufgaben),
+   wird pro Kapitel als ein Eintrag mit fester id gemeldet und bei Änderungen ersetzt – nie doppelt.
+   So kommen auch Durchgänge an, die vor dem Protokoll oder in einem alten, noch offenen Tab gemacht wurden. */
+function backfill(slug,P,chapters){
+ const prev=get('fr_log_snap_'+slug,{});const now=Date.now();let n=0;
+ const put=(key,data)=>{const sig=JSON.stringify(data);if(prev[key]===sig)return;prev[key]=sig;n++;
+  event(slug,Object.assign({id:'snap-'+dev+'-'+key,kind:key==='test'?'snapshot_test':'snapshot_chapter',snap:true,backfill:true,rev:now},data));};
+ (chapters||[]).forEach(c=>{const p=(P.ch||{})[c.id];if(!p)return;const solved=Object.keys(p.solved||{});
+  if(!(p.runs||p.best||solved.length||p.seen))return;
+  const asked=Object.fromEntries(c.ex.map(e=>e.id).filter(id=>(P.asked||{})[id]).map(id=>[id,P.asked[id]]));
+  put(c.id,{ch:c.id,chTitle:clip(String(c.title).replace(/<[^>]+>/g,''),80),runs:p.runs||0,best:p.best||0,done:(p.runs||0)>0&&(p.best||0)>=70,seen:!!p.seen,solved,asked});});
+ const t=P.test||{};if(t.runs||t.best)put('test',{ch:'test',runs:t.runs||0,best:t.best||0,stars:t.stars||0,last:t.last??null});
+ set('fr_log_snap_'+slug,prev);
+ // alte Nachtrag-Einträge dieses Geräts lokal entfernen (werden beim nächsten Senden auch zentral ersetzt)
+ const L=mem(slug);if(L.some(x=>LEGACY(x)&&x.dev===dev)){set(LK(slug),L.filter(x=>!(LEGACY(x)&&x.dev===dev)));st(slug).unsent++;}
+ if(n||st(slug).unsent)setTimeout(()=>flush(slug),800);
+ return n;}
 /* Lesen (für den Bericht) */
 async function fetchAll(slugs){const out={};await Promise.all(slugs.map(async s=>{let ev=mem(s);let src='lokal';
  if(BASE){try{const r=await fetch(url(s),{cache:'no-store'});if(r.ok){const d=parse(await r.text());const have=new Set(d.events.map(e=>e.id));ev=d.events.concat(ev.filter(e=>!have.has(e.id)));src='zentral';}}catch(e){}}

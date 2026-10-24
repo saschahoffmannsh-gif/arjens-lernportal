@@ -214,18 +214,19 @@ function startTest(){
 window.APPTEST={P:()=>P,take:id=>take(CHMAP[id]),single:(id)=>go('practice',{mode:'single',list:[ALLEX.find(e=>e.id===id)]}),ALLEX,CHAPTERS,startTest,startChapter,state:()=>S,KEY};
 
 let cur=null;
+const readBox=a=>`<div class="readbox"><div class="rb-h">📖 ${a.title||'Text'} <span class="legend">– lies den Text (🔊 = Aussprache)</span></div>${a.lines.map(l=>`<div class="tl">${l[0]&&window.CHARS[l[0]]?`<b>${window.NAMES[l[0]]||l[0]}:</b> `:''}<span class="fr">${l[1]}</span>${spk(l[1],l[0])}</div>`).join('')}</div>`;
 function renderEx(){
  const e=S.list[S.i];const c=CHMAP[e.ch];const [tl,ti]=tlabel(e);
  const head=S.mode==='test'?'🏆 Abschlusstest':S.mode==='mix'?'🔀 Gemischt':S.mode==='single'?'Aufgabe':c.title;
  const a=audioOf(e.au);
  main.innerHTML=`<div class="ex-wrap"><div class="ex-top"><button class="btn ghost small" data-quit="1" aria-label="Übung beenden">✕</button><div class="pbar"><i style="width:${S.i/S.list.length*100}%"></i></div><span class="ex-n">${S.i+1} / ${S.list.length}</span></div>
  <div class="ex-card fade" style="--c:${(CHMAP[e.ref]||c).c||L.color}"><div class="ex-meta"><span class="ex-type">${ti} ${tl}</span>${lvStars(e.lv)}<span class="ex-head">${head}</span></div>
- <div class="ex-q">${e.q}</div>${a?`<div class="ex-audio">${playBig(a,a.title?'Hörtext: '+a.title:'Anhören')}${e.auNote?`<div class="legend">${e.auNote}</div>`:''}</div>`:''}<div id="exBody"></div>
+ <div class="ex-q">${e.q}</div>${a&&L.readAu?readBox(a):''}${a&&!L.readAu?`<div class="ex-audio">${playBig(a,a.title?'Hörtext: '+a.title:'Anhören')}${e.auNote?`<div class="legend">${e.auNote}</div>`:''}</div>`:''}<div id="exBody"></div>
  <div class="fb" id="fb" role="status" aria-live="polite"></div><div class="actions"><button class="btn retry" id="retryBtn" hidden>↺ Nochmal versuchen</button><button class="btn" id="checkBtn" disabled>Prüfen</button></div>
  <div class="legend retrynote" id="retryNote" hidden></div></div>
  ${S.mode==='chapter'?`<div class="chreset slim"><button class="btn ghost small" data-chreset="${S.ch}">↺ Kapitel zurücksetzen</button></div>`:''}</div>`;
  const btn=$('#checkBtn'),rb=$('#retryBtn');
- btn.onclick=()=>{if(btn.dataset.next){next();return;}const r=cur.check();if(r==null)return;stopAudio();const first=!S.res[S.i];feedback(e,r,a);logAnswer(e,r,first);btn.textContent=S.i<S.list.length-1?'Weiter →':'Ergebnis ansehen';btn.dataset.next='1';btn.disabled=false;btn.classList.add(r.ok?'green':'red');
+ btn.onclick=()=>{if(btn.dataset.next){next();return;}const r=cur.check();if(r==null)return;stopAudio();const first=!S.res[S.i];feedback(e,r,L.readAu?null:a);logAnswer(e,r,first);btn.textContent=S.i<S.list.length-1?'Weiter →':'Ergebnis ansehen';btn.dataset.next='1';btn.disabled=false;btn.classList.add(r.ok?'green':'red');
   rb.hidden=false;rb.classList.toggle('hot',!r.ok);
   if(!r.ok&&(S.mode==='test'||S.mode==='chapter')){const n=$('#retryNote');n.hidden=false;n.textContent='Du kannst es nochmal versuchen – für die Punkte zählt aber dein erster Versuch.';}
   setTimeout(()=>{const f=$('#fb');if(f&&f.getBoundingClientRect().bottom>window.innerHeight)f.scrollIntoView({behavior:'smooth',block:'center'});},60);};

@@ -1,15 +1,15 @@
 /* Lektion: Texte schreiben – C'est moi & C'est ma chambre */
 const {F,G,conj,dlg,merk,attn,tip,hoer,card,reveal,tabs,track,steps,grp,ob,room,spk,spkLines,writer}=H;
 const {mc,pick,gap,gapw,ord,wr,mt,dl,clk,mark,mul,seg,tf,det}=X;
-window.LESSON={slug:'texte',title:'Texte schreiben',fr:'C’est moi! · C’est ma chambre!',icon:'✍️',color:'#ca8a04',testN:16,
- intro:'In der Klassenarbeit schreibst du wahrscheinlich einen kurzen Text: <b>dich vorstellen</b> oder <b>dein Zimmer beschreiben</b>. Hier hörst und liest du Mustertexte, sammelst Bausteine, baust Sätze – und schreibst dann deinen eigenen Text mit Checkliste.'};
+window.LESSON={slug:'texte',readAu:true,title:'Texte schreiben',fr:'C’est moi! · C’est ma chambre!',icon:'✍️',color:'#ca8a04',testN:16,
+ intro:'In der Klassenarbeit schreibst du wahrscheinlich einen kurzen Text: <b>dich vorstellen</b> oder <b>dein Zimmer beschreiben</b>. Hier liest du Mustertexte (mit 🔊 für die Aussprache), sammelst Bausteine, baust Sätze – und schreibst dann deinen eigenen Text mit Checkliste.'};
 room('jade','La chambre de Jade',[
  ['poster',8,10,42,'des posters',2],['photo',232,22,34,'des photos',2],['hamac',2,94,88,'un hamac'],['lit',90,118,92,'un lit'],
  ['table',186,118,72,'une table'],['ordinateur',204,104,36,'un ordinateur'],['chaise',250,132,46,'une chaise'],
  ['armoire',306,96,72,'une armoire'],['etagere',300,4,94,'une étagère'],['livre',306,10,27,'des livres',3],['bd',306,54,27,'des B.D.',3],
  ['minichaine',58,184,40,'une minichaîne'],['cd',104,198,22,'des CD',3],['pierre',196,190,26,'des pierres (la collection)',3]],{wx:140,wall:'#ede9fe'});
 window.TRACKS={
- leo:{title:'Léo: «C’est moi!»',kind:'Mustertext 1',open:true,intro:'Hör zu und lies mit. Achte darauf, wie Léo seinen Text aufbaut.',lines:[
+ leo:{title:'Léo: «C’est moi!»',kind:'Mustertext 1',open:true,intro:'Lies mit (🔊 = Aussprache). Achte darauf, wie Léo seinen Text aufbaut.',lines:[
   ['Léo','Salut! Je me présente: c’est moi, Léo.','Hallo! Ich stelle mich vor: Das bin ich, Léo.'],
   ['Léo','Je suis de Berlin.','Ich komme aus Berlin.'],
   ['Léo','Je suis élève à Strasbourg. Je suis en sixième A.','Ich bin Schüler in Straßburg. Ich bin in der 6A.'],
@@ -18,7 +18,7 @@ window.TRACKS={
   ['Léo','À la maison, je regarde des B.D. et j’écoute des CD.','Zu Hause schaue ich Comics an und höre CDs.'],
   ['Léo','Je téléphone à Lucas et nous parlons ensemble.','Ich rufe Lucas an und wir reden zusammen.'],
   ['Léo','Et toi? Tu t’appelles comment? Au revoir!','Und du? Wie heißt du? Auf Wiedersehen!']]},
- jade:{title:'Jade: «C’est ma chambre!»',kind:'Mustertext 2',open:true,intro:'Hör zu und lies mit. Schau dabei auf das Bild von Jades Zimmer.',lines:[
+ jade:{title:'Jade: «C’est ma chambre!»',kind:'Mustertext 2',open:true,intro:'Lies mit (🔊 = Aussprache). Schau dabei auf das Bild von Jades Zimmer.',lines:[
   ['Jade','Salut! C’est Jade. Voilà ma chambre!','Hallo! Hier ist Jade. Das ist mein Zimmer!'],
   ['Jade','Dans ma chambre, il y a un lit, une armoire et une étagère.','In meinem Zimmer gibt es ein Bett, einen Schrank und ein Regal.'],
   ['Jade','Dans l’étagère, il y a des livres et des B.D.','Im Regal gibt es Bücher und Comics.'],
@@ -45,11 +45,11 @@ window.WRITERS={
 };
 window.CHAPTERS=[
 /* ===== Block A ===== */
-{id:'moi-text',block:'Teil A · C’est moi!',kind:'Mustertext',icon:'🙋',title:'Léo stellt sich vor',sub:'Hören, mitlesen, verstehen',lv:1,
+{id:'moi-text',block:'Teil A · C’est moi!',kind:'Mustertext',icon:'🙋',title:'Léo stellt sich vor',sub:'Lesen und verstehen (🔊 = Aussprache)',lv:1,
 html:track('leo')+tip('Lies den Text zweimal: einmal mit Ton, einmal leise. Tippe auf 🔊 neben einem Satz, um ihn einzeln zu hören.','📖')
  +reveal('🔍 Wie ist Léos Text aufgebaut?',steps(['<b>Begrüßung</b> und <b>Name</b>: Salut! Je me présente: c’est moi, Léo.','<b>Herkunft</b>: Je suis de Berlin.','<b>Schule und Klasse</b>: Je suis élève à Strasbourg. Je suis en sixième A.','<b>Lehrer</b> und <b>Freund</b>: Le professeur de français, c’est … / Voilà Lucas …','<b>Zu Hause</b> (Verben auf -er): je regarde, j’écoute, je téléphone …','<b>Schluss</b> mit Frage: Et toi? Tu t’appelles comment? Au revoir!'])),
 ex:[
- tf('Richtig oder falsch? (Lies oder hör den Text.)',[['Léo est de Berlin.',true],['Léo est en cinquième.',false],['Le professeur de français, c’est Madame Fournier.',false],['Lucas et Léo sont ensemble dans la classe.',true],['À la maison, Léo regarde des B.D.',true]],'Léo ist in der <b>sixième</b> A, der Lehrer ist <b>Monsieur Martel</b>.',{au:'T:leo'}),
+ tf('Richtig oder falsch? (Lies den Text.)',[['Léo est de Berlin.',true],['Léo est en cinquième.',false],['Le professeur de français, c’est Madame Fournier.',false],['Lucas et Léo sont ensemble dans la classe.',true],['À la maison, Léo regarde des B.D.',true]],'Léo ist in der <b>sixième</b> A, der Lehrer ist <b>Monsieur Martel</b>.',{au:'T:leo'}),
  mc('Woher kommt Léo?',['aus Berlin','aus Straßburg','aus Paris','Das steht nicht im Text.'],'«Je suis de Berlin.»',{au:'T:leo'}),
  mc('Was macht Léo zu Hause? (2 Dinge passen – wähle die Antwort mit beiden.)',['Er schaut Comics an und hört CDs.','Er spielt Gitarre und schaut Fotos an.','Er hört CDs und spricht Deutsch.','Er schaut Fotos an und ruft Clara an.'],'«À la maison, je regarde des B.D. et j’écoute des CD.»'),
  mc('Mit welchem Satz <b>beginnt</b> man eine Selbstvorstellung?',['Salut! Je me présente: c’est moi, Léo.','Au revoir!','Et toi? Tu t’appelles comment?','Il est très cool.'],'Am Anfang: Begrüßung und Name.',{fr:true}),
@@ -88,7 +88,7 @@ ex:[
  dl('Ergänze den Text.',[['Clara','Bonjour! Je {0}: c’est moi, Clara.'],['Clara','Je {1} de Berlin. Je {2} en sixième A.'],['Clara','Jade et moi, nous {3} ensemble dans la classe.']],[['me présente','m’appelle','présente'],['suis','es','est'],['suis','sommes','es'],['sommes','sont','êtes']],'me présente · suis · suis · sommes.'),
 ]},
 /* ===== Block B ===== */
-{id:'chambre-text',block:'Teil B · C’est ma chambre!',kind:'Mustertext',icon:'🛏️',title:'Jade zeigt ihr Zimmer',sub:'Hören, mitlesen, im Bild finden',lv:1,
+{id:'chambre-text',block:'Teil B · C’est ma chambre!',kind:'Mustertext',icon:'🛏️',title:'Jade zeigt ihr Zimmer',sub:'Lesen, verstehen, im Bild finden',lv:1,
 html:card('La chambre de Jade','🖼️','<div class="roomwrap">'+window.ROOMS.jade.svg+'</div>')+track('jade')
  +reveal('🔍 Wie ist Jades Text aufgebaut?',steps(['<b>Einleitung</b>: Salut! C’est Jade. Voilà ma chambre!','<b>Möbel</b> mit il y a: un lit, une armoire, une étagère …','<b>Wo?</b> Dans l’étagère … / Là, dans le coin … / Dans le coin musique …','<b>Lieblingssachen</b>: ma collection de pierres, le hamac','<b>Was sie macht</b>: J’écoute … / je regarde …','<b>Schluss</b> mit Frage: Et toi? Qu’est-ce qu’il y a dans ta chambre?'])),
 ex:[
@@ -97,8 +97,6 @@ ex:[
  mc('Qu’est-ce qu’il y a dans le coin musique?',['une minichaîne et des CD','une guitare et des CD','un ordinateur et une table','des posters'],'«Dans le coin musique, il y a une minichaîne et des CD.»',{au:'T:jade',fr:true}),
  tf('Richtig oder falsch?',[['Dans la chambre de Jade, il y a un hamac.',true],['Il y a une guitare.',false],['Il y a des posters partout.',true],['Dans le coin, il y a une table, une chaise et un ordinateur.',true]],'Eine Gitarre kommt in Jades Text nicht vor.',{au:'T:jade'}),
  mark('Markiere alle Möbel, die Jade im <b>2. Satz</b> nennt.','jade',['lit','armoire','etagere'],'«Dans ma chambre, il y a un lit, une armoire et une étagère.»',{au:[['Jade','Dans ma chambre, il y a un lit, une armoire et une étagère.']]}),
- clk('Hör zu und tippe im Bild an.','jade','pierre','«Et voilà ma collection de pierres!»',{au:[['Jade','Et voilà ma collection de pierres!']]}),
- clk('Hör zu und tippe im Bild an.','jade','minichaine','une minichaîne = eine Mini-Stereoanlage.',{au:[['Jade','Dans le coin musique, il y a une minichaîne.']]}),
  mt('Was bedeutet das?',[['partout','überall'],['dans le coin','in der Ecke'],['le coin musique','die Musikecke'],['la collection','die Sammlung'],['C’est trop cool!','Das ist total cool!']],'Diese Wörter machen deinen Text lebendig.',{say:[['','partout, dans le coin, le coin musique, la collection, C’est trop cool!']]}),
 ]},
 {id:'chambre-bausteine',kind:'Redemittel',icon:'🧱',title:'Bausteine: mein Zimmer',sub:'il y a + un / une / des, Wo?',lv:2,
@@ -114,8 +112,6 @@ ex:[
  ord('Bilde die Frage.',['Qu’est-ce qu’','il y a','dans','ta','chambre','?'],'Qu’est-ce qu’il y a dans ta chambre?'),
  wr('Übersetze: „In meinem Zimmer gibt es einen Tisch.“',['Dans ma chambre, il y a une table.','Dans ma chambre il y a une table.','Il y a une table dans ma chambre.'],'la table ist weiblich → <b>une</b> table!',{strict:true}),
  wr('Übersetze: „Überall gibt es Poster.“',['Il y a des posters partout.','Partout, il y a des posters.','Partout il y a des posters.'],'Il y a des posters partout.',{strict:true,lv:3}),
- clk('Hör zu und tippe im Bild an.','jade','armoire','«Il y a une armoire.»',{au:[['Jade','Il y a une armoire.']]}),
- mark('Hör zu: Was steht <b>in der Ecke</b>? Markiere alles.','jade',['table','chaise','ordinateur'],'«Là, dans le coin, il y a une table, une chaise et un ordinateur.»',{au:[['Jade','Là, dans le coin, il y a une table, une chaise et un ordinateur.']]}),
 ]},
 {id:'chambre-schreiben',kind:'Schreibwerkstatt',icon:'✍️',title:'Dein Text: C’est ma chambre!',sub:'Zeichnen, beschriften, beschreiben',lv:2,
 html:steps(['<b>Zeichnen:</b> Zeichne dein Zimmer (oder dein Traumzimmer) auf Papier und beschrifte es mit <b>un / une / des</b>.','<b>Schreiben:</b> Mindestens 5–8 Sätze. Nutze <b>il y a</b> mehrmals und sag, <b>wo</b> etwas ist.','<b>Prüfen:</b> Stimmt der Artikel (m./f./Pl.)? Plural-s? Frage am Schluss?','<b>Vergleichen:</b> Erst dann die Beispiellösung öffnen.'])+writer('chambre'),
@@ -150,10 +146,9 @@ window.TEST_EX=[
  gap('Ergänze den Text.','Salut! Je {0} Yasmine. Je {1} de Berlin. À la maison, {2} des CD. Dans ma chambre, il y a {3} armoire et {4} hamac. Et toi? {5} il y a dans ta chambre?',[['m’appelle','suis','est'],['suis','es','m’appelle'],['j’écoute','je écoute','j’écoutes'],['une','un','des'],['un','une','des'],['Qu’est-ce qu’','C’est qui','Comment']],'m’appelle · suis · j’écoute · une armoire · un hamac · Qu’est-ce qu’il y a …?',{ref:'moi-bausteine',tag:'Redemittel'}),
  wr('Übersetze: „Ich bin Schülerin in Straßburg. Ich bin in der 6B.“',['Je suis élève à Strasbourg. Je suis en sixième B.','Je suis élève à Strasbourg. Je suis en 6e B.'],'Je suis élève à Strasbourg. Je suis en sixième B.',{strict:true,ref:'moi-schreiben',tag:'Sich vorstellen'}),
  wr('Übersetze: „In der Ecke gibt es eine Lampe.“',['Dans le coin, il y a une lampe.','Dans le coin il y a une lampe.','Il y a une lampe dans le coin.'],'Dans le coin, il y a une lampe.',{strict:true,ref:'chambre-bausteine',tag:'Zimmer beschreiben'}),
- mark('Hör zu: Was gibt es in Jades Zimmer? Markiere alles, was du hörst.','jade',['lit','hamac','cd','photo'],'Du hörst: un lit, un hamac, des CD und des photos.',{au:[['Jade','Voilà ma chambre! Il y a un lit et un hamac. J’écoute des CD et je regarde des photos.']],ref:'chambre-text',tag:'Hören: Zimmer'}),
 ];
 /* Pro Durchgang: so viele Aufgaben je Kapitel (Rest = Reserve-Pool); Pflichtaufgaben zu den Heftfehlern */
-H.setRun({'moi-text':3,'moi-bausteine':4,'moi-schreiben':3,'chambre-text':3,'chambre-bausteine':4,'chambre-schreiben':3,fehler:3},{fehler:[0],test:[0]});
+H.setRun({"moi-text":3,"moi-bausteine":4,"moi-schreiben":3,"chambre-text":3,"chambre-bausteine":4,"chambre-schreiben":3,fehler:3},{fehler:[0],test:[0]});
 /* INTRO */
 H.setIntro({
 _lesson:{t:'Eigene Texte schreiben',
@@ -165,12 +160,12 @@ _lesson:{t:'Eigene Texte schreiben',
  fallen:['<b>Je suis de Berlin</b> – nicht „von“.','<b>il est</b> (ist) – nicht „il et“ (und).','<b>j’écoute</b> – nicht „je écoute“.','Mit „… et moi“: <b>nous sommes</b> (oder on est).','<b>il y a un / une / des</b> – nicht le / la.'],
  check:['Bausteine auswählen.','Sätze schreiben.','Checkliste abhaken: Formen, Artikel, Akzente.']},
 'moi-text':{rule:"Ein Vorstellungstext hat einen Aufbau: Begrüßung und Name – Herkunft, Schule, Klasse – Lehrer und Freunde – was du gern machst – Schluss.",t:'Mustertext: sich vorstellen',
- was:'Léo stellt sich vor. Lies und hör seinen Text. Achte darauf, <b>wie</b> er aufgebaut ist – so kannst du deinen eigenen Text genauso bauen.',
+ was:'Léo stellt sich vor. Lies seinen Text (🔊 = Aussprache). Achte darauf, <b>wie</b> er aufgebaut ist – so kannst du deinen eigenen Text genauso bauen.',
  schritte:['Begrüßung und Name.','Woher kommt er? Welche Schule, welche Klasse?','Lehrer, Freunde, was er gern macht.','Schluss / Verabschiedung.'],
  bsp:[['Salut! Je me présente: c’est moi, Léo.','Hallo! Ich stelle mich vor: Das bin ich, Léo.','Léo'],['Je suis de Berlin.','Ich bin aus Berlin.','Léo'],['Je suis élève à Strasbourg.','Ich bin Schüler in Straßburg.','Léo'],['À la maison, j’écoute des CD.','Zu Hause höre ich CDs.','Léo']],
  merk:'Ein Text hat einen Aufbau: Anfang – Infos – Schluss.',
  fallen:['<b>élève</b> mit zwei Akzenten.','<b>à</b> Strasbourg (in) – mit Akzent.'],
- check:['Lesen und hören.','Aufbau erkennen.','Fragen beantworten.']},
+ check:['Lesen.','Aufbau erkennen.','Fragen beantworten.']},
 'moi-bausteine':{rule:"Name: Je m’appelle … · Herkunft: Je suis de … · Klasse: Je suis en sixième … · Freunde: … et moi, nous sommes …",t:'Bausteine: sich vorstellen',
  was:'Bausteine sind fertige Satzanfänge. Du musst nur noch deine eigenen Infos einsetzen.',
  schritte:['Name: <i>Je m’appelle … / Moi, c’est …</i>','Herkunft: <i>Je suis de …</i>','Schule: <i>Je suis en sixième A. / Je suis élève à …</i>','Freunde: <i>… et moi, nous sommes ensemble.</i>'],
@@ -186,12 +181,12 @@ _lesson:{t:'Eigene Texte schreiben',
  fallen:['Nach je kommt -e (je regard<b>e</b>), nach nous -ons.','Am Satzende Punkt.'],
  check:['Sammeln.','Schreiben.','Prüfen.']},
 'chambre-text':{rule:"Eine Zimmerbeschreibung: Voilà ma chambre! – Il y a + un / une / des … – wo etwas ist (dans le coin, là …).",t:'Mustertext: das Zimmer',
- was:'Jade beschreibt ihr Zimmer. Lies und hör ihren Text. Achte auf <b>il y a</b> + un / une / des und darauf, wie sie sagt, <b>wo</b> etwas ist.',
+ was:'Jade beschreibt ihr Zimmer. Lies ihren Text (🔊 = Aussprache). Achte auf <b>il y a</b> + un / une / des und darauf, wie sie sagt, <b>wo</b> etwas ist.',
  schritte:['Einleitung: <i>Voilà ma chambre!</i>','Möbel: <i>Il y a un lit, une table …</i>','Wo? <i>Dans le coin … / Là …</i>','Was sie besonders mag (die Sammlung).'],
  bsp:[['Voilà ma chambre!','Das ist mein Zimmer!','Jade'],['Il y a un lit et une armoire.','Es gibt ein Bett und einen Schrank.','Jade'],['Dans le coin, il y a un hamac.','In der Ecke gibt es eine Hängematte.','Jade'],['Il y a des posters partout.','Überall gibt es Poster.','Jade']],
  merk:'il y a + un / une / des – damit sagst du, was es gibt.',
  fallen:['<b>partout</b> = überall.','<b>des CD</b> und <b>des B.D.</b> ohne s.'],
- check:['Lesen und hören.','Aufbau erkennen.','Fragen beantworten.']},
+ check:['Lesen.','Aufbau erkennen.','Fragen beantworten.']},
 'chambre-bausteine':{rule:"Was es gibt: il y a + un (m.) / une (f.) / des (Plural, Nomen mit -s). Wo: dans le coin, là, dans l’étagère.",t:'Bausteine: mein Zimmer',
  was:'Mit diesen Bausteinen beschreibst du jedes Zimmer.',
  schritte:['Einleitung: <i>Voilà ma chambre! / C’est ma chambre.</i>','Was gibt es? <i>Dans ma chambre, il y a …</i>','Wo? <i>Dans le coin, … / Là, … / Dans l’étagère, …</i>','Bewertung: <i>Le hamac est super!</i>'],
