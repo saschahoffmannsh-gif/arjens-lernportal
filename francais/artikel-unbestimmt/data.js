@@ -176,4 +176,4 @@ window.TEST_EX=[
  mark('Hör zu und markiere im Bild, was es in Noahs Zimmer gibt.','noah',['hamac','ordinateur','lampe','cd'],'Du hörst: un hamac, un ordinateur, une lampe et des CD.',{au:[['Noah','Il y a un hamac, un ordinateur, une lampe et des CD.']],ref:'szenen',tag:'Hören: Bild markieren'}),
 ];
 /* Pro Durchgang: so viele Aufgaben je Kapitel (Rest = Reserve-Pool); Pflichtaufgaben zu den Heftfehlern */
-H.setRun({entdecken:3,regel:3,'le-un':3,szenen:3,leicht:5,mittel:5,schwer:5,fehler:4},{fehler:[0],test:[4]});
+H.setRun({entdecken:2,regel:3,'le-un':2,szenen:2,leicht:4,mittel:4,schwer:4,fehler:3},{fehler:[0],test:[4]});

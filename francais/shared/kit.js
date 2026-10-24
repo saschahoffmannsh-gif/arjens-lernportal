@@ -78,7 +78,7 @@ H.steps=(arr)=>`<ol class="steps">${arr.map(s=>`<li>${s}</li>`).join('')}</ol>`;
    takes: {kapitelId:n}; must: {kapitelId:[index,…], test:[index,…]} */
 H.setRun=(takes,must={})=>{(W.CHAPTERS||[]).forEach(c=>{c.take=Math.min(c.ex.length,takes[c.id]||4);(must[c.id]||[]).forEach(i=>{c.ex[i].must=true;});});
  (must.test||[]).forEach(i=>{W.TEST_EX[i].must=true;});};
-H.TEST_N=10;
+H.TEST_N=8;
 /** Aufgaben pro Durchgang einer Lektion (Kapitel + Abschlusstest) und geschätzte Minuten */
 H.runInfo=()=>{const n=(W.CHAPTERS||[]).reduce((a,c)=>a+(c.take||4),0)+H.TEST_N;return {n,min:Math.round(n*1.1/5)*5};};
 W.H=H;

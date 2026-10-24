@@ -113,7 +113,7 @@ function home(){
  <div class="lh-btns">${nc?`<button class="btn big" data-open="${nc.id}">▶ ${o.d?'Weiter mit Kapitel '+(nc.idx+1):'Los geht’s: Kapitel 1'}</button>`:`<button class="btn big red" data-test="1">🏆 Abschlusstest</button>`}</div></div>
  <div class="lh-art">${window.HERO[L.slug]||''}</div></section>
  <div class="soundtip"><span class="st-ic">🔊</span><div><b>Mit Ton lernen:</b> Tippe auf einen Lautsprecher, dann hörst du den Satz (nochmal tippen = Stopp). <b>Kein Ton auf dem iPhone?</b> Stummschalter an der Seite aus und lauter stellen.</div></div>
- <div class="section-title"><div class="bar"></div><h2>Deine Kapitel</h2><span class="sct-n">${o.d}/${o.t} geschafft</span></div><p class="legend runinfo">📏 Ein Durchgang: <b>≈ ${RI.n} Aufgaben · ca. ${RI.min} Min.</b> (${RI.n-H.TEST_N} in den Kapiteln + ${H.TEST_N} im Abschlusstest) – am besten auf 2–3 kurze Lernzeiten verteilen.</p><ol class="path">`;
+ <div class="section-title"><div class="bar"></div><h2>Deine Kapitel</h2><span class="sct-n">${o.d}/${o.t} geschafft</span></div><p class="legend runinfo">📏 Ein Durchgang: <b>≈ ${RI.n} Aufgaben · ca. ${RI.min} Min.</b> (${RI.n-H.TEST_N} in den Kapiteln + ${H.TEST_N} im Abschlusstest) – am besten auf 2 kurze Lernzeiten à 15–20 Min. verteilen.</p><ol class="path">`;
  CHAPTERS.forEach((c,i)=>{const s=chapterStatus(c);const pct=s.p.best||0;
   if(c.block)h+=`<li class="pblock" style="--c:${c.c}"><span>${c.block}</span></li>`;
   h+=`<li><button class="pstep${s.done?' done':''}" style="--c:${c.c}" data-open="${c.id}"><span class="pnum">${s.done?'✓':i+1}</span><span class="pbody"><span class="pk">${c.kind||'Kapitel '+(i+1)}</span><span class="pt"><span class="pic">${c.icon||''}</span>${c.title}</span><span class="ps">${c.sub||''}</span>

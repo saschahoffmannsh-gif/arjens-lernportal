@@ -179,4 +179,4 @@ window.TEST_EX=[
  det('Fehlerdetektiv: Finde die 4 Fehler.','Voilà [le|la] classe de sixième A. [Le|Les] élèves sont dans la cour. [La|L’] étagère est dans [la|le] coin.','la classe · Les élèves · L’étagère · le coin.',{ref:'fehler',tag:'Fehler finden'}),
 ];
 /* Pro Durchgang: so viele Aufgaben je Kapitel (Rest = Reserve-Pool); Pflichtaufgaben zu den Heftfehlern */
-H.setRun({entdecken:3,regel:3,plural:3,szenen:3,leicht:5,mittel:5,schwer:5,fehler:4},{fehler:[0],test:[5]});
+H.setRun({entdecken:2,regel:3,plural:2,szenen:2,leicht:4,mittel:4,schwer:4,fehler:3},{fehler:[0],test:[5]});

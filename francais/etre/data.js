@@ -191,4 +191,4 @@ window.TEST_EX=[
  wr('Setze in den Plural: «Elle est nouvelle.»',['Elles sont nouvelles.'],'elle est → elles sont; nouvelle → nouvelles.',{ref:'schwer',tag:'Plural'}),
 ];
 /* Pro Durchgang: so viele Aufgaben je Kapitel (Rest = Reserve-Pool); Pflichtaufgaben zu den Heftfehlern */
-H.setRun({entdecken:3,formen:3,pronomen:3,szenen:3,leicht:5,mittel:5,schwer:5,fehler:4},{fehler:[0],test:[4]});
+H.setRun({entdecken:2,formen:3,pronomen:2,szenen:2,leicht:4,mittel:4,schwer:4,fehler:3},{fehler:[0],test:[4]});

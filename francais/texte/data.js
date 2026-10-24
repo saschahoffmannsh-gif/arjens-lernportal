@@ -153,4 +153,4 @@ window.TEST_EX=[
  mark('Hör zu: Was gibt es in Jades Zimmer? Markiere alles, was du hörst.','jade',['lit','hamac','cd','photo'],'Du hörst: un lit, un hamac, des CD und des photos.',{au:[['Jade','Voilà ma chambre! Il y a un lit et un hamac. J’écoute des CD et je regarde des photos.']],ref:'chambre-text',tag:'Hören: Zimmer'}),
 ];
 /* Pro Durchgang: so viele Aufgaben je Kapitel (Rest = Reserve-Pool); Pflichtaufgaben zu den Heftfehlern */
-H.setRun({'moi-text':4,'moi-bausteine':4,'moi-schreiben':3,'chambre-text':4,'chambre-bausteine':4,'chambre-schreiben':3,fehler:4},{fehler:[0],test:[0]});
+H.setRun({'moi-text':3,'moi-bausteine':4,'moi-schreiben':3,'chambre-text':3,'chambre-bausteine':4,'chambre-schreiben':3,fehler:3},{fehler:[0],test:[0]});

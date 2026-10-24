@@ -197,4 +197,4 @@ window.TEST_EX=[
  wr('Übersetze: „Ihr schaut die Fotos an.“',['Vous regardez les photos.'],'Vous regardez les photos.',{strict:true,ref:'schwer',tag:'Übersetzen'}),
 ];
 /* Pro Durchgang: so viele Aufgaben je Kapitel (Rest = Reserve-Pool); Pflichtaufgaben zu den Heftfehlern */
-H.setRun({entdecken:3,bauplan:3,heftverben:3,appeler:4,hoeren:3,leicht:5,mittel:5,schwer:5,fehler:4},{bauplan:[0],heftverben:[9],appeler:[0],fehler:[0,1,2],test:[2,4]});
+H.setRun({entdecken:2,bauplan:2,heftverben:2,appeler:3,hoeren:2,leicht:4,mittel:4,schwer:4,fehler:3},{bauplan:[0],heftverben:[9],appeler:[0],fehler:[0,1,2],test:[2,4]});
