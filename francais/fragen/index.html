@@ -186,6 +186,15 @@ table.t th{background:#eff6ff;color:var(--navy);font-family:'FredokaApp',sans-se
 .way .n{width:32px;height:32px;border-radius:50%;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:900;margin-right:6px}
 .way h4{margin:0 0 6px;font-size:18px;font-family:'FredokaApp',sans-serif;font-weight:600;color:var(--navy);display:flex;align-items:center}
 .intonation{display:block;width:100%;max-width:260px;height:auto;margin:6px 0}
+.btn.retry{background:#fff;color:var(--navy);box-shadow:0 0 0 2px #cbd5e1 inset,0 3px 0 #cbd5e1}
+.btn.retry.hot{background:#f59e0b;color:#fff;box-shadow:0 4px 0 #b45309;animation:fade .3s}
+.btn.retry[hidden],.retrynote[hidden]{display:none}
+.retrynote{text-align:right;margin-top:8px}
+.chreset{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-top:18px;padding:12px 16px;border-radius:14px;background:#f8fafc;border:2px dashed #cbd5e1}
+.chreset.slim{justify-content:center;background:none;border:0;padding:4px 0}
+.resetbox{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;margin-top:30px;padding:18px 20px;border-radius:18px;background:#fff1f2;border:2px solid #fecdd3}
+.resetbox h3{margin:0 0 4px;font-family:'FredokaApp',sans-serif;font-weight:600;color:#9f1239;font-size:20px}
+.resetbox p{margin:0;font-size:16px;color:#475569;max-width:520px}
 .footer{margin-top:40px;text-align:center;font-size:14px;color:var(--muted)}
 .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#1e293b;color:#fff;border-radius:14px;padding:10px 18px;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:50;animation:fade .3s}
 .confetti{position:fixed;inset:0;pointer-events:none;z-index:60;overflow:hidden}
@@ -213,6 +222,11 @@ table.t th{background:#eff6ff;color:var(--navy);font-family:'FredokaApp',sans-se
  .dlg .av{flex-basis:44px}.dlg .av svg{width:44px}
  .bub{max-width:85%}
  .opts{grid-template-columns:1fr}
+ .actions .btn{flex:1 1 auto;justify-content:center}
+ .retrynote{text-align:center}
+ .chreset{justify-content:center;text-align:center}
+ .resetbox{flex-direction:column;align-items:stretch;text-align:center}
+ .resetbox .btn{justify-content:center}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style></head>
@@ -562,6 +576,9 @@ const KEY='fragen_fr_progress_v1';
 let P=load();
 function load(){try{const p=JSON.parse(localStorage.getItem(KEY)||'{}');p.ch=p.ch||{};p.test=p.test||{best:null,stars:0,runs:0};return p;}catch(e){return {ch:{},test:{best:null,stars:0,runs:0}};}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(P));}catch(e){}}
+function resetChapter(id){delete P.ch[id];save();}
+function resetTest(){P.test={best:null,stars:0,runs:0};save();}
+function resetAll(){P={ch:{},test:{best:null,stars:0,runs:0}};save();}
 function chp(id){return P.ch[id]=P.ch[id]||{lesson:false,best:0,solved:{}};}
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -636,7 +653,8 @@ function home(){
  h+=`<button class="chap test" data-test="1"><span class="check ${t.stars>=2?'on':''}">★</span><span class="num">Finale</span><span class="q">🏆 Abschlusstest</span><span class="de">15 gemischte Aufgaben mit Punkten, Sternen und Abzeichen</span>
  <span class="st">${t.best!==null?`Bestwert ${t.best} % · ${'★'.repeat(t.stars)}${'☆'.repeat(3-t.stars)}`:'Noch nicht gemacht'}</span></button></div>
  <div class="merk blue"><h3>🧭 So lernst du am besten</h3><ul><li>Öffne die Kapitel <b>der Reihe nach</b>. Lies die Erklärung und hör dir die Dialoge an (🔊).</li><li>Dann klickst du auf <b>„Jetzt üben“</b>. Ein Kapitel bekommt seinen Haken ✓, wenn du die Erklärung gelesen und mindestens <b>70 %</b> richtig hast.</li><li>Die Aufgaben kommen jedes Mal in einer <b>neuen Reihenfolge</b> – Wiederholen lohnt sich!</li><li>Zum Schluss: <b>Abschlusstest</b>. Danach siehst du, was du noch einmal üben solltest.</li></ul></div>
- <div class="toolbar"><button class="btn" data-mix="1">🔀 Alles gemischt üben (12 Aufgaben)</button><button class="btn ghost" data-reset="1">↺ Fortschritt zurücksetzen</button></div>
+ <div class="toolbar"><button class="btn" data-mix="1">🔀 Alles gemischt üben (12 Aufgaben)</button><button class="btn ghost" data-reset="1">↺ Gesamten Fortschritt zurücksetzen</button></div>
+ <div class="resetbox"><div><h3>↺ Neu anfangen</h3><p>Hier löschst du <b>alle</b> Haken, gelösten Aufgaben und Test-Bestwerte. Einzelne Kapitel kannst du auch direkt im Kapitel zurücksetzen.</p></div><button class="btn red" data-reset="1">↺ Gesamten Fortschritt zurücksetzen</button></div>
  <div class="footer">Wortschatz: Découvertes Unité 1 bis Unité 2 Volet 1 (bis „le globe“). ${TTS?'🔊 Vorlesen über die Sprachausgabe deines Geräts.':'Hinweis: Dein Browser unterstützt keine Sprachausgabe – die Vorlese-Knöpfe sind ausgeblendet.'}</div>`;
  main.innerHTML=h;
 }
@@ -659,9 +677,12 @@ function lesson(id){
  if(c.id==='start')h=h.replace('<div class="card"><h3><span class="ic">📘</span>Das Wichtigste zuerst</h3>','<div>').replace(/<\/div>$/,'</div>');
  if(c.dlg){h+=`<div class="card"><h3><span class="ic">🎭</span>Beispiele mit Antwort</h3>`+c.dlg.map(dlgHtml).join('')+`</div>`;}
  if(c.attn)h+=`<div class="attn"><h3>⚠️ Attention! Typische Fehler</h3>${c.attn}</div>`;
- h+=`<div class="toolbar" style="justify-content:center"><button class="btn green" data-practice="${id}">✏️ Jetzt üben (${c.ex.length} Aufgaben)</button>${c.idx<CHAPTERS.length-1?`<button class="btn ghost" data-open="${CHAPTERS[c.idx+1].id}">Nächstes Kapitel →</button>`:`<button class="btn red" data-test="1">🏆 Zum Abschlusstest</button>`}</div>`;
+ h+=chResetBar(id)+`<div class="toolbar" style="justify-content:center"><button class="btn green" data-practice="${id}">✏️ Jetzt üben (${c.ex.length} Aufgaben)</button>${c.idx<CHAPTERS.length-1?`<button class="btn ghost" data-open="${CHAPTERS[c.idx+1].id}">Nächstes Kapitel →</button>`:`<button class="btn red" data-test="1">🏆 Zum Abschlusstest</button>`}</div>`;
  main.innerHTML=h;
 }
+
+function chResetBar(id){const c=CHMAP[id],s=chapterStatus(c);
+ return `<div class="chreset" id="chReset"><span class="legend" style="margin:0">Dein Stand in diesem Kapitel: <b>${s.solved}/${s.total} gelöst</b>${s.p.best?` · Bestwert ${s.p.best} %`:''}${s.done?' · ✓ Haken':''}</span><button class="btn ghost small" data-chreset="${id}">↺ Kapitel zurücksetzen</button></div>`;}
 
 /* ---------- Übungs-Sitzung ---------- */
 let S=null;
@@ -687,15 +708,29 @@ function renderEx(){
  main.innerHTML=`<div class="ex-wrap"><div class="ex-top"><button class="btn ghost small" data-quit="1">✕</button><div class="pbar"><i style="width:${S.i/S.list.length*100}%"></i></div><span class="fred" style="color:#475569;white-space:nowrap">${S.i+1} / ${S.list.length}</span></div>
  <div class="ex-card fade" style="--c:${c.c}"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><span class="ex-type">${ti} ${tl}</span><span class="legend">${head}</span></div>
  <div class="ex-q">${e.q}</div><div id="exBody"></div>
- <div class="fb" id="fb"></div><div class="actions"><button class="btn" id="checkBtn" disabled>Prüfen</button></div></div></div>`;
- cur=RENDER[e.type](e,$('#exBody'));
- const btn=$('#checkBtn');
- btn.onclick=()=>{if(btn.dataset.next){next();return;}const r=cur.check();if(r==null)return;feedback(e,r);btn.textContent=S.i<S.list.length-1?'Weiter →':'Ergebnis ansehen';btn.dataset.next='1';btn.disabled=false;btn.classList.add(r.ok?'green':'red');btn.focus();};
+ <div class="fb" id="fb"></div><div class="actions"><button class="btn retry" id="retryBtn" hidden>↺ Nochmal versuchen</button><button class="btn" id="checkBtn" disabled>Prüfen</button></div>
+ <div class="legend retrynote" id="retryNote" hidden></div></div>
+ ${S.mode==='chapter'?`<div class="chreset slim"><button class="btn ghost small" data-chreset="${S.ch}">↺ Kapitel zurücksetzen</button></div>`:''}</div>`;
+ const btn=$('#checkBtn'),rb=$('#retryBtn');
+ btn.onclick=()=>{if(btn.dataset.next){next();return;}const r=cur.check();if(r==null)return;feedback(e,r);btn.textContent=S.i<S.list.length-1?'Weiter →':'Ergebnis ansehen';btn.dataset.next='1';btn.disabled=false;btn.classList.add(r.ok?'green':'red');
+  rb.hidden=false;rb.classList.toggle('hot',!r.ok);
+  if(!r.ok&&(S.mode==='test'||S.mode==='chapter')){const n=$('#retryNote');n.hidden=false;n.textContent='Du kannst es nochmal versuchen – für die Punkte zählt aber dein erster Versuch.';}
+  (r.ok?btn:rb).focus();};
+ rb.onclick=()=>mountEx(e);
+ mountEx(e);
+}
+function mountEx(e){ // Aufgabe (neu) in den Ausgangszustand bringen
+ if(TTS)try{speechSynthesis.cancel();}catch(x){}
+ const old=$('#exBody'),body=document.createElement('div');body.id='exBody';old.replaceWith(body);
+ const fb=$('#fb');fb.className='fb';fb.innerHTML='';
+ const btn=$('#checkBtn');btn.textContent='Prüfen';delete btn.dataset.next;btn.disabled=true;btn.classList.remove('green','red');
+ const rb=$('#retryBtn');rb.hidden=true;rb.classList.remove('hot');const n=$('#retryNote');if(n)n.hidden=true;
+ cur=RENDER[e.type](e,body);
 }
 function ready(v){const b=$('#checkBtn');if(b&&!b.dataset.next)b.disabled=!v;}
 const PRAISE=['Super, richtig!','Très bien!','Genau!','Bravo!','Parfait!','Klasse!'];
 function feedback(e,r){
- const fb=$('#fb');S.res.push({e,ok:r.ok});
+ const fb=$('#fb');if(!S.res[S.i])S.res[S.i]={e,ok:r.ok};
  if(r.ok&&S.mode!=='single'){const p=chp(e.ch);p.solved[e.id]=1;save();}
  fb.className='fb show '+(r.ok?'ok':'bad');
  fb.innerHTML=`<div class="ico">${r.ok?'✓':'✗'}</div><div style="flex:1"><div class="ttl">${r.ok?PRAISE[Math.floor(Math.random()*PRAISE.length)]:'Leider nicht richtig.'}</div>
@@ -782,7 +817,7 @@ RENDER.multi=(e,el)=>{
 /* ---------- Ergebnis ---------- */
 function medal(col,label){return `<svg class="medal" viewBox="0 0 120 120"><path d="M40,4 L60,48 L80,4 Z" fill="#c8102e"/><path d="M48,4 L60,32 L72,4Z" fill="#2563eb"/><circle cx="60" cy="74" r="38" fill="${col}" stroke="#fff" stroke-width="5"/><circle cx="60" cy="74" r="28" fill="none" stroke="#ffffff88" stroke-width="3"/><text x="60" y="82" text-anchor="middle" font-family="FredokaApp,sans-serif" font-size="${label.length>4?17:22}" font-weight="700" fill="#fff">${label}</text></svg>`;}
 function result(){
- const n=S.list.length,k=S.res.filter(r=>r.ok).length,pct=Math.round(k/n*100);
+ S.res=S.res.filter(Boolean);const n=S.list.length,k=S.res.filter(r=>r.ok).length,pct=Math.round(k/n*100);
  const stars=pct>=90?3:pct>=70?2:pct>=50?1:0;
  let extra='';
  if(S.mode==='chapter'){const p=chp(S.ch);p.best=Math.max(p.best||0,pct);save();}
@@ -797,15 +832,21 @@ function result(){
  ${badge}<div class="stars">${[0,1,2].map(i=>`<span class="s ${i<stars?'on':''}" style="animation-delay:${i*.2}s">★</span>`).join('')}</div>
  <div class="score">${k} / ${n} Punkte</div><div style="font-size:19px;color:#475569">${pct} % richtig · ${title}</div>
  ${S.mode==='chapter'?`<div class="legend" style="margin-top:8px">${pct>=70?'✓ Kapitel geschafft! Der Haken ist gesetzt.':'Für den Haken brauchst du mindestens 70 %.'}</div>`:''}${rev}
- <div class="toolbar" style="justify-content:center">${S.mode==='test'?'<button class="btn red" data-test="1">↻ Test wiederholen</button>':S.mode==='chapter'?`<button class="btn" data-practice="${S.ch}">↻ Noch einmal (neue Reihenfolge)</button>`:S.mode==='mix'?'<button class="btn" data-mix="1">↻ Neue Mischung</button>':''}<button class="btn ghost" data-home="1">Zur Übersicht</button></div></div></div>`;
+ <div class="toolbar" style="justify-content:center">${S.mode==='test'?'<button class="btn red" data-test="1">↻ Test nochmal machen</button>':S.mode==='chapter'?`<button class="btn" data-practice="${S.ch}">↻ Noch einmal (neue Reihenfolge)</button>`:S.mode==='mix'?'<button class="btn" data-mix="1">↻ Neue Mischung</button>':''}<button class="btn ghost" data-home="1">Zur Übersicht</button></div>
+ ${S.mode==='test'?`<div class="chreset"><span class="legend" style="margin:0" id="testBest">Dein Test-Bestwert: <b>${P.test.best??0} %</b> · ${'★'.repeat(P.test.stars)}${'☆'.repeat(3-P.test.stars)} · ${P.test.runs}× gemacht</span><button class="btn ghost small" data-testreset="1">🗑 Test-Bestwerte löschen</button></div>`:S.mode==='chapter'?`<div class="chreset"><span class="legend" style="margin:0">Ganz von vorn beginnen?</span><button class="btn ghost small" data-chreset="${S.ch}">↺ Kapitel zurücksetzen</button></div>`:''}</div></div>`;
  if(stars>=2&&S.mode!=='single')confetti();
 }
 
 /* ---------- Navigation ---------- */
-document.addEventListener('click',ev=>{const b=ev.target.closest('[data-open],[data-practice],[data-test],[data-home],[data-mix],[data-reset],[data-quit]');if(!b)return;
+document.addEventListener('click',ev=>{const b=ev.target.closest('[data-open],[data-practice],[data-test],[data-home],[data-mix],[data-reset],[data-quit],[data-chreset],[data-testreset]');if(!b)return;
  if(b.dataset.open)go('lesson',b.dataset.open);else if(b.dataset.practice)startChapter(b.dataset.practice);else if(b.dataset.test)startTest();else if(b.dataset.home)go('home');else if(b.dataset.mix)startMix();
  else if(b.dataset.quit){if(S&&S.res.length&&S.mode!=='single'&&!confirm('Übung abbrechen? Dein Ergebnis wird nicht gespeichert.'))return;go('home');}
- else if(b.dataset.reset){if(confirm('Willst du wirklich deinen ganzen Fortschritt löschen?')){P={ch:{},test:{best:null,stars:0,runs:0}};save();go('home');toast('Fortschritt zurückgesetzt.');}}});
+ else if(b.dataset.reset){if(confirm('Willst du wirklich deinen ganzen Fortschritt löschen? Alle Haken, gelösten Aufgaben und Test-Bestwerte werden gelöscht.')){resetAll();go('home');toast('Gesamter Fortschritt zurückgesetzt.');}}
+ else if(b.dataset.chreset){const id=b.dataset.chreset,c=CHMAP[id];if(!confirm(`Kapitel „${strip(c.q)}“ zurücksetzen?\nHaken, gelöste Aufgaben und Bestwert dieses Kapitels werden gelöscht. Die Aufgaben werden neu gemischt.`))return;
+  const inLesson=!!b.closest('#chReset');resetChapter(id);
+  if(inLesson){chp(id).lesson=true;save();$('#chReset').outerHTML=chResetBar(id);updateTop();}else startChapter(id);
+  toast('Kapitel zurückgesetzt – neu gemischt!');}
+ else if(b.dataset.testreset){if(confirm('Test-Bestwerte (Prozent, Sterne, Anzahl) wirklich löschen?')){resetTest();const t=$('#testBest');if(t)t.innerHTML='Test-Bestwerte gelöscht.';b.disabled=true;updateTop();toast('Test-Bestwerte gelöscht.');}}});
 $('#logo').onclick=()=>go('home');
 go('home');
 })();
