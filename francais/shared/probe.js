@@ -72,7 +72,7 @@ function stopTick(){if(tick){clearInterval(tick);tick=null;}}
 /* ---------- Deckblatt ---------- */
 HUB.views.probe=function(){stopTick();const h=$('#hubTitle');if(h)h.textContent='Probe-Klassenarbeit';
  const prev=TR.probes().slice(-3).reverse();
- M().innerHTML=`<div class="crumb"><a class="btn ghost small" href="../">← Übersicht</a><span class="crumb-n">Probe-Klassenarbeit</span></div>
+ M().innerHTML=`<div class="crumb"><a class="btn ghost small" href="${window.PKG_BACK||'../'}">← Übersicht</a><span class="crumb-n">Probe-Klassenarbeit</span></div>
  <div class="paper cover"><div class="pp-head"><div><b>1<sup>er</sup> contrôle de français</b><br><span class="legend">Probe-Klassenarbeit · Klasse 6</span></div><div class="pp-name">Name: <u>Arjen</u><br>Zeit: 45 Min.</div></div>
  <ol class="pp-parts">${PARTS.map(p=>`<li><span class="pp-ic">${p.ic}</span><b>${p.k}</b> ${p.t}<span class="pp-pts">${p.max} P.</span></li>`).join('')}</ol>
  <div class="pp-sum">Gesamt: <b>${TOTAL} Punkte</b> · ca. 40–45 Minuten</div>
@@ -200,7 +200,7 @@ HUB.views.probeResult=function(){if(!PR||PR.total==null){HUB.E.go('probe');retur
  <div class="scale"><div class="legend">Notenschlüssel (Orientierung – üblicher Schlüssel wie im Übungspaket: ab 92 / 81 / 67 / 50 / 30 %; deine Lehrerin kann abweichen):</div><table><tr>${scale}</tr></table></div>
  <h3>📌 Das solltest du wiederholen</h3>${weak.length?weak.map(p=>`<div class="rep"><b>${p.ic} ${p.k} · ${p.t.split(' – ')[1]||p.t}</b> <span class="legend">${fmtP(PR.G[p.k]||0)} / ${p.max} P.</span><div class="rep-l">${(REP[p.k]||[]).map(r=>link(...r)).join('')}</div></div>`).join(''):'<p>🎉 Alles sitzt – super!</p>'}
  <h3>🔍 Deine Fehler im Einzelnen</h3>${PARTS.filter(p=>byPart(p.k).length).map(p=>`<details class="pcorr"><summary>${p.ic} ${p.k} – ${byPart(p.k).length} Fehler</summary>${byPart(p.k).map(w=>`<div class="pc"><div class="legend">${esc(w.q)}</div>${w.right?(V.diff&&w.given&&w.given!=='nicht bearbeitet'&&w.right.split(' ').length>1&&String(w.given).split(' ').length>1?V.diff(w.given,w.right):`<div class="cmp"><span class="cmp-w">✗ <s>${esc(w.given||'–')}</s></span><span class="cmp-a">→</span><span class="cmp-r">✓ <b>${esc(w.right)}</b></span></div>`):`<div class="legend">✗ ${esc(w.given)}</div>`}${dg(w)}</div>`).join('')}</details>`).join('')||'<p>Keine Fehler in A–E.</p>'}
- <div class="toolbar center"><button class="btn red" id="pAgain">↻ Neue Probe-Arbeit</button><a class="btn ghost" href="../">Zur Übersicht</a></div></div>`;
+ <div class="toolbar center"><button class="btn red" id="pAgain">↻ Neue Probe-Arbeit</button><a class="btn ghost" href="${window.PKG_BACK||'../'}">Zur Übersicht</a></div></div>`;
  $('#pAgain').onclick=()=>{PR=null;HUB.E.go('probe');};if(g<=2)HUB.E.confetti();};
 HUB.probeTest={genExam,nounScore,sentence,word,findErrs,CONTENT,TOTAL,PARTS,state:()=>PR,grade1};
 })();

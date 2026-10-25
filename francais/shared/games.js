@@ -29,7 +29,7 @@ const GAMES={
   how:{vis:V.legoGrid('regarder'),warumVis:V.appeler(),was:'Steck die richtige <b>Endung</b> an den Stamm. Bei <b>appeler</b> wählst du zuerst den Stamm: <b>ll</b> oder <b>l</b>?',schritte:[[V.b('tu','p'),'Wer?'],[V.lego('regard','?',{ear:false}),'Stamm'],[V.lego('regard','es',{ear:false}),'Endung anstecken']],merk:'-e, -es, -e, -ons, -ez, -ent · appeler: ll, wenn die Endung stumm ist',fallen:[['tu regarde','tu regardes','tu → <b>-es</b>.'],['nous appellons','nous appelons','Endung hörbar → nur ein <b>l</b>.']]}}};
 /* ---------- Übersicht ---------- */
 HUB.views.spiele=function(){const h=$('#hubTitle');if(h)h.textContent='Spiele';
- M().innerHTML=`<div class="crumb"><a class="btn ghost small" href="../">← Übersicht</a><span class="crumb-n">Spiele</span></div><h1 class="hub-h1">🎮 Lern-Spiele</h1>
+ M().innerHTML=`<div class="crumb"><a class="btn ghost small" href="${window.PKG_BACK||'../'}">← Übersicht</a><span class="crumb-n">Spiele</span></div><h1 class="hub-h1">🎮 Lern-Spiele</h1>
  ${V.hint('💡','Spiele sind <b>Extra-Übung</b> für zwischendurch – sie ersetzen die Lektionen nicht. Jede Runde dauert <b>1 Minute</b>.')}
  <div class="glist">${Object.entries(GAMES).map(([k,g])=>{const b=TR.gameBest(k);return `<button class="gtile" data-hub="spiel-${k}" style="--c:${g.c}"><span class="gt-ic">${g.ic}</span><span class="gt-b"><b>${g.t}</b><small>${g.sub}</small><small class="gt-best">🏆 Rekord: ${b.best} · ${b.plays}× gespielt</small></span></button>`;}).join('')}</div>`;};
 let G=null;let gt=null;
