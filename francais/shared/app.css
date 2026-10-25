@@ -725,3 +725,4 @@ details.howto{margin-top:16px}
 .agree .wb{white-space:nowrap}.agree .wb .wt{white-space:nowrap}.agree td{font-size:.92rem}
 .agree .wb b{color:#dc2626;font-weight:900}
 .on-g{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}.on-r.on-col{flex-direction:column;gap:2px}
+.applogo{width:16px;height:16px;border-radius:4px;vertical-align:-3px;margin-right:5px;display:inline-block}
