@@ -205,7 +205,7 @@ ex:[
  mc('Jemand schreibt: «Je es Clara.» Was ist der Fehler?',['Zu je gehört suis: Je suis Clara.','Es fehlt ein Akzent: Je ès Clara.','Es muss heißen: Je est Clara.','Da ist kein Fehler.'],'je → <b>suis</b>. «es» gehört zu tu.'),
 ]},
 /* ---------------- 10 · Extra-Übung: Nachholbedarf 1 (Arjens Fehler aus dem Abschlusstest) */
-{id:'nachholbedarf',kind:'Nachholbedarf',icon:'🎯',title:'Nachholbedarf 1',sub:'Satzbau · „Ersetze durch ein Pronomen“ · le professeur / Monsieur',lv:1,extra:true,c:'#f97316',
+{id:'nachholbedarf',kind:'Nachholbedarf',nh:true,icon:'🎯',title:'Nachholbedarf 1',sub:'Satzbau · „Ersetze durch ein Pronomen“ · le professeur / Monsieur',lv:1,extra:true,c:'#f97316',
 plan:{A1:1,A2:2,A3:1,B1:2,B2:2,B3:2,C1:1,C2:1,C3:1},
 html:attn(`<table class="t"><tr><th>✗ So war es im Test</th><th>✓ So ist es richtig</th><th>Warum?</th></tr>
  <tr><td><s>Monsieur Martel le professeur de français est.</s></td><td>${F('Monsieur Martel est le professeur de français.','Martel')}</td><td>Wer? → <b>Verb</b> → Rest. Das Verb steht direkt nach dem Subjekt, nie am Ende.</td></tr>

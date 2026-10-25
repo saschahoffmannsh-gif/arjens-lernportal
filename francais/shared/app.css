@@ -726,3 +726,74 @@ details.howto{margin-top:16px}
 .agree .wb b{color:#dc2626;font-weight:900}
 .on-g{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}.on-r.on-col{flex-direction:column;gap:2px}
 .applogo{width:16px;height:16px;border-radius:4px;vertical-align:-3px;margin-right:5px;display:inline-block}
+/* ===== Kachel-Navigation (Startseite + Fachseite) ===== */
+.tap{transition:transform .12s ease,box-shadow .12s ease;-webkit-tap-highlight-color:transparent;cursor:pointer}
+.tap:active{transform:scale(.97);box-shadow:0 2px 8px rgba(30,58,138,.12)}
+@media (hover:hover){.tap:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(30,58,138,.14),0 2px 4px rgba(30,58,138,.08)}}
+.back-l{width:auto!important;padding:0 12px 0 10px;gap:4px}.back-l span{font-size:15px;font-weight:800}
+@media (max-width:600px){.back-l{padding:0;width:38px!important}.back-l span{display:none}}
+/* Startseite */
+body.portal{background:var(--bg)}
+.pt-head{background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;display:flex;align-items:center;justify-content:center;gap:14px;padding:calc(26px + env(safe-area-inset-top)) 20px 54px;text-align:left}
+.pt-head h1{margin:0;font-family:FredokaApp,NunitoApp,sans-serif;font-weight:600;font-size:clamp(26px,7vw,40px);line-height:1.1}.pt-head p{margin:4px 0 0;opacity:.9;font-size:15px}
+.pt-logo{width:56px;height:56px;border-radius:14px;box-shadow:0 4px 14px rgba(0,0,0,.25),0 0 0 2px rgba(255,255,255,.35);flex:0 0 auto}
+.pt-main{max-width:1000px;margin:-34px auto 40px;padding:0 14px;padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right))}
+.pt-h2{margin:0 2px 10px;font-size:15px;text-transform:uppercase;letter-spacing:.05em;color:#fff;font-weight:800}
+.pt-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media (min-width:640px){.pt-grid{grid-template-columns:repeat(3,1fr);gap:16px}}
+@media (min-width:900px){.pt-grid{grid-template-columns:repeat(4,1fr)}}
+.pt-tile{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-height:150px;background:#fff;border-radius:20px;padding:16px 14px 14px;box-shadow:var(--shadow);text-decoration:none;color:var(--ink);overflow:hidden}
+.pt-ic{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;font-size:28px;background:color-mix(in srgb,var(--c) 14%,#fff);margin-bottom:6px}
+.pt-n{font-family:FredokaApp,NunitoApp,sans-serif;font-weight:600;font-size:19px;line-height:1.15;color:var(--navy);hyphens:manual}
+.pt-s{font-size:13.5px;color:var(--muted);font-weight:700}
+.pt-live{grid-column:1/-1;min-height:0;background:linear-gradient(135deg,var(--c),#2563eb);color:#fff;padding:18px 16px 16px}
+.pt-live .pt-ic{background:rgba(255,255,255,.18);width:60px;height:60px;font-size:34px}
+.pt-live .pt-n{color:#fff;font-size:24px}.pt-live .pt-s{color:#dbeafe}
+.pt-bar{display:block;width:100%;height:8px;border-radius:99px;background:rgba(255,255,255,.25);margin-top:6px;overflow:hidden}.pt-bar i{display:block;height:100%;background:#fcd34d;border-radius:99px}
+.pt-ka{margin-top:8px;font-size:14px;font-weight:800;background:rgba(255,255,255,.16);border-radius:99px;padding:3px 10px}
+.pt-nhl{margin-top:6px;font-size:14px;font-weight:800;background:#f97316;color:#fff;border-radius:99px;padding:3px 10px}
+.pt-nh{position:absolute;top:12px;right:12px;background:#f97316;color:#fff;font-weight:900;font-size:15px;border-radius:99px;padding:4px 10px;box-shadow:0 3px 10px rgba(0,0,0,.2);border:2px solid #fff}
+@media (min-width:640px){.pt-live{grid-column:span 2}}
+.pt-soon{opacity:.62;filter:saturate(.35);box-shadow:0 1px 4px rgba(30,58,138,.08);cursor:default}
+.pt-soon .pt-s{margin-top:auto;background:#eef2f7;border-radius:99px;padding:1px 9px;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+.pt-foot{color:var(--muted);font-size:14px;text-align:center;margin-top:18px}
+/* Fachseite: Nachholbedarf-Band */
+.nhband{margin:16px 0 4px;background:linear-gradient(135deg,#fff7ed,#ffedd5);border:2px solid #fdba74;border-radius:22px;padding:14px;box-shadow:var(--shadow)}
+.nh-h{display:flex;align-items:center;gap:12px}.nh-ic{width:46px;height:46px;border-radius:14px;background:#f97316;color:#fff;display:grid;place-items:center;font-size:24px;flex:0 0 auto;box-shadow:0 3px 0 #c2410c}
+.nh-hb{flex:1;min-width:0}.nh-hb h2{margin:0;font-family:FredokaApp,sans-serif;font-weight:600;color:#9a3412;font-size:22px;line-height:1.1}.nh-hb p{margin:2px 0 0;font-size:14px;color:#7c2d12;line-height:1.35}
+.nh-cnt{flex:0 0 auto;background:#f97316;color:#fff;font-weight:900;border-radius:99px;padding:3px 10px;font-size:14px;align-self:flex-start}
+.nh-list{display:grid;gap:8px;margin-top:12px}
+.nh-it{display:flex;align-items:center;gap:10px;background:#fff;border-radius:16px;padding:10px 12px;text-decoration:none;color:var(--ink);box-shadow:0 2px 8px rgba(154,52,18,.1);flex-wrap:wrap}
+.nh-l{width:42px;height:42px;border-radius:12px;background:var(--c);display:grid;place-items:center;font-size:22px;flex:0 0 auto}
+.nh-b{display:flex;flex-direction:column;flex:1;min-width:140px}.nh-b b{font-size:17px;color:var(--navy)}.nh-b small{font-size:13px;color:var(--muted)}
+.nh-st{font-size:13.5px;font-weight:900;border-radius:99px;padding:3px 10px;white-space:nowrap}
+.nh-go{font-size:26px;font-weight:900;color:#f97316;line-height:1}
+.st-open .nh-st{background:#fee2e2;color:#b91c1c}.st-work .nh-st{background:#fef3c7;color:#92400e}.st-done .nh-st{background:#dcfce7;color:#166534}
+/* Fachseite: Lektions-Kacheln */
+.ov-grid{grid-template-columns:repeat(2,1fr);gap:12px}
+@media (min-width:700px){.ov-grid{grid-template-columns:repeat(3,1fr);gap:16px}}
+@media (min-width:1000px){.ov-grid{grid-template-columns:repeat(4,1fr)}}
+.ov-card.lt{flex-direction:column;align-items:stretch;gap:2px;border-left:0;border-top:6px solid var(--c);padding:12px 12px 12px;min-height:236px;position:relative}
+.lt-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.lt .ov-ic{width:48px;height:48px;font-size:25px;border-radius:14px}
+.lt-ring{width:46px;height:46px;border-radius:50%;background:conic-gradient(var(--c) calc(var(--p)*1%),#e2e8f0 0);display:grid;place-items:center;position:relative}
+.lt-ring::before{content:'';position:absolute;inset:5px;border-radius:50%;background:#fff}
+.lt-ring b{position:relative;font-size:13px;color:var(--navy);font-weight:900}.lt-ring small{font-size:9px}
+.lt .ov-t{font-size:18px}.lt .ov-fr{font-size:13.5px;color:var(--muted);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.lt-foot{margin-top:auto;padding-top:8px;display:flex;flex-direction:column;gap:3px}
+.lt .ov-bar{display:block;height:6px;border-radius:99px;background:#e2e8f0;overflow:hidden;margin:0}.lt .ov-bar i{display:block;height:100%;background:var(--c);border-radius:99px}
+.lt .ov-s{font-size:12.5px;color:var(--muted);line-height:1.3}.lt-stars{color:#f59e0b;letter-spacing:1px}
+.lt .ov-extra{font-size:12px;font-weight:800;border-radius:8px;padding:2px 7px;margin-top:2px;line-height:1.3}
+.lt .ov-extra.st-open{background:#ffedd5;color:#9a3412}.lt .ov-extra.st-work{background:#fef3c7;color:#92400e}.lt .ov-extra.st-done{background:#dcfce7;color:#166534}
+.lt-st{position:absolute;top:-6px;left:50%;transform:translate(-50%,-50%);font-size:10.5px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;border-radius:99px;padding:1px 8px;white-space:nowrap;display:none}
+.lt-fertig{display:block;background:#16a34a;color:#fff}
+@media (max-width:600px){.ov-card.lt{min-height:226px}.lt .ov-t{font-size:16.5px}}
+/* Spiele als Kacheln, Bericht */
+.glist{grid-template-columns:repeat(3,1fr)}
+.gtile{flex-direction:column;align-items:center;text-align:center;border-left:0;border-top:5px solid var(--c);gap:6px;padding:12px 8px;min-height:140px}
+.gtile .gt-b{align-items:center}.gtile .gt-b b{font-size:15px;line-height:1.2}
+@media (max-width:600px){.gtile .gt-sub{display:none}}
+.ov-probe{border-left:0;border-top:6px solid #c8102e}
+.rp-tile{border-top:6px solid #475569}
+.ov-sub{font-size:15px;opacity:.9!important}.ov-hero{padding:16px 18px}.ov-hero h1{font-size:clamp(24px,6vw,34px)}
+@media (max-width:600px){.back-keep{width:auto!important;padding:0 12px 0 10px}.back-keep span{display:inline}}
