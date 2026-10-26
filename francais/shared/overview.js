@@ -31,7 +31,7 @@ const esc0=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;'
 function nhHTML(){const L=PR.nh(LS);if(!L.length)return '';const open=L.filter(x=>x.key!=='fertig').length;
  return `<section class="nhband" id="nachholbedarf"><div class="nh-h"><span class="nh-ic">🔁</span><div class="nh-hb"><h2>Nachholbedarf</h2><p>Deine Stolpersteine aus den Tests – extra zum Üben. Ein Tipp öffnet die Übung direkt.</p></div><span class="nh-cnt">${open?open+' zu tun':'alles ✓'}</span></div>
  <div class="nh-list">${L.map(x=>`<a class="nh-it tap ${x.cls}" href="${R}${x.href}" style="--c:${x.color}" data-nh="${x.slug}:${x.id}"><span class="nh-l">${x.icon}</span><span class="nh-b"><b>${esc0(x.title)}</b><small>Lektion ${x.n} · ${esc0(x.lesson)} · ${x.take} Aufgaben</small></span><span class="nh-st">${x.ic} ${x.t}${x.runs?` · ${x.best} %`:''}</span><span class="nh-go">›</span></a>`).join('')}</div></section>`;}
-let h=nhHTML()+`<section class="ov-hero"><div class="ov-flag"><i></i><i></i><i></i></div><div class="ov-k">Französisch · ${PKG?(KA?'Klassenarbeit':'Hausaufgabe')+' · '+PK.fmtDate(PKG):'6. Klasse · 1. Lernjahr'}</div><h1>${PKG?esc0(PKG.titel):'Klassenarbeit 30. Oktober'}</h1><p class="ov-cd">⏳ ${cdH}</p>${PKG&&PKG.schwerpunkte?`<div class="ov-chips">${PKG.schwerpunkte.map(x=>`<span class="chip">${esc0(x)}</span>`).join('')}</div>`:''}<p class="ov-sub">${LS.length} Lektion${LS.length===1?'':'en'} · je ca. 30 Aufgaben · am besten 2 × 15–20 Min. pro Lektion</p></section>
+function build(){let h=nhHTML()+`<section class="ov-hero"><div class="ov-flag"><i></i><i></i><i></i></div><div class="ov-k">Französisch · ${PKG?(KA?'Klassenarbeit':'Hausaufgabe')+' · '+PK.fmtDate(PKG):'6. Klasse · 1. Lernjahr'}</div><h1>${PKG?esc0(PKG.titel):'Klassenarbeit 30. Oktober'}</h1><p class="ov-cd">⏳ ${cdH}</p>${PKG&&PKG.schwerpunkte?`<div class="ov-chips">${PKG.schwerpunkte.map(x=>`<span class="chip">${esc0(x)}</span>`).join('')}</div>`:''}<p class="ov-sub">${LS.length} Lektion${LS.length===1?'':'en'} · je ca. 30 Aufgaben · am besten 2 × 15–20 Min. pro Lektion</p></section>
 <div class="section-title"><div class="bar"></div><h2>Deine Lektionen</h2></div><div class="ov-grid">`;
 const PARTS=PKG?PKG.teile:[{t:'Teil 1 · Grammatik & Texte – zuerst alles in Ruhe durcharbeiten',lektionen:LS.filter(m=>m.slug!=='ecouter').map(m=>m.slug)},{t:'Teil 2 · Hören & Aussprache – zum Schluss',lektionen:['ecouter']}];
 const FIRST={};PARTS.forEach(t=>{const f=(t.lektionen||[]).find(s=>LS.some(m=>m.slug===s));if(f)FIRST[f]=t.t;});
@@ -48,8 +48,12 @@ CHECK.forEach(([k,t])=>{const m=LS.find(x=>x.slug===k);h+=`<li><label><input typ
 if(PLAN.length){h+=`<div class="section-title"><div class="bar"></div><h2>Lernplan bis zur Arbeit</h2></div><div class="card ov-plan"><table>`;
 PLAN.forEach(([d,t,k])=>{h+=`<tr><th>${d}</th><td>${k?`<a href="${R}${k.includes('#')?k:k+'/'}">${t}</a>`:t}</td></tr>`;});
 h+=`</table><p class="legend">Pro Tag ca. 35 Minuten – am besten in 2 Portionen à 15–20 Minuten. Lieber jeden Tag ein bisschen als alles am Donnerstag!</p></div>`;}
-$('#main').innerHTML=h;
-if(TRN)TRN.sync().then(()=>{const t=$('#ovTrain');if(t)t.innerHTML=trainHTML();});
+return h;}
+$('#main').innerHTML=build();
+/* zentraler Stand (sync.js) angekommen → nur die Fortschritts-Teile austauschen (Checkliste/Bericht bleiben) */
+function refresh(){const tmp=document.createElement('div');tmp.innerHTML=build();
+ ['#nachholbedarf','.ov-hero','.ov-grid','#ovTrain'].forEach(sel=>{const o=$(sel),n=tmp.querySelector(sel);if(o&&n)o.replaceWith(n);else if(!o&&n&&sel==='#nachholbedarf'){const m=$('#main');m.insertBefore(n,m.firstChild);}});}
+if(window.SYNC)window.SYNC.on(refresh);else if(TRN)TRN.sync().then(()=>{const t=$('#ovTrain');if(t)t.innerHTML=trainHTML();});
 
 /* ---------- Bericht für Eltern ---------- */
 const esc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -78,8 +82,8 @@ function berichtHTML(data){let h='';
    <td>${fe.length?'<ul>'+fe.map(f=>`<li><span class="legend">${esc(f.prompt).slice(0,90)}</span><br><s>${esc(f.given)}</s> → <b>${esc(f.correct)}</b>${f.n>1?` (${f.n}×)`:''}</li>`).join('')+'</ul>':'–'}</td></tr>`;});
   h+='</table></div></div>';});
  return h;}
-h=`<div class="section-title" id="bericht"><div class="bar"></div><h2>📊 Bericht für Eltern</h2></div><div class="card rp-tile"><p class="legend">Zeigt pro Kapitel: Durchgänge, Bestwert, wie viel beim <b>ersten Versuch</b> richtig war, Übungszeit und die häufigsten Fehler. Die Daten werden zentral gespeichert (nur Vorname, keine Anmeldung).</p><button class="btn" id="rpBtn">📊 Bericht anzeigen</button><div id="rpOut"></div></div>`;
-$('#ovBericht').innerHTML=h;
+{const h=`<div class="section-title" id="bericht"><div class="bar"></div><h2>📊 Bericht für Eltern</h2></div><div class="card rp-tile"><p class="legend">Zeigt pro Kapitel: Durchgänge, Bestwert, wie viel beim <b>ersten Versuch</b> richtig war, Übungszeit und die häufigsten Fehler. Die Daten werden zentral gespeichert (nur Vorname, keine Anmeldung).</p><button class="btn" id="rpBtn">📊 Bericht anzeigen</button><div id="rpOut"></div></div>`;
+$("#ovBericht").innerHTML=h;}
 function trainingHTML(d){const ev=((d&&d.events)||[]).filter(e=>e.kind==='probe_end'||e.kind==='game_end'||e.kind==='mini_end').filter(e=>!PKG||e.kind==='game_end'||(e.kind==='mini_end'?e.pkg===PKG.id:(e.pkg||PK.firstKA())===PKG.id)); // ältere Einträge (Fehlerkiste/Mission, entfernt) werden ignoriert
  let h=`<div class="card rp-l"><h3>🎯 ${PKG&&PKG.probe&&PKG.probe.typ==='mini'?'Mini-Probearbeit':'Probe-Arbeit'} & Spiele <span class="legend">(${d?d.src:'lokal'}, ${ev.length} Einträge)</span></h3>`;
  // Probe

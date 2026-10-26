@@ -16,6 +16,11 @@ function migrate(){try{const o=JSON.parse(localStorage.getItem(OLDKEY)||'null');
 function load(){try{let p=JSON.parse(localStorage.getItem(KEY)||'null');if(!p||typeof p!=='object')p=migrate()||blank();p.ch=p.ch||{};p.asked=p.asked||{};p.test=p.test||blank().test;return p;}catch(e){return blank();}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(P));}catch(e){}}
 function chp(id){return P.ch[id]=P.ch[id]||{seen:false,best:0,runs:0,solved:{}};}
+/* Anzeige-Stand = lokal ODER zentral (window.SYNC, nur gelesen). P bleibt rein lokal → Stand-Abgleich/Backfill sieht nie gemergte Daten. */
+const SY=(!window.HUB&&window.SYNC)||null;
+function remote(){try{return SY?SY.lesson(L.slug):null;}catch(e){return null;}}
+function view(id){const p=chp(id);const r=remote();return r&&r.ch[id]?SY.mergeCh(p,r.ch[id]):p;}
+function tview(){const r=remote();return r&&r.test?SY.mergeTest(P.test,r.test):P.test;}
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
 const CHMAP={};
 const REGN=CHAPTERS.filter(c=>!c.extra).length;let XN=0;
@@ -91,7 +96,7 @@ function confetti(){const c=document.createElement('div');c.className='confetti'
  document.body.appendChild(c);setTimeout(()=>c.remove(),3500);}
 
 /* ---------- Fortschritt ---------- */
-function chapterStatus(c){const p=chp(c.id);const n=take(c);return {p,n,pool:c.ex.length,done:(p.runs||0)>0&&p.best>=70};}
+function chapterStatus(c){const p=view(c.id);const n=take(c);return {p,n,pool:c.ex.length,done:!!p.done||(p.runs||0)>0&&p.best>=70};}
 function take(c){return Math.min(c.ex.length,c.take||4);}
 const REG=()=>CHAPTERS.filter(c=>!c.extra),EXTRA=()=>CHAPTERS.filter(c=>c.extra);
 function nextReg(c){const r=REG();const k=r.indexOf(c);return k>=0&&k<r.length-1?r[k+1]:null;}
@@ -131,7 +136,7 @@ function home(){
   h+=`<li><button class="pstep${s.done?' done':''}${c.extra?' extra':''}" style="--c:${c.c}" data-open="${c.id}"><span class="pnum">${s.done?'✓':c.num}</span><span class="pbody"><span class="pk">${c.extra?`<span class="xbadge">🧡 Extra-Übung</span> Kapitel ${c.num}`:c.kind||'Kapitel '+(i+1)}</span><span class="pt"><span class="pic">${c.icon||''}</span>${c.title}</span><span class="ps">${c.sub||''}</span>
   <span class="pst"><span class="mini"><i style="width:${pct}%"></i></span>${s.n} Aufgaben${s.p.best?` · Bestwert ${s.p.best} %`:''}</span></span></button></li>`;return h;};
  REG().forEach((c,i)=>{h+=stepHTML(c,i);});
- const t=P.test;
+ const t=tview();
  h+=`<li><button class="pstep test${t.stars>=2?' done':''}" data-test="1"><span class="pnum">🏆</span><span class="pbody"><span class="pk">Finale</span><span class="pt">Abschlusstest</span><span class="ps">${testSize()} Aufgaben auf Klassenarbeitsniveau – mit Punkten, Medaille und „Das solltest du noch einmal üben“</span>
  <span class="pst">${t.best!==null?`Bestwert ${t.best} % · <span class="stars-s">${stars(t.stars)}</span> · ${t.runs}× gemacht`:'Noch nicht gemacht'}</span></span></button></li>${EXTRA().length?`<li class="pblock xblock"><span>🧡 Extra – Nachholbedarf (zusätzlich, zählt nicht zum Durchgang)</span></li>`+EXTRA().map(c=>stepHTML(c,c.idx)).join(''):''}</ol>
  <div class="merk blue"><h3>🧭 So lernst du am besten</h3><ul><li>Gehe die Kapitel <b>der Reihe nach</b> durch: erst lesen und anhören, dann <b>„Jetzt üben“</b>.</li><li>Jedes Kapitel hat nur <b>wenige Aufgaben pro Durchgang</b>. Übst du es noch einmal, kommen bevorzugt <b>neue Aufgaben</b> dran.</li><li>Ein Kapitel bekommt seinen Haken ✓ ab <b>70 %</b> in einem Durchgang. Für die Punkte zählt immer der <b>erste Versuch</b> – mit „Nochmal versuchen“ kannst du aber jede Aufgabe wiederholen.</li><li>Die Aufgaben kommen jedes Mal <b>neu gemischt</b>.</li><li>Zum Schluss: <b>Abschlusstest</b>. Danach siehst du genau, was du noch üben solltest.</li></ul></div>
@@ -157,7 +162,7 @@ function chResetBar(id){const c=CHMAP[id],s=chapterStatus(c);
 /* ---------- Widgets in Lektionstexten ---------- */
 function mountWidgets(root,c){
  $$('.track',root).forEach(el=>{const t=TRACKS[el.dataset.track];if(!t)return;const a={lines:t.lines};
-  const p=c?chp(c.id):{runs:0,solved:{}};const open=t.open||p.runs>0||Object.keys(p.solved).length>0;
+  const p=c?view(c.id):{runs:0,solved:{}};const open=t.open||p.runs>0||Object.keys(p.solved).length>0;
   el.innerHTML=`<div class="tb-head"><span class="tb-ic">🎧</span><div><div class="tb-k">${t.kind||'Hörtext'}</div><div class="tb-t">${t.title}</div></div></div>${t.intro?`<p class="tb-intro">${t.intro}</p>`:''}${playBig(a,t.open?'Anhören und mitlesen':'Hörtext anhören')}
   ${t.open?`<div class="transbox">${transcript(a)}</div>`:`<button type="button" class="btn ghost small trans-btn" ${open?'':'disabled'}>${open?'📄 Transkript zeigen':'🔒 Transkript erst nach den Aufgaben'}</button><div class="transbox" hidden>${transcript(a)}</div>`}`;
   const b=$('.trans-btn',el);if(b)b.onclick=()=>{const tb=$('.transbox',el);tb.hidden=!tb.hidden;b.textContent=tb.hidden?'📄 Transkript zeigen':'🙈 Transkript ausblenden';};});
@@ -430,7 +435,7 @@ function result(){
  <div class="score">${pts} / ${max} Punkte</div><div class="score-sub">${pct} % · ${title}</div>
  ${S.mode==='chapter'?`<div class="legend" style="margin-top:8px">${pct>=70?'✓ Kapitel geschafft! Der Haken ist gesetzt.':'Für den Haken brauchst du mindestens 70 %.'}</div>`:''}${S.mode==='test'?`<div class="legend" style="margin-top:8px">${res.length} Aufgaben · gezählt wird der erste Versuch</div>`:''}${rev}${S.mode==='test'&&EXTRA().length?`<div class="tip xtip"><span class="tip-ic">🧡</span><div><b>Extra-Übung:</b> Deine typischen Fehler gezielt üben – mit Erklärung. ${EXTRA().map(c=>`<button class="btn small extra-btn" data-open="${c.id}">${c.title}</button>`).join(' ')}</div></div>`:''}
  <div class="toolbar center">${S.mode==='test'?'<button class="btn red" data-test="1">↻ Neuer Test</button>':S.mode==='chapter'?`<button class="btn" data-practice="${S.ch}">↻ Noch einmal (neue Aufgaben)</button>${nextReg(CHMAP[S.ch])?`<button class="btn green" data-open="${nextReg(CHMAP[S.ch]).id}">Nächstes Kapitel →</button>`:CHMAP[S.ch].extra?'':'<button class="btn red" data-test="1">🏆 Abschlusstest</button>'}`:S.mode==='mix'?'<button class="btn" data-mix="1">↻ Neue Mischung</button>':''}<button class="btn ghost" data-home="1">Zur Übersicht</button></div>
- ${S.mode==='test'?`<div class="chreset"><span class="legend" id="testBest">Test-Bestwert: <b>${P.test.best??0} %</b> · ${stars(P.test.stars)} · ${P.test.runs}× gemacht</span><button class="btn ghost small" data-testreset="1">🗑 Test-Bestwerte löschen</button></div>`:S.mode==='chapter'?`<div class="chreset"><span class="legend">Ganz von vorn beginnen?</span><button class="btn ghost small" data-chreset="${S.ch}">↺ Kapitel zurücksetzen</button></div>`:''}</div></div>`;
+ ${S.mode==='test'?`<div class="chreset"><span class="legend" id="testBest">Test-Bestwert: <b>${tview().best??0} %</b> · ${stars(tview().stars)} · ${tview().runs}× gemacht</span><button class="btn ghost small" data-testreset="1">🗑 Test-Bestwerte löschen</button></div>`:S.mode==='chapter'?`<div class="chreset"><span class="legend">Ganz von vorn beginnen?</span><button class="btn ghost small" data-chreset="${S.ch}">↺ Kapitel zurücksetzen</button></div>`:''}</div></div>`;
  if(st>=2&&S.mode!=='single')confetti();
 }
 
@@ -446,6 +451,8 @@ document.addEventListener('click',ev=>{const b=ev.target.closest('[data-open],[d
  else if(b.dataset.testreset){if(confirm('Test-Bestwerte wirklich löschen?')){lg({kind:'reset_test',before:{runs:P.test.runs,best:P.test.best},flush:true});P.test=blank().test;save();const t=$('#testBest');if(t)t.innerHTML='Test-Bestwerte gelöscht.';b.disabled=true;toast('Test-Bestwerte gelöscht.');}}});
 const logo=$('#logo');if(logo)logo.onclick=()=>go('home');
 if(LG){LG.attach(L.slug);if(!HUB)try{LG.backfill(L.slug,P,CHAPTERS);}catch(err){}}
+/* zentraler Stand angekommen → Übersicht / Kapitel-Stand neu zeichnen (nicht während einer Übung) */
+if(SY)SY.on(()=>{try{updateTop();if(curView==='home'){const y=window.scrollY;VIEWS.home();window.scrollTo(0,y);}else if(curView==='lesson'){const b=$('#chReset');if(b&&b.querySelector('[data-chreset]'))b.outerHTML=chResetBar(b.querySelector('[data-chreset]').dataset.chreset);}}catch(e){}});
 const VIEWS={home,lesson,practice,result};
 window.ENGINE={cur:()=>curView,go,RENDER,speak,stopAudio,audioOf,playBig,transcript,compare,norm,shuffle,toast,confetti,medal,lg,CHMAP,ALLEX,gidOf,introBox,start:(mode,list,extra)=>go('practice',Object.assign({mode,list},extra||{})),state:()=>S,P:()=>P,tlabel,esc,strip,spk};
 if(HUB&&HUB.views){Object.assign(VIEWS,HUB.views);if(HUB.init)HUB.init(window.ENGINE);}

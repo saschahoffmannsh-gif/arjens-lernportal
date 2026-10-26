@@ -14,6 +14,8 @@ HUB.views.home=function(){setTitle('Training');
  <button class="hubtile" data-hub="spiele"><span class="ht-ic">🎮</span><b>Spiele</b><small>être-Blitz · Artikel · Lego</small></button></div>
  <div class="toolbar center"><a class="btn ghost" href="${window.PKG_BACK||'../'}">← Zurück zum Paket</a></div>`;};
 HUB.init=E=>{HUB.E=E;if(W.TR&&W.TR.sync)W.TR.sync();
+ /* zentraler Stand (Probe/Spiele anderer Geräte) angekommen → Übersichtsseiten neu zeichnen, nie mitten in einer Übung */
+ if(W.SYNC)W.SYNC.on(()=>{try{const v=E.cur();if(v==='probe'||v==='spiele'||v==='home'){const y=W.scrollY;E.go(v,null,true);W.scrollTo(0,y);}}catch(e){}});
  /* alte Daten von Fehlerkiste/Tagesmission (entfernt) still aufräumen */
  try{['fr_kiste_v1'].forEach(k=>localStorage.removeItem(k));}catch(e){}};
 HUB.initial=()=>{const h=(location.hash||'').slice(1);if(h!=='home'&&HUB.views[h])return [h];const m=h.match(/^spiel-(\w+)$/);if(m&&HUB.views.game)return ['game',m[1]];const mi=h.match(/^mini-([\w-]+)$/);if(mi&&HUB.views.mini)return ['mini',mi[1]];return null;};

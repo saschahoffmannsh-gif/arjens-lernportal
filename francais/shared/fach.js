@@ -40,5 +40,5 @@ function listPage(){const T=PK.TYP[PG.typ];const L=PK.sorted(PK.list(PG.fach,PG.
  if(old.length)h+=`<div class="section-title"><div class="bar"></div><h2>Erledigt</h2></div><div class="pklist">${old.map(card).join('')}</div>`;
  $('#main').innerHTML=h;}
 const render=()=>{if(PG.mode==='fach')fachPage();else listPage();};
-render();if(W.TR&&W.TR.sync)W.TR.sync().then(n=>{if(n)render();});
+render();if(W.SYNC)W.SYNC.on(render);else if(W.TR&&W.TR.sync)W.TR.sync().then(n=>{if(n)render();});
 })();

@@ -845,3 +845,6 @@ body.portal{background:var(--bg)}
 .mini-res{display:flex;gap:16px;align-items:center;justify-content:center;margin:12px 0}
 @media (max-width:480px){.mini-hero{flex-direction:column;text-align:center}}
 .mini-kick{background:#0d9488;color:#fff;font-weight:900;font-size:13px;letter-spacing:.04em;text-transform:uppercase;border-radius:10px;padding:6px 10px;text-align:center}.mini-res .score{font-size:30px}.mini-res .score-sub{font-size:16px}
+/* Hinweis „Stand von Arjen geladen“ (sync.js) – dezent unten links */
+.syncpill{position:fixed;left:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:60;background:rgba(15,23,42,.82);color:#fff;font-size:.78rem;font-weight:700;padding:5px 10px;border-radius:999px;opacity:0;transform:translateY(6px);transition:opacity .35s,transform .35s;pointer-events:none}
+.syncpill.show{opacity:1;transform:none}.syncpill.off{background:rgba(100,116,139,.85)}

@@ -19,7 +19,10 @@ const KINDS=/^(game_end|probe_end|mini_end)$/;
 const RK='fr_train_remote_v1';
 function allEvents(){const L=LOG();const loc=(L?L.local(DOC):[]).filter(e=>KINDS.test(e.kind||''));const rem=get(RK,[]).filter(e=>KINDS.test(e.kind||''));const ids=new Set(loc.map(e=>e.id));return loc.concat(rem.filter(e=>!ids.has(e.id)));}
 let syncing=null;
-function sync(){if(syncing)return syncing;const L=LOG();if(!L||!L.store){syncing=Promise.resolve(0);return syncing;}
+function sync(){if(syncing)return syncing;
+ /* zentral über sync.js (liest auch das Dokument „training“ in den Zwischenspeicher) */
+ if(W.SYNC){syncing=W.SYNC.load().then(r=>r&&r.changed?allEvents().length||1:0).catch(()=>0).finally(()=>{setTimeout(()=>{syncing=null;},1000);});return syncing;}
+ const L=LOG();if(!L||!L.store){syncing=Promise.resolve(0);return syncing;}
  syncing=L.fetchAll([DOC]).then(d=>{const evs=((d[DOC]||{}).events||[]).filter(e=>KINDS.test(e.kind||''));set(RK,evs.slice(-400));return evs.length;}).catch(()=>0).finally(()=>{setTimeout(()=>{syncing=null;},1000);});
  return syncing;}
 /* Spiele */

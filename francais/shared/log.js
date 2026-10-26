@@ -68,7 +68,7 @@ function backfill(slug,P,chapters){
  const put=(key,data)=>{const sig=JSON.stringify(data);if(prev[key]===sig)return;prev[key]=sig;n++;
   event(slug,Object.assign({id:'snap-'+dev+'-'+key,kind:key==='test'?'snapshot_test':'snapshot_chapter',snap:true,backfill:true,rev:now},data));};
  (chapters||[]).forEach(c=>{const p=(P.ch||{})[c.id];if(!p)return;const solved=Object.keys(p.solved||{});
-  if(!(p.runs||p.best||solved.length||p.seen))return;
+  if(!(p.runs||p.best||solved.length))return; // nur angesehen (seen) → nichts melden: Ansehen erzeugt keine Einträge
   const asked=Object.fromEntries(c.ex.map(e=>e.id).filter(id=>(P.asked||{})[id]).map(id=>[id,P.asked[id]]));
   put(c.id,{ch:c.id,chTitle:clip(String(c.title).replace(/<[^>]+>/g,''),80),runs:p.runs||0,best:p.best||0,done:(p.runs||0)>0&&(p.best||0)>=70,seen:!!p.seen,solved,asked});});
  const t=P.test||{};if(t.runs||t.best)put('test',{ch:'test',runs:t.runs||0,best:t.best||0,stars:t.stars||0,last:t.last??null});

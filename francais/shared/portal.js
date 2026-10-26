@@ -13,7 +13,8 @@ const F=[
  {k:'musik',n:'Musik',ic:'🎵',c:'#db2777'},
  {k:'kunst',n:'Bildende Kunst',ic:'🎨',c:'#ea580c'},
  {k:'sport',n:'Sport',ic:'⚽',c:'#65a30d'}];
-const PK=window.PK;const S=PR?PR.subject(LS):{done:0,total:0,pct:0,any:false,nhOpen:0,nh:[]};
+const PK=window.PK;
+function render(){const S=PR?PR.subject(LS):{done:0,total:0,pct:0,any:false,nhOpen:0,nh:[]};
 /* Pakete des Fachs: nächste Klassenarbeit, offene Hausaufgaben, Nachholbedarf aus allen Paketen */
 const PKS=PK?PK.list('francais'):[];const nextKA=PK?PK.sorted(PK.list('francais','klassenarbeit')).filter(p=>!PK.done(p))[0]:null;
 const haOpen=PK?PK.list('francais','hausaufgabe').filter(p=>!PK.done(p)).length:0;
@@ -25,5 +26,6 @@ const tile=f=>{if(!f.live)return `<div class="pt-tile pt-soon" style="--c:${f.c}
  return `<a class="pt-tile pt-live tap" href="${f.href}" style="--c:${f.c}">${nh}<span class="pt-ic">${f.ic}</span><span class="pt-n">${f.n}</span>
  <span class="pt-s">Hausaufgaben · Klassenarbeiten${S.any?` · ${S.pct} % gelernt`:''}</span><span class="pt-bar"><i style="width:${S.pct}%"></i></span>${ka}${S.nhOpen?`<span class="pt-nhl">🔁 Nachholbedarf: ${S.nhOpen} noch zu tun</span>`:''}</a>`;};
 document.getElementById('main').innerHTML=`<h2 class="pt-h2">Meine Fächer</h2><div class="pt-grid">${F.map(tile).join('')}</div>
-<p class="pt-foot">Weitere Fächer folgen, sobald es Lernsachen dafür gibt.</p>`;
+<p class="pt-foot">Weitere Fächer folgen, sobald es Lernsachen dafür gibt.</p>`;}
+render();if(window.SYNC)window.SYNC.on(render);
 })();
