@@ -16,11 +16,11 @@ const PLAN=(PKG&&PKG.lernplan)||[];
 const ck=get(CKEY)||{};
 const TRN=window.TR;
 function trainHTML(){if(!TRN)return '';if(PKG&&PKG.probe&&PKG.probe.typ==='mini')return miniHTML();if(PKG&&!PKG.probe)return '';const pr=TRN.probes().filter(e=>!PKG||(e.pkg||PK.firstKA())===PKG.id);const last=pr[pr.length-1];const best=pr.reduce((a,p)=>!a||p.total>a.total?p:a,null);
- const G=[['etre','⚡','être-Blitz','#ea580c','Wer? → être-Form'],['artikel','🧺','Artikel-Sortierer','#0d9488','le / la / l’ / les · un / une / des'],['lego','🧱','Endungs-Lego','#16a34a','-e, -es, -ons … + appeler']];
+ const G=(window.GAMECAT||[{id:'etre',ic:'⚡',t:'être-Blitz',c:'#ea580c',sub:'Wer? → être-Form'},{id:'artikel',ic:'🧺',t:'Artikel-Sortierer',c:'#0d9488',sub:'le / la / l’ / les · un / une / des'},{id:'lego',ic:'🧱',t:'Endungs-Lego',c:'#16a34a',sub:'-e, -es, -ons … + appeler'}]).map(g=>[g.id,g.ic,g.t,g.c,g.sub]);
  return `<div class="section-title"><div class="bar"></div><h2>📝 Probe-Klassenarbeit</h2></div>
  <a class="ov-probe tap" href="${R}training/#probe"><span class="op-paper"><b>1<sup>er</sup> contrôle</b><i></i><i></i><i></i><span class="op-grade">${last?last.grade:'?'}</span></span><span class="op-b"><b>Wie die echte Arbeit · 45 Min.</b><small>A Hören · B Vokabeln · C être · D Artikel · E Verben · F Text – mit Punkten und Note (1–6). Jedes Mal neue Aufgaben.</small>
  <small class="op-last">${last?`Zuletzt: ${String(last.total).replace('.',',')} / ${last.max} P. · Note ${last.grade}${best&&best!==last?` · Bestes: Note ${best.grade}`:''}`:'Noch nicht geschrieben – am besten am Donnerstag 29.10.'}</small></span></a>
- ${PKG&&!PKG.spiele?'':`<div class="section-title"><div class="bar"></div><h2>🎮 Spiele</h2><span class="sct-n">Extra-Übung · je 1 Minute</span></div>
+ ${PKG&&!PKG.spiele?'':`<div class="section-title"><div class="bar"></div><h2>🎮 Spiele</h2><span class="sct-n">${G.length} Spiele · je 1–2 Minuten</span></div>
  <div class="glist">${G.map(g=>{const b=TRN.gameBest(g[0]);return `<a class="gtile tap" href="${R}training/#spiel-${g[0]}" style="--c:${g[3]}"><span class="gt-ic">${g[1]}</span><span class="gt-b"><b>${g[2]}</b><small class="gt-sub">${g[4]}</small><small class="gt-best">🏆 ${b.best}</small></span></a>`;}).join('')}</div>
  <p class="legend">Spiele sind zum Üben zwischendurch – sie ersetzen die Lektionen nicht.</p>`}`;}
 function miniHTML(){const r=PK.probe(PKG);const n=PKG.probe.n||10;const p=r&&r.n?r.last.pct:null;
@@ -93,7 +93,7 @@ function trainingHTML(d){const ev=((d&&d.events)||[]).filter(e=>e.kind==='probe_
  // Mini-Probearbeiten (Hausaufgaben-Pakete)
  const mi=ev.filter(e=>e.kind==='mini_end');if(mi.length)h+=`<h4>🧪 Mini-Probearbeiten</h4><div class="rp-scroll"><table class="rp"><tr><th>Datum</th><th>Paket</th><th>Punkte</th><th>%</th><th>Note</th><th>Zeit</th><th>Fehler</th></tr>${mi.slice(-8).reverse().map(e=>`<tr><td>${esc(e.day)}</td><td>${esc(e.title||e.pkg)}</td><td>${e.pts}/${e.max}</td><td><b>${e.pct} %</b></td><td><b>${e.grade}</b></td><td>${fmtMin(e.ms||0)}</td><td>${(e.wrong||[]).slice(0,3).map(w=>`<span class="legend">${esc(w.q).slice(0,60)}</span>: <s>${esc(w.given)}</s> → <b>${esc(w.correct)}</b>`).join('<br>')||'–'}</td></tr>`).join('')}</table></div>`;
  // Spiele
- const gs=ev.filter(e=>e.kind==='game_end');const GN={etre:'⚡ être-Blitz',artikel:'🧺 Artikel-Sortierer',lego:'🧱 Endungs-Lego'};
+ const gs=ev.filter(e=>e.kind==='game_end');const GN=Object.assign({etre:'⚡ être-Blitz',artikel:'🧺 Artikel-Sortierer',lego:'🧱 Endungs-Lego'},Object.fromEntries((window.GAMECAT||[]).map(g=>[g.id,g.ic+' '+g.t])));
  if(!PKG||PKG.spiele)h+=`<h4>🎮 Spiele</h4>${gs.length?`<table class="rp"><tr><th>Spiel</th><th>Rekord</th><th>gespielt</th><th>zuletzt</th></tr>${Object.keys(GN).map(g=>{const x=gs.filter(e=>e.game===g);if(!x.length)return '';return `<tr><td>${GN[g]}</td><td><b>${Math.max(...x.map(e=>e.score||0))}</b></td><td>${x.length}×</td><td>${x[x.length-1].score} (${x[x.length-1].right} ✓ / ${x[x.length-1].wrong} ✗)</td></tr>`;}).join('')}</table>`:'<p class="legend">Noch nicht gespielt.</p>'}`;
  return h+'</div>';}
 async function showReport(){const o=$('#rpOut');o.innerHTML='<p class="legend">Lade …</p>';

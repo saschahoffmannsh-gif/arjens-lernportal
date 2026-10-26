@@ -11,7 +11,7 @@ function setTitle(t){const h=$('#hubTitle');if(h)h.textContent=t;document.title=
 HUB.views.home=function(){setTitle('Training');
  M().innerHTML=`<section class="hubhero"><h1>🎯 Training</h1><p>Zusätzlich zu den Lektionen: Probe-Arbeit und Spiele.</p></section>
  <div class="hubgrid"><button class="hubtile" data-hub="probe"><span class="ht-ic">📝</span><b>Probe-Klassenarbeit</b><small>wie die echte Arbeit · 45 Min.</small></button>
- <button class="hubtile" data-hub="spiele"><span class="ht-ic">🎮</span><b>Spiele</b><small>être-Blitz · Artikel · Lego</small></button></div>
+ <button class="hubtile" data-hub="spiele"><span class="ht-ic">🎮</span><b>Spiele</b><small>${Object.keys(HUB.GAMES||{}).length||9} Spiele: Memory, Zimmer, Bingo …</small></button></div>
  <div class="toolbar center"><a class="btn ghost" href="${window.PKG_BACK||'../'}">← Zurück zum Paket</a></div>`;};
 HUB.init=E=>{HUB.E=E;if(W.TR&&W.TR.sync)W.TR.sync();
  /* zentraler Stand (Probe/Spiele anderer Geräte) angekommen → Übersichtsseiten neu zeichnen, nie mitten in einer Übung */

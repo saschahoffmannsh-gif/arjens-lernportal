@@ -27,10 +27,12 @@ const GAMES={
   how:{vis:V.artSet([['lit','le','lit'],['lampe','la','lampe'],['armoire','l’','armoire'],['livre','les','livres']]),was:'Zieh jeden Gegenstand in den richtigen <b>Artikel-Korb</b> – oder tippe auf den Korb.',schritte:[['👥','Mehrere? → les / des'],['🅰️','Vokal am Anfang? → l’'],['♂ ♀','sonst: le / un (m.) · la / une (f.)']],merk:'Farben: le / un blau · la / une rot · l’ türkis · les / des lila',fallen:[['la armoire','l’armoire','Vokal → l’'],['un lampe','une lampe','lampe ist weiblich.']]}},
  lego:{t:'Endungs-Lego',ic:'🧱',c:'#16a34a',sub:'Die richtige Endung an den Stamm stecken',lesson:['verben-er','bauplan'],
   how:{vis:V.legoGrid('regarder'),warumVis:V.appeler(),was:'Steck die richtige <b>Endung</b> an den Stamm. Bei <b>appeler</b> wählst du zuerst den Stamm: <b>ll</b> oder <b>l</b>?',schritte:[[V.b('tu','p'),'Wer?'],[V.lego('regard','?',{ear:false}),'Stamm'],[V.lego('regard','es',{ear:false}),'Endung anstecken']],merk:'-e, -es, -e, -ons, -ez, -ent · appeler: ll, wenn die Endung stumm ist',fallen:[['tu regarde','tu regardes','tu → <b>-es</b>.'],['nous appellons','nous appelons','Endung hörbar → nur ein <b>l</b>.']]}}};
+/* weitere Spiele (games2.js) tragen sich hier ein: HUB.GAMES[id]={t,ic,c,sub,lesson,how,time,go,run(api)} */
+HUB.GAMES=GAMES;
 /* ---------- Übersicht ---------- */
 HUB.views.spiele=function(){const h=$('#hubTitle');if(h)h.textContent='Spiele';
  M().innerHTML=`<div class="crumb"><a class="btn ghost small" href="${window.PKG_BACK||'../'}">← Übersicht</a><span class="crumb-n">Spiele</span></div><h1 class="hub-h1">🎮 Lern-Spiele</h1>
- ${V.hint('💡','Spiele sind <b>Extra-Übung</b> für zwischendurch – sie ersetzen die Lektionen nicht. Jede Runde dauert <b>1 Minute</b>.')}
+ ${V.hint('💡','Spiele sind <b>Extra-Übung</b> für zwischendurch – sie ersetzen die Lektionen nicht. Eine Runde dauert <b>1–2 Minuten</b>. Alles, was vorkommt, ist in den Lektionen erklärt.')}
  <div class="glist">${Object.entries(GAMES).map(([k,g])=>{const b=TR.gameBest(k);return `<button class="gtile" data-hub="spiel-${k}" style="--c:${g.c}"><span class="gt-ic">${g.ic}</span><span class="gt-b"><b>${g.t}</b><small>${g.sub}</small><small class="gt-best">🏆 Rekord: ${b.best} · ${b.plays}× gespielt</small></span></button>`;}).join('')}</div>`;};
 let G=null;let gt=null;
 const stop=()=>{if(gt){clearInterval(gt);gt=null;}};
@@ -38,13 +40,22 @@ HUB.views.game=function(id){stop();const g=GAMES[id];if(!g){HUB.E.go('spiele');r
  M().innerHTML=`<div class="crumb"><button class="btn ghost small" data-hub="spiele">← Spiele</button><span class="crumb-n">${g.ic} ${g.t}</span></div>
  <section class="ghero" style="--c:${g.c}"><span class="gh-ic">${g.ic}</span><div><h1>${g.t}</h1><p>${g.sub}</p><span class="gt-best">🏆 Dein Rekord: <b>${b.best}</b></span></div></section>
  <div class="howto30"><div class="h30-h">⏱️ So geht’s – in 30 Sekunden</div>${V.explain(g.how)}</div>
- <div class="toolbar center sticky-go"><button class="btn big green" id="gGo">▶ Los! (1 Minute)</button></div>`;
+ <div class="toolbar center sticky-go"><button class="btn big green" id="gGo">${g.go||'▶ Los! (1 Minute)'}</button></div>`;
  $('#gGo').onclick=()=>start(id);};
-function frame(id){const g=GAMES[id];return `<div class="gplay" style="--c:${g.c}"><div class="gbar"><span class="g-sc">⭐ <b id="gS">0</b></span><div class="g-time"><i id="gT"></i></div><span class="g-s" id="gSec">${ROUND}</span><button class="btn ghost small" id="gQuit" aria-label="Spiel beenden">✕</button></div><div class="g-combo" id="gC"></div><div id="gArea" class="garea"></div><div class="g-msg" id="gM" aria-live="polite"></div></div>`;}
+const TIME=g=>g.time==null?ROUND:g.time;
+function frame(id){const g=GAMES[id];return `<div class="gplay" style="--c:${g.c}"><div class="gbar"><span class="g-sc">⭐ <b id="gS">0</b></span><div class="g-time${TIME(g)?'':' prog'}"><i id="gT"${TIME(g)?'':' style="width:0%"'}></i></div><span class="g-s" id="gSec">${TIME(g)||'0:00'}</span><button class="btn ghost small" id="gQuit" aria-label="Spiel beenden">✕</button></div><div class="g-combo" id="gC"></div><div id="gArea" class="garea"></div><div class="g-msg" id="gM" aria-live="polite"></div></div>`;}
 function start(id){stop();G={id,score:0,right:0,wrong:0,streak:0,mist:[],t0:Date.now(),lock:false,end:false};M().innerHTML=frame(id);window.scrollTo(0,0);
  $('#gQuit').onclick=()=>{stop();G.end=true;HUB.E.go('game',id);};
- const t0=Date.now();gt=setInterval(()=>{const s=ROUND-(Date.now()-t0)/1000;const el=$('#gT');if(!el){stop();return;}el.style.width=Math.max(0,s/ROUND*100)+'%';$('#gSec').textContent=Math.max(0,Math.ceil(s));if(s<=10)el.classList.add('low');if(s<=0){stop();finish();}},200);
- ({etre:etreNext,artikel:artNext,lego:legoNext})[id]();}
+ const g=GAMES[id],T=TIME(g);const t0=Date.now();
+ gt=setInterval(()=>{const el=$('#gT');if(!el){stop();return;}const el2=$('#gSec');
+  if(!T){const s=Math.floor((Date.now()-t0)/1000);el2.textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');return;}
+  const s=T-(Date.now()-t0)/1000;el.style.width=Math.max(0,s/T*100)+'%';el2.textContent=Math.max(0,Math.ceil(s));if(s<=10)el.classList.add('low');if(s<=0){stop();finish();}},200);
+ if(g.run)g.run(API);else ({etre:etreNext,artikel:artNext,lego:legoNext})[id]();}
+/* Schnittstelle für die weiteren Spiele (games2.js) */
+const API={get G(){return G;},area:()=>$('#gArea'),hit:(ok,pts)=>hit(ok,pts),msg:(t,c)=>msg(t,c),mist:(a,b)=>{if(G)G.mist.push([a,b]);},
+ progress:f=>{const el=$('#gT');if(el)el.style.width=Math.max(0,Math.min(1,f))*100+'%';},bonus:n=>{if(!G)return;G.score+=n;const s=$('#gS');if(s)s.textContent=G.score;},
+ combo:t=>{const c=$('#gC');if(c){c.textContent=t;c.classList.remove('pop');void c.offsetWidth;c.classList.add('pop');}},
+ done:()=>{stop();finish();},ended:()=>!G||G.end,secs:()=>G?(Date.now()-G.t0)/1000:0,speak:t=>{try{return HUB.E.speak(t);}catch(e){return false;}},shuffle,rnd,esc};
 const hit=(ok,pts=1)=>{if(ok){G.right++;G.streak++;let p=pts;if(G.streak%5===0){p+=2;const c=$('#gC');if(c){c.textContent='🔥 Combo! +2';c.classList.remove('pop');void c.offsetWidth;c.classList.add('pop');}}G.score+=p;}else{G.wrong++;G.streak=0;}const s=$('#gS');if(s)s.textContent=G.score;};
 const msg=(t,cls)=>{const m=$('#gM');if(m){m.innerHTML=t;m.className='g-msg '+(cls||'');}};
 /* être-Blitz */
