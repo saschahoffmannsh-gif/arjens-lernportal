@@ -96,12 +96,12 @@ reg('puzzle',{lesson:['texte','moi-bausteine'],time:90,go:'▶ Los! (90 Sekunden
  run(api){const bag=shuffle(D.PUZ);let k=0;
   const next=()=>{if(api.ended())return;const p=bag[k++%bag.length];const parts=p[0].split('|').map(x=>{const m=x.match(/^(.*)\/([a-z])$/);return {t:m[1],r:m[2]};});
    const trapIdx=trapOf(parts,p[1]);const trap={t:p[1],r:parts[Math.max(0,trapIdx)].r,trap:true};
-   const chips=shuffle(parts.map((x,i)=>Object.assign({i},x)).concat([Object.assign({i:-1},trap)]));const c={p,parts,chips,pos:0,lock:false,bad:0};CUR.puzzle=c;
+   api.msg('');const chips=shuffle(parts.map((x,i)=>Object.assign({i},x)).concat([Object.assign({i:-1},trap)]));const c={p,parts,chips,pos:0,lock:false,bad:0};CUR.puzzle=c;
    api.area().innerHTML=`<div class="pz-q pop">${p[4]?`<div class="pz-fig">${V.who(p[4])}</div>`:''}<div class="pz-de">🇩🇪 ${esc(p[2])}</div></div><div class="pz-line" id="pzLine">${parts.map(()=>'<span class="pz-slot"></span>').join('')}</div>
     <div class="pz-chips">${chips.map((x,j)=>`<button class="pzc" data-j="${j}">${V.b(esc(x.t),x.r)}</button>`).join('')}</div>`;
    $$('.pzc').forEach(b=>b.onclick=()=>{if(c.lock||api.ended())return;const x=chips[+b.dataset.j];
     if(x.i===c.pos){const sl=$$('.pz-slot')[c.pos];sl.innerHTML=V.b(esc(x.t),x.r);sl.classList.add('in');b.disabled=true;b.classList.add('used');c.pos++;
-     if(c.pos===parts.length){const s=parts.map(y=>y.t).join(' ');api.hit(true,c.bad?1:parts.length);api.speak(s);api.msg('✓ '+V.train(p[0],{ok:true}),'ok');c.lock=true;later(1300,next);}return;}
+     if(c.pos===parts.length){const s=parts.map(y=>y.t).join(' ');api.hit(true,c.bad?1:parts.length);api.speak(s);api.msg(V.train(p[0],{ok:true}),'ok');c.lock=true;later(1300,next);}return;}
     b.classList.add('shake');later(400,()=>b.classList.remove('shake'));c.bad++;api.hit(false);
     if(x.trap){const wrong=parts.map((y,i)=>i===trapIdx?x.t:y.t).join(' ');api.mist(wrong,parts.map(y=>y.t).join(' '));api.msg(`🪤 Falle! ${p[3]}`,'bad');b.disabled=true;b.classList.add('used');}
     else{const need=parts[c.pos];api.msg(`✗ Jetzt kommt ${need.r==='v'?'das <b>Verb</b>':need.r==='r'?'der <b>Rest</b>':'<b>Wer?</b>'} – Wer → Verb → Rest.`,'bad');}});};
@@ -117,7 +117,7 @@ reg('blitz',{lesson:['artikel-bestimmt','fehler'],time:60,
   schritte:[['👀','Ausdruck lesen'],['✓ / ✗','Richtig oder falsch tippen'],['🔥','5 richtig hintereinander = Combo']],
   merk:'Vokal → l’ · mehrere → les + -s · cahier m. · guitare f. · ein Junge dabei → ils',fallen:[['les l’élèves','les élèves','<b>les</b> ersetzt l’.'],['Elles/p|sont/v|ensemble./r','Ils/p|sont/v|ensemble./r','Théo + Jade: ein Junge dabei → <b>ils</b>.']]},
  run(api){let bag=[],last=null;const NM=['Théo','Jade','Yasmine','Léo','Clara'];
-  const next=()=>{if(api.ended())return;if(!bag.length)bag=shuffle(D.BLITZ.filter(b=>!b[1]).concat(shuffle(D.BLITZ.filter(b=>b[1])).slice(0,16)));let it=bag.pop();if(it===last&&bag.length)it=bag.pop();last=it;CUR.blitz=it;
+  const next=()=>{if(api.ended())return;if(!bag.length)bag=shuffle(D.BLITZ.filter(b=>!b[1]).concat(shuffle(D.BLITZ.filter(b=>b[1])).slice(0,16)));let it=bag.pop();if(it===last&&bag.length)it=bag.pop();last=it;CUR.blitz=it;api.msg('');
    const figs=(it[0].match(/^([A-ZÉ][a-zéè]+) et ([A-ZÉ][a-zéè]+)/)||[]).slice(1).filter(n=>NM.includes(n));
    api.area().innerHTML=`<div class="bz-card pop">${figs.length?`<div class="bz-fig">${V.who(figs)}</div>`:''}<div class="bz-t">${esc(it[0])}</div></div><div class="bz-btns"><button class="bzb ok" data-v="1">✓ richtig</button><button class="bzb no" data-v="0">✗ falsch</button></div>`;
    let lock=false;$$('.bzb').forEach(b=>b.onclick=()=>{if(lock||api.ended())return;lock=true;const said=b.dataset.v==='1';const ok=said===!!it[1];api.hit(ok);b.classList.add(ok?'good':'bad');$('.bz-card').classList.add(ok?'okc':'shake');
