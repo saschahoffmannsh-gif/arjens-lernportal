@@ -150,6 +150,64 @@ V.onPart=(mode='etre')=>mode==='er'?{h:'👥 <b>on</b> bei den -er-Verben',
 /** Wie-Wörter passen sich an (nouveau / ami) */
 V.agree=()=>{const R=[['m','nouveau','l’ami','ein Junge'],['f','nouve<b>lle</b>','l’ami<b>e</b>','ein Mädchen'],['mm','nouveau<b>x</b>','les ami<b>s</b>','mehrere Jungen / gemischt'],['ff','nouvelle<b>s</b>','les amie<b>s</b>','nur Mädchen']];
  return `<table class="agree"><tr><th></th><th>neu</th><th>Freund/in</th></tr>${R.map(r=>`<tr><td>${V.fig(r[0])}<small>${r[3]}</small></td><td>${V.b(r[1],'r')}</td><td>${V.b(r[2],'r')}</td></tr>`).join('')}</table>`;};
+/* ---------- Lernkarten (Story-Format, 27.10.): je Karte EINE Idee, wischen oder tippen ----------
+   Gleiche Kernstruktur wie V.explain (was · warum · schritte · bsp · merk · fallen, dazu parts / ende),
+   aber als wenige große Karten. Kürzen = verdichten: alle Fallen bleiben (kompakt), Beispiele max. 3. */
+const plainSpec=t=>isSpec(t)?t.split('|').map(p=>p.replace(/\/[a-z]+$/,'')).join(' ').replace(/\s+([.,!?])/g,'$1'):t;
+V.fallS=f=>{if(!Array.isArray(f))return `<div class="sf sf-note"><span class="sf-i">⚠️</span><div>${f}</div></div>`;const [b,g,t]=f;
+ const good=isSpec(g)?V.train(g,{ok:true}):`<div class="train ok"><span class="tr-s">✓</span><span class="tr-w">${V.auto(g)}</span>${spk(strip(g),'','mini')}</div>`;
+ return `<div class="sf"><div class="sf-bad"><span class="sf-x">✗</span><s>${strip(plainSpec(b))}</s></div>${good}${t?`<div class="sf-why">${t}</div>`:''}</div>`;};
+const STAG={was:['🎯','Worum geht’s?'],warum:['🤔','Warum?'],wie:['🪜','So geht’s'],bsp:['👀','Beispiele'],merk:['⭐','Merk dir!'],fall:['⚠️','Achtung, Falle!'],ende:['💡','Tipp']};
+function storyCards(x,h,u,compact,noMerk){const C=[];const add=(k,body)=>C.push({k,u,body});
+ const vis=v=>v?`<div class="sc-vis">${v}</div>`:'',txt=t=>t?`<p class="sc-t">${t}</p>`:'';
+ const why=(x.warumVis||x.warum)?`<div class="sc-why"><span class="sc-whyt">🤔 Warum?</span>${vis(x.warumVis)}${txt(x.warum)}</div>`:'';
+ const bs=(x.bsp||[]).slice(0,Math.min(compact?2:3,x.bspMax||3)),bsH=bs.length?`<div class="sc-bsp">${bs.map(b=>V.ex(b[0],b[1],b[2],b[3])).join('')}</div>`:'';
+ const st=(x.schritte||[]),stH=st.length||x.tab?`<ol class="sc-steps">${st.map((s,i)=>{const [pic,t]=Array.isArray(s)?s:['',s];return `<li><span class="ss-n">${i+1}</span>${pic?`<span class="ss-p">${pic}</span>`:''}<span class="ss-t">${t}</span></li>`;}).join('')}</ol>${x.tab||''}`:'';
+ if(compact){ // mehrere Teile: je Teil 3–4 Karten
+  const merge=!(x.vis&&x.warumVis);
+  if(x.vis||x.was||(merge&&why))add('was',vis(x.vis)+txt(x.was)+(merge?why:''));
+  if(!merge&&why)add('warum',vis(x.warumVis)+txt(x.warum));
+  if(stH||bsH)add(stH?'wie':'bsp',stH+(bsH?`${stH?'<div class="sc-sub">👀 Beispiele</div>':''}${bsH}`:''));}
+ else{if(x.vis||x.was)add('was',vis(x.vis)+txt(x.was));if(x.warumVis||x.warum)add('warum',vis(x.warumVis)+txt(x.warum));if(stH)add('wie',stH);if(bsH)add('bsp',bsH);}
+ const fl=(x.fallen||[]),fh=fl.length?`<div class="sc-fall">${fl.map(V.fallS).join('')}</div>`:'';
+ if(x.merk&&!noMerk)add('merk',`<div class="sc-note">${x.merk}</div>${fh?`<div class="sc-fallh">⚠️ Achtung, Falle!</div>${fh}`:''}`);else if(fh)add('fall',fh);
+ if(h&&C.length)C[0].h=h;return C;}
+V.story=(x,o={})=>{if(!x)return '';const P=x.parts||[],multi=P.length>0;
+ // mehrere Teile: Überblick (Teil 1) kompakt; ohne eigene Schritte/Beispiele wandert der Merksatz als Zusammenfassung ans Ende
+ const overview=multi&&!(x.schritte||[]).length&&!(x.bsp||[]).length;
+ let C=storyCards(x,o.h||(multi&&!overview?'Grundregel':''),0,multi,overview);if(multi&&!overview&&C.length)C[0].pn=1;P.forEach((p,i)=>{const pc=storyCards(p,p.h||('Teil '+(i+2)),i+1,true);if(pc.length)pc[0].pn=overview?i+1:i+2;C=C.concat(pc);});
+ if(overview&&x.merk||x.ende){const u=C.length?C[C.length-1].u+1:0;C.push({k:overview&&x.merk?'merk':'ende',u,h:overview&&x.merk?'Zusammenfassung':'',body:(overview&&x.merk?`<div class="sc-note">${x.merk}</div>`:'')+(x.ende?`<p class="sc-t sc-ende">💡 ${x.ende}</p>`:'')});}
+ if(!C.length)return '';const N=C.length,U=new Set(C.map(c=>c.u)).size;
+ const end=o.end?`<button type="button" class="btn green sy-end" data-syend="${o.end.act||''}">${o.end.label}</button>`:'';
+ return `<div class="story${U>1?' multi':''}" data-n="${N}"${o.c?` style="--sc:${o.c}"`:''}>
+ ${o.title?`<div class="sy-head"><span class="sy-ic">📖</span><span class="sy-t">${o.title}</span><span class="sy-hint">${N} Karten · wischen</span></div>`:''}
+ <div class="sy-bar" aria-hidden="true">${C.map((c,i)=>`<i class="${i?'':'on'}${i&&c.u!==C[i-1].u?' gap':''}"></i>`).join('')}</div>
+ <div class="sy-track" tabindex="0">${C.map((c,i)=>{const [ic,t]=STAG[c.k];return `<section class="sc sc-${c.k}${i?'':' on'}" data-i="${i}" aria-label="Karte ${i+1} von ${N}"><div class="sc-in">${c.h?`<div class="sc-part">${c.pn?`<span class="sc-pn">${c.pn}</span>`:''}${c.h}</div>`:''}<div class="sc-tag"><span>${ic}</span>${t}</div><div class="sc-body">${c.body}</div></div></section>`;}).join('')}</div>
+ <div class="sy-nav"><button type="button" class="sy-prev" aria-label="Vorige Karte" disabled>‹</button><span class="sy-cnt"><b>1</b> / ${N}</span><button type="button" class="sy-next">Weiter ›</button>${end}</div></div>`;};
+V.explain=x=>V.story(x);
+/* Steuerung: Wischen (scroll-snap) oder Tippen; Höhe passt sich der aktuellen Karte an */
+if(typeof document!=='undefined'&&!W.__storyInit){W.__storyInit=true;
+ const idxOf=tr=>Math.max(0,Math.min(tr.children.length-1,Math.round(tr.scrollLeft/Math.max(1,tr.clientWidth))));
+ const sync=(sy,force)=>{const tr=sy.querySelector('.sy-track');if(!tr)return;const i=idxOf(tr),N=tr.children.length;if(!force&&sy._i===i){const c=tr.children[i];if(c)tr.style.height=c.scrollHeight+'px';return;}sy._i=i;
+  [...tr.children].forEach((c,j)=>c.classList.toggle('on',j===i));[...sy.querySelectorAll('.sy-bar i')].forEach((b,j)=>{b.classList.toggle('on',j<=i);});
+  const cnt=sy.querySelector('.sy-cnt b');if(cnt)cnt.textContent=i+1;const pv=sy.querySelector('.sy-prev'),nx=sy.querySelector('.sy-next'),en=sy.querySelector('.sy-end');
+  if(pv)pv.disabled=i===0;if(nx)nx.hidden=i===N-1&&!!en;if(nx)nx.disabled=i===N-1&&!en;if(en)en.hidden=i!==N-1;
+  const card=tr.children[i];if(card)tr.style.height=card.scrollHeight+'px';};
+ const initAll=()=>document.querySelectorAll('.story').forEach(sy=>{if(sy._init){return;}sy._init=true;const tr=sy.querySelector('.sy-track');
+  tr.addEventListener('scroll',()=>{clearTimeout(sy._t);sy._t=setTimeout(()=>sync(sy),60);},{passive:true});sync(sy,true);
+  if(W.ResizeObserver){const ro=new ResizeObserver(()=>{const c=tr.children[sy._i||0];if(c)tr.style.height=c.scrollHeight+'px';});[...tr.children].forEach(c=>ro.observe(c));}
+  tr.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();go(sy,e.key==='ArrowRight'?1:-1);}});});
+ const go=(sy,d)=>{const tr=sy.querySelector('.sy-track');const i=Math.max(0,Math.min(tr.children.length-1,idxOf(tr)+d));tr.scrollTo({left:i*tr.clientWidth,behavior:'smooth'});setTimeout(()=>sync(sy),420);};
+ document.addEventListener('click',e=>{const b=e.target.closest('.sy-prev,.sy-next,.sy-end,.sy-bar i');if(!b)return;const sy=b.closest('.story');if(!sy)return;
+  if(b.matches('.sy-bar i')){const i=[...b.parentNode.children].indexOf(b);const tr=sy.querySelector('.sy-track');tr.scrollTo({left:i*tr.clientWidth,behavior:'smooth'});setTimeout(()=>sync(sy),420);return;}
+  if(b.classList.contains('sy-end')){const a=b.dataset.syend;if(a==='practice'){const p=document.querySelector('.toolbar [data-practice]');if(p)p.click();}
+   else if(a){const t=document.querySelector(a);if(t){if(t.matches('button'))t.click();else t.scrollIntoView({behavior:'smooth',block:'start'});}}return;}
+  go(sy,b.classList.contains('sy-next')?1:-1);});
+ const mo=new MutationObserver(()=>{if(document.querySelector('.story:not([data-ready])')){document.querySelectorAll('.story:not([data-ready])').forEach(s=>s.setAttribute('data-ready','1'));requestAnimationFrame(initAll);}});
+ const start=()=>{mo.observe(document.body,{childList:true,subtree:true});initAll();};
+ if(document.body)start();else document.addEventListener('DOMContentLoaded',start);
+ W.addEventListener('resize',()=>document.querySelectorAll('.story').forEach(sy=>sync(sy,true)));
+ W.addEventListener('load',()=>document.querySelectorAll('.story').forEach(sy=>sync(sy,true)));}
 /* ---------- Erklärungen nachträglich bebildern ---------- */
 H.patchIntro=m=>{const I=W.INTRO||{};Object.entries(m).forEach(([id,p])=>{const x=id==='_lesson'?(W.LESSON&&W.LESSON.explain)||I._lesson:I[id];if(!x)return;Object.assign(x,p);
  const c=(W.CHAPTERS||[]).find(c=>c.id===id);if(c){c.merk=x.merk;if(p.rule)c.rule=p.rule;}if(id==='_lesson'&&W.LESSON)W.LESSON.merk=x.merk;});};

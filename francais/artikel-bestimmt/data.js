@@ -248,7 +248,7 @@ regel:{vis:'<div class="rulefl">'+V.b('mehrere?','x')+' → '+V.art('les')+'<br>
  warumVis:V.elision('le','ordinateur','ordinateur'),
  warum:'Vor einem Vokal fällt e / a weg – so spricht es sich leichter.',
  schritte:[['<span class="big-ic">👥</span>','Mehrere? → les'],['<span class="big-ic">🅰️</span>','Vokal (a, e, i, o, u, h)? → l’'],['<span class="big-ic">♂♀</span>','sonst: le (m.) oder la (f.)']],
- fallen:[['la armoire','l’armoire','Vokal → <b>l’</b>, egal ob m. oder f.'],['l’ chaise','la chaise','l’ nur vor Vokal.']]},
+ fallen:[['la armoire','l’armoire','Vokal → <b>l’</b>, egal ob m. oder f.'],['l’ chaise','la chaise','l’ nur vor Vokal.'],['l’hamac','le hamac','Ausnahme: <b>le hamac</b> – trotz h kein l’.']]},
 plural:{vis:'<div class="aset">'+V.obj('livre','le','livre',{n:1})+' <span class="big-ic">→</span> '+V.obj('livre','les','livres')+'</div>',
  was:'Mehrere → immer <b>les</b>, und das Nomen bekommt ein stummes <b>-s</b>.',
  warum:'Das -s hört man nicht – aber man schreibt es.',

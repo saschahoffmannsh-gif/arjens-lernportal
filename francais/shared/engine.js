@@ -119,17 +119,21 @@ window.APPGO=(v,a)=>go(v,a);
 function nextChapter(){const c=REG().find(c=>!chapterStatus(c).done);return c||null;}
 
 /* ---------- Erklär-Kasten (Anfang der Lektion / des Kapitels) ---------- */
-function introBox(x,lesson){if(!x)return '';
- const body=window.V.explain(x)+(x.parts||[]).map((p,i)=>`<section class="inpart"><h3 class="inpart-h"><span class="inpart-n">${i+1}</span><span>${p.h}</span></h3>${window.V.explain(p)}</section>`).join('')+(x.ende?window.V.hint('💡',x.ende):'');
- return `<details class="intro${lesson?' lesson-intro':''}" open><summary><span class="in-ic">📖</span><span>Erklärung: ${x.t||''}</span><span class="in-tg" aria-hidden="true"></span></summary><div class="intro-body">${body}</div></details>`;}
+function introBox(x,lesson,end){if(!x)return '';
+ return `<div class="intro${lesson?' lesson-intro':''}">${window.V.story(x,{title:'Erklärung'+(x.t?': '+x.t:''),end})}</div>`;}
+/* Material zum Kapitel: Texte/Dialoge/Hörstücke bleiben offen, Tabellen & Listen zum Nachschlagen werden eingeklappt */
+function materialBox(c){const h=c.html||'';if(!h)return '';
+ if(/class="(dlg|track|writer|reveal|room|roomwrap|player|play-big)\b/.test(h))return `${c.intro?'<div class="lb-h">📚 Material zum Kapitel</div>':''}<div class="lesson-body">${h}</div>`;
+ const T=[...h.matchAll(/<h3[^>]*>([\s\S]*?)<\/h3>/g)].map(m=>m[1].replace(/<span class="(ic|attn-ic)">[\s\S]*?<\/span>/,'').replace(/<[^>]+>/g,'').trim()).filter(Boolean).slice(0,4);
+ return `<details class="matbox"><summary><span class="mb-ic">📚</span><span class="mb-t"><b>Zum Nachschlagen</b><small>${T.length?T.join(' · '):'Tabellen und Tipps'}</small></span><span class="in-tg" aria-hidden="true"></span></summary><div class="lesson-body">${h}</div></details>`;}
 function home(){
  const o=overall(),nc=nextChapter(),RI=H.runInfo();
  let h=`<section class="lhero" style="--c:${L.color}"><div class="lh-txt"><div class="kicker"><span class="flag"><i></i><i></i><i></i></span>Französisch · Klassenarbeit 30.10.</div>
  <h1>${L.title}</h1><div class="lh-fr">${L.fr}</div><p>${L.intro}</p>
  <div class="lh-btns">${nc?`<button class="btn big" data-open="${nc.id}">▶ ${o.d?'Weiter mit Kapitel '+(nc.idx+1):'Los geht’s: Kapitel 1'}</button>`:`<button class="btn big red" data-test="1">🏆 Abschlusstest</button>`}${EXTRA().filter(c=>!chapterStatus(c).done).map(c=>`<button class="btn big extra-btn" data-open="${c.id}">🧡 Extra-Übung: ${c.title}</button>`).join('')}</div></div>
  <div class="lh-art">${window.HERO[L.slug]||''}</div></section>
- <div class="soundtip"><span class="st-ic">🔊</span><div><b>Mit Ton lernen:</b> Tippe auf einen Lautsprecher, dann hörst du den Satz (nochmal tippen = Stopp). <b>Kein Ton auf dem iPhone?</b> Stummschalter an der Seite aus und lauter stellen.</div></div>
- ${introBox(L.explain,true)}
+ ${introBox(L.explain,true,{label:'Zu den Kapiteln ↓',act:'.path'})}
+ <div class="soundtip"><span class="st-ic">🔊</span><div>Tippe auf 🔊 zum Anhören. <b>Kein Ton?</b> Stummschalter am iPhone aus.</div></div>
  <div class="section-title"><div class="bar"></div><h2>Deine Kapitel</h2><span class="sct-n">${o.d}/${o.t} geschafft</span></div><p class="legend runinfo">📏 Ein Durchgang: <b>≈ ${RI.n} Aufgaben · ca. ${RI.min} Min.</b> (${RI.n-H.TEST_N} in den Kapiteln + ${H.TEST_N} im Abschlusstest) – am besten auf 2 kurze Lernzeiten à 15–20 Min. verteilen.${EXTRA().length?' Die <b>Extra-Übung</b> nach dem Test ist zusätzlich und zählt hier nicht mit.':''}</p><ol class="path">`;
  const stepHTML=(c,i)=>{const s=chapterStatus(c);const pct=s.p.best||0;let h='';
   if(c.block)h+=`<li class="pblock" style="--c:${c.c}"><span>${c.block}</span></li>`;
@@ -139,7 +143,7 @@ function home(){
  const t=tview();
  h+=`<li><button class="pstep test${t.stars>=2?' done':''}" data-test="1"><span class="pnum">🏆</span><span class="pbody"><span class="pk">Finale</span><span class="pt">Abschlusstest</span><span class="ps">${testSize()} Aufgaben auf Klassenarbeitsniveau – mit Punkten, Medaille und „Das solltest du noch einmal üben“</span>
  <span class="pst">${t.best!==null?`Bestwert ${t.best} % · <span class="stars-s">${stars(t.stars)}</span> · ${t.runs}× gemacht`:'Noch nicht gemacht'}</span></span></button></li>${EXTRA().length?`<li class="pblock xblock"><span>🧡 Extra – Nachholbedarf (zusätzlich, zählt nicht zum Durchgang)</span></li>`+EXTRA().map(c=>stepHTML(c,c.idx)).join(''):''}</ol>
- <div class="merk blue"><h3>🧭 So lernst du am besten</h3><ul><li>Gehe die Kapitel <b>der Reihe nach</b> durch: erst lesen und anhören, dann <b>„Jetzt üben“</b>.</li><li>Jedes Kapitel hat nur <b>wenige Aufgaben pro Durchgang</b>. Übst du es noch einmal, kommen bevorzugt <b>neue Aufgaben</b> dran.</li><li>Ein Kapitel bekommt seinen Haken ✓ ab <b>70 %</b> in einem Durchgang. Für die Punkte zählt immer der <b>erste Versuch</b> – mit „Nochmal versuchen“ kannst du aber jede Aufgabe wiederholen.</li><li>Die Aufgaben kommen jedes Mal <b>neu gemischt</b>.</li><li>Zum Schluss: <b>Abschlusstest</b>. Danach siehst du genau, was du noch üben solltest.</li></ul></div>
+ <details class="merk blue howlearn"><summary><h3>🧭 So lernst du am besten</h3></summary><ul><li>Gehe die Kapitel <b>der Reihe nach</b> durch: erst lesen und anhören, dann <b>„Jetzt üben“</b>.</li><li>Jedes Kapitel hat nur <b>wenige Aufgaben pro Durchgang</b>. Übst du es noch einmal, kommen bevorzugt <b>neue Aufgaben</b> dran.</li><li>Ein Kapitel bekommt seinen Haken ✓ ab <b>70 %</b> in einem Durchgang. Für die Punkte zählt immer der <b>erste Versuch</b> – mit „Nochmal versuchen“ kannst du aber jede Aufgabe wiederholen.</li><li>Die Aufgaben kommen jedes Mal <b>neu gemischt</b>.</li><li>Zum Schluss: <b>Abschlusstest</b>. Danach siehst du genau, was du noch üben solltest.</li></ul></details>
  <div class="toolbar"><button class="btn" data-mix="1">🔀 Gemischt üben (8 Aufgaben)</button><a class="btn ghost" href="${window.PKG_BACK||'../'}">📋 Alle Lektionen</a></div>
  <div class="resetbox"><div><h3>↺ Neu anfangen</h3><p>Löscht in dieser Lektion <b>alle</b> Haken, Bestwerte und Test-Ergebnisse. Einzelne Kapitel setzt du im Kapitel selbst zurück.</p></div><button class="btn red" data-reset="1">↺ Gesamten Fortschritt zurücksetzen</button></div>
  ${lessonNav()}`;
@@ -152,7 +156,7 @@ function lesson(id){
  const c=CHMAP[id];const p=chp(id);p.seen=true;save();
  let h=`<div class="crumb"><button class="btn ghost small" data-home="1">← Übersicht</button><span class="crumb-n">${c.extra?`<span class="xbadge">🧡 Extra-Übung</span> Kapitel ${c.num}`:`Kapitel ${c.num} von ${REG().length}`}</span></div>
  <header class="chead" style="--c:${c.c}"><span class="cic">${c.icon||'📘'}</span><div><div class="ck">${c.extra?'<span class="xbadge">🧡 Extra-Übung</span> ':''}${c.kind||'Kapitel '+(c.idx+1)}</div><h1>${c.title}</h1>${c.sub?`<div class="cs">${c.sub}</div>`:''}</div></header>
- ${introBox(c.intro)}${c.intro&&c.html?'<div class="lb-h">📚 Material zum Kapitel</div>':''}<div class="lesson-body">${c.html||''}</div>`;
+ ${introBox(c.intro,false,{label:'✏️ Jetzt üben',act:'practice'})}${materialBox(c)}`;
  h+=chResetBar(id)+`<div class="toolbar center"><button class="btn green big" data-practice="${id}">✏️ Jetzt üben (${take(c)} Aufgaben)</button>${nextReg(c)?`<button class="btn ghost" data-open="${nextReg(c).id}">Nächstes Kapitel →</button>`:c.extra?'<button class="btn ghost" data-home="1">Zur Übersicht</button>':`<button class="btn red" data-test="1">🏆 Zum Abschlusstest</button>`}</div>`;
  main.innerHTML=h;mountWidgets(main,c);
 }

@@ -39,7 +39,7 @@ const stop=()=>{if(gt){clearInterval(gt);gt=null;}};
 HUB.views.game=function(id){stop();const g=GAMES[id];if(!g){HUB.E.go('spiele');return;}const h=$('#hubTitle');if(h)h.textContent=g.t;const b=TR.gameBest(id);
  M().innerHTML=`<div class="crumb"><button class="btn ghost small" data-hub="spiele">← Spiele</button><span class="crumb-n">${g.ic} ${g.t}</span></div>
  <section class="ghero" style="--c:${g.c}"><span class="gh-ic">${g.ic}</span><div><h1>${g.t}</h1><p>${g.sub}</p><span class="gt-best">🏆 Dein Rekord: <b>${b.best}</b></span></div></section>
- <div class="howto30"><div class="h30-h">⏱️ So geht’s – in 30 Sekunden</div>${V.explain(g.how)}</div>
+ <div class="howto30"><div class="h30-h">⏱️ So geht’s – in 30 Sekunden</div>${V.story(g.how,{end:{label:g.go||'▶ Los!',act:'#gGo'}})}</div>
  <div class="toolbar center sticky-go"><button class="btn big green" id="gGo">${g.go||'▶ Los! (1 Minute)'}</button></div>`;
  $('#gGo').onclick=()=>start(id);};
 const TIME=g=>g.time==null?ROUND:g.time;

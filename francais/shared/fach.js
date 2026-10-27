@@ -10,16 +10,10 @@ const ring=(pct,lbl,col)=>`<span class="pk-ring" style="--p:${pct==null?0:pct};-
 /* ---------- Fachseite ---------- */
 function fachPage(){
  const h=location.hash;if(/^#(bericht|nachholbedarf)$/.test(h)){const k=PK.currentKA();if(k){location.replace(R+k+'/'+h);return;}}
- const tile=typ=>{const T=PK.TYP[typ];const L=PK.sorted(PK.list(PG.fach,typ));const up=L.filter(p=>!PK.done(p));
-  const nhOpen=L.reduce((a,p)=>a+PK.progress(p).nhOpen,0);const nx=up[0];const pr=nx?PK.probe(nx):null;
-  let info='';
-  if(!L.length)info=`<span class="ft-s">Noch keine – hier erscheinen Übungen, wenn etwas noch nicht sitzt.</span>`;
-  else{info=`<span class="ft-s">${L.length} ${L.length===1?'Paket':'Pakete'}${up.length&&up.length!==L.length?` · ${up.length} aktuell`:''}</span>`;
-   if(nx){const d=PK.days(nx);info+=`<span class="ft-next"><b>${esc(nx.titel)}</b> · ${PK.fmtDate(nx)}${typ==='klassenarbeit'&&d!=null?` <span class="ft-cd">⏳ ${cdTxt(d)}</span>`:''}</span>`;
-    const pg=PK.progress(nx);info+=`<span class="ft-meta"><span class="ft-bar"><i style="width:${pg.pct}%"></i></span>${pg.pct} % der Lektionen${pr&&pr.n?` · Probe: ${pr.last.pct} % (Note ${pr.last.grade})`:''}</span>`;}}
-  return `<a class="ftile tap" href="${T.dir}/" style="--c:${T.c}" data-typ="${typ}">${nhOpen?`<span class="pt-nh">🔁 ${nhOpen}</span>`:''}<span class="ft-ic">${T.ic}</span><span class="ft-b"><span class="ft-t">${T.t}</span>${info}</span><span class="ft-go">›</span></a>`;};
- $('#main').innerHTML=`<section class="fach-hero" style="--c:${FACH.c}"><span class="fh-ic">${FACH.ic}</span><div><div class="ov-k">${FACH.k}</div><h1>${FACH.n}</h1></div></section>
- <div class="ftiles">${tile('klassenarbeit')}${tile('hausaufgabe')}</div>`;}
+ const G={klassenarbeit:['#e11d48','#fb923c'],hausaufgabe:['#0d9488','#4ade80']};
+ const tile=typ=>{const T=PK.TYP[typ];return `<a class="ft2 tap" href="${T.dir}/" style="--c:${G[typ][0]};--c2:${G[typ][1]}" data-typ="${typ}"><span class="ft2-ic">${T.ic}</span><span class="ft2-t">${T.t}</span></a>`;};
+ $('#main').innerHTML=`<section class="fach-hero" style="--c:${FACH.c}"><span class="fh-ic">${FACH.ic}</span><div><h1>${FACH.n}</h1></div></section>
+ <div class="ft2-grid">${tile('klassenarbeit')}${tile('hausaufgabe')}</div>`;}
 /* ---------- Paket-Liste ---------- */
 function card(p){const T=PK.TYP[p.typ];const d=PK.days(p),dn=PK.done(p),pg=PK.progress(p),pr=PK.probe(p);const dt=PK.dateOf(p);
  const MON=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
