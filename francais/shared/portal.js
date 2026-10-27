@@ -6,7 +6,7 @@ const F=[
  {k:'francais',n:'Französisch',ic:'🇫🇷',c:'#1d4ed8',c2:'#60a5fa',href:'francais/',live:true},
  {k:'deutsch',n:'Deutsch',ic:'📖',c:'#dc2626',c2:'#fb7185'},
  {k:'mathe',n:'Mathematik',ic:'📐',c:'#7c3aed',c2:'#a78bfa'},
- {k:'englisch',n:'Englisch',ic:'🇬🇧',c:'#0f766e',c2:'#2dd4bf'},
+ {k:'englisch',n:'Englisch',ic:'🇬🇧',c:'#0f766e',c2:'#2dd4bf',href:'englisch/',live:true},
  {k:'nawi',n:'Naturwissen&shy;schaften',ic:'🔬',c:'#15803d',c2:'#4ade80'},
  {k:'erdkunde',n:'Erdkunde',ic:'🌍',c:'#0369a1',c2:'#38bdf8'},
  {k:'religion',n:'Religion / Ethik',ic:'🕊️',c:'#a16207',c2:'#facc15'},

@@ -83,6 +83,6 @@ function load(){if(loading)return loading;
   return {state,changed};});
  return loading;}
 function on(f){subs.push(f);}
-W.SYNC={lesson,mergeCh,mergeTest,mergeP,load,on,base:BASE,state:()=>state,build,events};
+W.SYNC={lesson,mergeCh,mergeTest,mergeP,load,on,base:BASE,state:()=>state,build,events,doc:s=>BASE?getDoc(s):Promise.resolve([])};  // doc: weitere Dokumente lesen (z. B. Englisch)
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>load());else setTimeout(load,0);
 })();
