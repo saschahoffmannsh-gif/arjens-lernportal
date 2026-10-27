@@ -148,6 +148,34 @@ function diagnose(wrong,right,ctx=''){const W=DN(wrong),R=DN(right);if(!W||W===R
  else if(DEACC(W)===DEACC(R))res.push(...diagTok(W.replace(/ /g,''),R.replace(/ /g,''),'',''));
  const seen=new Set();return res.filter(x=>!seen.has(x.t)&&seen.add(x.t));}
 W.diagnose=diagnose;W.hlDiff=hlDiff;W.DN=DN;
+/* ---------- Satz-Bewertung „Zeile für Zeile“ (tolerant: Akzente, Groß/Klein, Satzzeichen egal) ---------- */
+const LSN=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[’`´ʼ]/g,"'").replace(/[«»"“”„?!.,:;–—()\-]/g,' ').replace(/'\s+/g,"'").replace(/\s+/g,' ').trim();
+function lsScore(given,L){const max=L.max||2,g=LSN(given);const core=L.core||[];
+ if(!g)return {pts:0,max,exact:false,hit:[],miss:core.map(c=>c[0]),tips:[]};
+ if([].concat(L.sol).some(x=>LSN(x)===g))return {pts:max,max,exact:true,hit:core.map(c=>c[0]),miss:[],tips:[]};
+ const hit=[],miss=[];core.forEach(([l,re])=>(re.test(g)?hit:miss).push(l));
+ let pts=core.length?Math.floor(hit.length/core.length*max*2)/2:0;
+ const tips=[];(L.errs||[]).forEach(([re,m])=>{if(re.test(g)&&!tips.includes(m))tips.push(m);});
+ if(tips.length&&pts>=max)pts=max-.5;
+ return {pts,max,exact:false,hit,miss,tips};}
+/* typische Kernteile und Fehler (Arjens Fehlerschwerpunkte) – Muster auf normalisiertem Text (ohne Akzente, ’ → ') */
+const LC={GREET:['Begrüßung',/\b(salut|bonjour|coucou)\b/],NAME:['Je m’appelle …',/\bje m'?\s?appelle [a-z]+|\bmoi c'?\s?est [a-z]+|\bc'?\s?est moi [a-z]+/],
+ ASK:['Tu t’appelles comment?',/tu t'?\s?appelles comment|comment tu t'?\s?appelles|comment t'?\s?appelles tu/],
+ JSDE:['Je suis de + Ort',/\bje suis de (?!a\b|la\b|le\b|l')[a-z]+/],EN6D:['en sixième D',/\ben (sixieme|6e?|6 e) ?d\b/],JESUIS:['je suis',/\bje suis\b/],
+ NOUVEAU:['nouveau (Junge)',/\bnouveau\b/],NOUVELLE:['nouvelle (Mädchen)',/\bnouvelle\b/],BYE:['Verabschiedung',/\b(au revoir|salut|a plus|a bientot|a demain|tchao|ciao)\b/],
+ CESONT:['Ce sont …',/\bce sont\b/],SURV:['les surveillant(e)s',/\bles surveillant(e)?s\b/],RECRE:['C’est la récré',/\bc'?\s?est la recre(ation)?\b/],
+ OUI:['Oui',/\boui\b/],NON:['Non',/\bnon\b/],CAVA:['Ça va?',/\bca va\b/],ILYA:['il y a',/\bil y a\b/]};
+const LE={IL_F:[/\bil (est|s'?\s?appelle|regarde|ecoute)\b/,'👧 Ein Mädchen / eine Frau → <b>elle</b> est (nicht il).'],ILS_F:[/\bils sont\b/,'👩👧 Nur Frauen / Mädchen → <b>elles</b> sont.'],
+ NOUVELLE_M:[/\bnouvelle\b/,'👦 Junge → <b>nouveau</b>. Nur ein Mädchen ist <i>nouvelle</i>.'],NOUVEAU_F:[/\bnouveau\b/,'👧 Mädchen → <b>nouvelle</b> (mit -lle).'],
+ DEMAISON:[/\bde a\b|\bde la maison\b|\ba la maison\b/,'📍 Woher? → <b>Je suis de</b> + Ort (Je suis de Mainz). <i>à la maison</i> heißt „zu Hause“.'],
+ DANSCLASSE:[/dans la classe de (sixieme|cinquieme|6|5)/,'🏫 Klasse → <b>en</b> sixième D (nicht „dans la classe de sixième“).'],
+ ILSSONTLE:[/\b(ils|elles) sont (le|la|les|l')|\bc'?\s?est (le|la|les) surveillant/,'👥 „Das sind …“ = <b>Ce sont</b> les … – Plural: les + Nomen mit -s.'],
+ PLS:[/\bles surveillante?(?!s)\b/,'👥 Plural: les surveillant<b>s</b> – mit -s.'],COUR:[/\bla cour\b/,'🏫 la cour = der Schulhof. ⏰ Pause = <b>la récré</b> (la récréation).'],
+ NOUSSONT:[/\bnous (sont|est|suis)\b|\b(ils|elles) sont ensemble\b/,'👦+🙋 „… und ich“ → <b>nous sommes</b> (oder on est).'],LAMI_F:[/\bl'?\s?ami\b(?!e)/,'👧 Freundin → <b>l’amie</b> (mit -e).'],
+ JEECOUTE:[/\bje ecoute\b/,'Vokal → <b>j’</b>écoute.'],ARTNEU:[/il y a (le|la|l'|les) /,'🆕 Was es gibt → <b>un / une / des</b> (nicht le / la).'],
+ UNF:[/\bun (armoire|etagere|table|chaise|lampe|minichaine)\b/,'♀️ armoire, étagère, table, chaise … sind weiblich → <b>une</b>.']};
+W.LS={N:LSN,score:lsScore,C:LC,E:LE};
+
 
 H.setIntro=m=>{W.INTRO=m;(W.CHAPTERS||[]).forEach(c=>{const x=m[c.id];if(x){c.intro=x;c.merk=x.merk;c.rule=x.rule||x.was;}});if(m._lesson&&W.LESSON){W.LESSON.explain=m._lesson;W.LESSON.merk=m._lesson.merk;}};
 W.H=H;
@@ -167,5 +195,7 @@ X.mul=(q,o,why,x={})=>Object.assign({type:'multi',q,o,why},x);
 X.seg=(q,opts,rows,why,x={})=>Object.assign({type:'seg',q,opts,rows,why},x);
 X.tf=(q,rows,why,x={})=>Object.assign({type:'seg',tf:true,q,opts:['vrai','faux'],rows:rows.map(r=>[r[0],r[1]?'vrai':'faux',r[2]])},{why},x);
 X.det=(q,text,why,x={})=>Object.assign({type:'detect',q,text,why},x);
+/* Zeile für Zeile nach deutschen Vorgaben (wie in der Klassenarbeit): lines=[{de,sol:[…],core:[[Label,/re/]],errs:[[/re/,Tipp]],max}] */
+X.zl=(q,lines,why,x={})=>Object.assign({type:'lines',q,lines,why},x);
 W.X=X;
 })(window);

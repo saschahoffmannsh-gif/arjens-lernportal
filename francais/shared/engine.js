@@ -28,7 +28,7 @@ CHAPTERS.forEach((c,i)=>{c.idx=i;c.c=c.c||L.color;CHMAP[c.id]=c;c.num=c.extra?RE
 TEST_EX.forEach((e,j)=>{e.ch='test';e.id='test-'+j;e.lv=e.lv||3;});
 CHMAP.test={id:'test',title:'Abschlusstest',c:'#c8102e',icon:'🏆'};
 const ALLEX=CHAPTERS.flatMap(c=>c.ex).concat(TEST_EX);
-const TYPE={mc:['Multiple Choice','🔘'],genus:['Geschlechter-Check','⚖️'],pick:['Bild wählen','🖼️'],gap:['Lückentext','✏️'],gapw:['Lücken schreiben','⌨️'],order:['Satzpuzzle','🧩'],write:['Schreiben','⌨️'],
+const TYPE={lines:['Zeile für Zeile schreiben','📝'],mc:['Multiple Choice','🔘'],genus:['Geschlechter-Check','⚖️'],pick:['Bild wählen','🖼️'],gap:['Lückentext','✏️'],gapw:['Lücken schreiben','⌨️'],order:['Satzpuzzle','🧩'],write:['Schreiben','⌨️'],
  match:['Zuordnen','🔗'],dialog:['Mini-Dialog','💬'],click:['Bild-Aufgabe','👆'],mark:['Bild markieren','🖍️'],multi:['Mehrfachauswahl','☑️'],seg:['Auswählen','🎯'],detect:['Fehlerdetektiv','🔍']};
 const RA=e=>!!((e&&e._L)||L).readAu;
 const HUB=window.HUB||null;
@@ -281,7 +281,7 @@ function feedback(e,r,a){
  // Diagnose typischer Fehler
  const close=(a,b)=>{a=DN(a);b=DN(b);let p=0;while(p<a.length&&p<b.length&&a[p]===b[p])p++;let q=0;while(q<a.length-p&&q<b.length-p&&a[a.length-1-q]===b[b.length-1-q])q++;return p+q>=Math.min(3,Math.min(a.length,b.length));};
  const allP=(r.pairs||[]).filter(p=>p&&p[0]!=null&&p[1]!=null&&DN(p[0])!==DN(p[1]));
- let own=[];if(!r.ok&&typeof e.dx==='function'){try{own=e.dx(r.raw!=null?String(r.raw):strip(String(r.given||'')),r,e)||[];}catch(err){own=[];}}
+ let own=[];if(!r.ok&&r.tips&&r.tips.length)own=r.tips.slice();else if(!r.ok&&typeof e.dx==='function'){try{own=e.dx(r.raw!=null?String(r.raw):strip(String(r.given||'')),r,e)||[];}catch(err){own=[];}}
  const dg=own.slice();if(!own.length)allP.forEach(p=>dg.push(...diagnose(p[0],p[1],p[2]||'')));
  const pairs=allP.filter(p=>!/^(vrai|faux)$/.test(p[0])&&(own.length||close(p[0],p[1])||diagnose(p[0],p[1],p[2]||'').length));
  const seen=new Set();const D=dg.filter(x=>!seen.has(x.t)&&seen.add(x.t)).slice(0,own.length?3:2);
@@ -334,17 +334,34 @@ function bindGaps(el){$$('select.gapsel',el).forEach(s=>s.onchange=()=>ready($$(
 const fill=(e,t,u=true)=>t.replace(/\{(\d+)\}/g,(m,k)=>u?'<u>'+e.gaps[+k][0]+'</u>':e.gaps[+k][0]);
 RENDER.gap=(e,el)=>{el.innerHTML=`<div class="ex-sub">${e.sub||'Wähle in jeder Lücke das passende Wort.'}</div><div class="gaptext${e.table?' tbl':''}">${gapSelects(e,e.text)}</div>`;bindGaps(el);
  return {check(){const r=gapCheck(e,el);if(r==null)return null;return {ok:r.n===r.max,pts:r.n,max:r.max,sol:fill(e,e.text),pairs:r.pairs,given:givenFill(e.text,r.vals),raw:strip(e.text.replace(/\{(\d+)\}/g,(m,k)=>(r.vals[k]||[''])[0])),say:sayOf(e,e.table?null:strip(fill(e,e.text,false)))};}};};
-RENDER.gapw=(e,el)=>{
- el.innerHTML=`<div class="ex-sub">${e.sub||'Schreibe die fehlenden Wörter in die Lücken.'}</div><div class="gaptext">${e.text.replace(/\{(\d+)\}/g,(m,k)=>{const len=Math.max(...[].concat(e.ans[+k]).map(x=>x.length));return `<input class="gapin" data-g="${k}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Lücke ${+k+1}" style="width:${Math.max(3.2,len*0.72+1.4)}em">`;})}</div>
+RENDER.gapw=(e,el)=>{const KB=['','Pronomen','Artikel','Info'];
+ el.innerHTML=`<div class="ex-sub">${e.sub||'Schreibe die fehlenden Wörter in die Lücken.'}</div>${e.box?`<div class="kb-leg"><span><span class="kb kb1">1</span> Personalpronomen</span><span><span class="kb kb2">2</span> Artikel</span><span><span class="kb kb3">3</span> passende Information</span></div>`:''}${e.bank?`<div class="kb-bank"><span class="lbl">🧺 Wortkasten:</span> ${shuffle(Object.keys(e.ans).map(k=>[].concat(e.ans[k])[0])).map(w=>`<span class="kb-w">${w}</span>`).join('')}</div>`:''}<div class="gaptext${e.box?' kbt':''}">${e.text.replace(/\{(\d+)\}/g,(m,k)=>{const len=Math.max(...[].concat(e.ans[+k]).map(x=>x.length));return `${e.box&&e.box[+k]?`<span class="kb kb${e.box[+k]}" title="${KB[e.box[+k]]}">${e.box[+k]}</span>`:''}<input class="gapin" data-g="${k}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Lücke ${+k+1}" style="width:${Math.max(3.2,len*0.72+1.4)}em">`;})}</div>
  <div class="acc">${['é','è','ê','à','ç','’'].map(c=>`<button type="button" data-c="${c}">${c}</button>`).join('')}</div>`;
  const ins=$$('.gapin',el);let lastI=ins[0];
  const upd=()=>ready(ins.every(i=>i.value.trim().length>0));
  ins.forEach(i=>{i.addEventListener('input',upd);i.addEventListener('focus',()=>lastI=i);i.addEventListener('keydown',ev=>{if(ev.key==='Enter'){const k=ins.indexOf(i);if(k<ins.length-1)ins[k+1].focus();else{const cb=$('#checkBtn');if(cb&&!cb.disabled)cb.click();}}});});
  $$('.acc button',el).forEach(b=>b.onclick=()=>{const i=lastI;const s=i.selectionStart??i.value.length,t=i.selectionEnd??s;i.value=i.value.slice(0,s)+b.dataset.c+i.value.slice(t);i.focus();i.setSelectionRange(s+1,s+1);upd();});
- const solT=e.text.replace(/\{(\d+)\}/g,(m,k)=>'<u>'+[].concat(e.ans[+k])[0]+'</u>');
+ const solT=e.text.replace(/\{(\d+)\}( ?)/g,(m,k,sp)=>{const a=[].concat(e.ans[+k])[0];return '<u>'+a+'</u>'+(/[’']$/.test(a)?'':sp);});
  return {check(){if(!ins.every(i=>i.value.trim()))return null;let n=0;const accs=[];
   const pairs=[],vals={};ins.forEach(i=>{const A=[].concat(e.ans[+i.dataset.g]);const r=compare(i.value,A);if(r.acc&&e.strict)r.ok=false;vals[i.dataset.g]=[i.value,r.ok];i.classList.add(r.ok?'ok':'bad');if(r.ok)n++;else pairs.push([i.value,r.acc||A[0],gapCtx(i)]);if(r.acc)accs.push(r.acc);i.disabled=true;});$$('.acc button',el).forEach(b=>b.disabled=true);
   return {ok:n===ins.length,pts:n,max:ins.length,acc:accs.join(' · '),sol:solT,pairs,given:givenFill(e.text,vals),showSol:accs.length>0,say:sayOf(e,strip(solT))};}};};
+/* Zeile für Zeile (wie in der Klassenarbeit): deutsche Vorgabe → französischer Satz, Auswertung pro Zeile mit Musterlösung */
+RENDER.lines=(e,el)=>{const LS=window.LS;
+ el.innerHTML=(e.ctx?`<div class="zl-ctx">${e.ctx}</div>`:'')+`<ol class="zl">${e.lines.map((L,i)=>`<li class="zl-li"><div class="zl-de">${L.de} <span class="zl-p">${L.max||2} P.</span></div>${L.who?`<span class="zl-who">${L.who}:</span>`:''}<input class="inp zl-in" data-i="${i}" autocomplete="off" autocapitalize="sentences" autocorrect="off" spellcheck="false" placeholder="Auf Französisch …" aria-label="Zeile ${i+1}"><div class="zl-fb" hidden></div></li>`).join('')}</ol>
+ <div class="acc">${['é','è','ê','à','ç','’'].map(c=>`<button type="button" data-c="${c}">${c}</button>`).join('')}</div>
+ <div class="legend">Groß-/Kleinschreibung und Satzzeichen sind egal. Wichtig sind die <b>Kernteile</b> jedes Satzes.</div>`;
+ const ins=$$('.zl-in',el);let lastI=ins[0];const upd=()=>ready(ins.every(i=>i.value.trim().length>0));
+ ins.forEach((i,k)=>{i.addEventListener('input',upd);i.addEventListener('focus',()=>lastI=i);i.addEventListener('keydown',ev=>{if(ev.key==='Enter'){if(k<ins.length-1)ins[k+1].focus();else{const cb=$('#checkBtn');if(cb&&!cb.disabled)cb.click();}}});});
+ $$('.acc button',el).forEach(b=>b.onclick=()=>{const i=lastI;const s=i.selectionStart??i.value.length,t=i.selectionEnd??s;i.value=i.value.slice(0,s)+b.dataset.c+i.value.slice(t);i.focus();i.setSelectionRange(s+1,s+1);upd();});
+ return {check(){if(!ins.every(i=>i.value.trim()))return null;let pts=0,max=0;const tips=[];
+  ins.forEach(i=>{const L=e.lines[+i.dataset.i];const r=LS.score(i.value,L);pts+=r.pts;max+=r.max;i.disabled=true;i.classList.add(r.pts>=r.max?'ok':'bad');
+   const fb=i.parentElement.querySelector('.zl-fb');fb.hidden=false;
+   fb.innerHTML=r.pts>=r.max?`<span class="zl-ok">✓ ${r.max}/${r.max}</span>${r.exact?'':` <span class="legend">Muster: <span class="fr">${[].concat(L.sol)[0]}</span></span>`}`
+    :`<span class="zl-pt">${String(r.pts).replace('.',',')}/${r.max}</span> <span class="lbl">Muster:</span> <span class="fr">${[].concat(L.sol)[0]}</span>${r.miss.length?`<div class="zl-miss">Es fehlt: ${r.miss.map(x=>`<b>${x}</b>`).join(' · ')}</div>`:''}${r.tips.map(t=>`<div class="zl-tip">${t}</div>`).join('')}`;
+   r.tips.forEach(t=>{if(!tips.some(x=>x.t===t))tips.push({t});});});
+  $$('.acc button',el).forEach(b=>b.disabled=true);
+  const ok=pts>=max;const sol=e.lines.map((L,k)=>`${k+1}. ${[].concat(L.sol)[0]}`).join('<br>');
+  return {ok,pts,max,sol,given:ins.map((i,k)=>`${k+1}. ${esc(i.value)}`).join('<br>'),raw:ins.map(i=>i.value).join(' / '),pairs:[],tips,say:e.lines.map(L=>[L.voice||'',strip([].concat(L.sol)[0])])};}};};
 RENDER.dialog=(e,el)=>{let side={},n=0;
  el.innerHTML=`<div class="ex-sub">Wähle in jeder Lücke das passende Wort.</div><div class="dlg">`+e.lines.map(([w,t])=>{if(!(w in side))side[w]=n++%2;return `<div class="row ${side[w]?'r':''}"><div class="av">${window.CHARS[w]||''}<span>${window.NAMES[w]||w}</span></div><div class="bub"><span class="tx">${gapSelects(e,t)}</span></div></div>`;}).join('')+'</div>';bindGaps(el);
  return {check(){const r=gapCheck(e,el);if(r==null)return null;return {ok:r.n===r.max,pts:r.n,max:r.max,pairs:r.pairs,given:e.lines.map(([w,t])=>`${window.NAMES[w]||w}: `+givenFill(t,r.vals)).join('<br>'),sol:e.lines.map(([w,t])=>`${window.NAMES[w]||w}: `+fill(e,t)).join('<br>'),say:e.lines.map(([w,t])=>[w,strip(fill(e,t,false))])};}};};
