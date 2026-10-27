@@ -183,7 +183,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('.tab');if(!t)ret
  $$('.tab',box).forEach((x,k)=>{x.classList.toggle('on',k===i);});[...box.children].filter(x=>x.classList.contains('tabpane')).forEach((p,k)=>p.hidden=k!==i);stopAudio();});
 function mountWriter(el,w,id){if(!w)return;const sk=WKEY+'_w_'+id;let txt='';try{txt=localStorage.getItem(sk)||'';}catch(e){}
  el.innerHTML=`<div class="wr-head">✍️ ${w.title}</div><p class="legend">${w.hint||''}</p>
- <div class="wr-frame"><div class="wr-ft">🧱 Schreibrahmen – tippe auf einen Baustein, dann wird er in deinen Text eingefügt:</div>${w.frame.map(([fr,de])=>`<button type="button" class="wr-b" data-ins="${esc(fr)}"><span class="fr">${fr}</span><small>${de}</small></button>`).join('')}</div>
+ <div class="wr-frame"><div class="wr-ft">🧱 Schreibrahmen – tippe auf einen Baustein, dann wird er in deinen Text eingefügt:</div>${w.listen?`<div class="wr-listen">${H.spkLines(w.frame.map(f=>[w.who||'',f[0]]),'','Mustertext anhören')}<span>Mustertext anhören</span></div>`:''}${w.frame.map(([fr,de])=>`<button type="button" class="wr-b" data-ins="${esc(fr)}"><span class="fr">${fr}</span><small>${de}</small></button>`).join('')}</div>
  <textarea class="wr-ta" rows="9" autocapitalize="sentences" spellcheck="false" placeholder="Schreibe hier deinen Text auf Französisch …">${esc(txt)}</textarea>
  <div class="acc">${['é','è','ê','à','ç','ô','î','’'].map(c=>`<button type="button" data-c="${c}">${c}</button>`).join('')}</div>
  <div class="wr-check"><div class="wr-ct">✅ Checkliste <span class="wr-n"></span></div><ul>${w.checks.map((c,i)=>`<li data-i="${i}"><span class="ck-b"></span>${c[0]}</li>`).join('')}</ul></div>

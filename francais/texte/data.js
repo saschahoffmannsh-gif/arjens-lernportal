@@ -34,14 +34,14 @@ const LEO=window.TRACKS.leo.lines, JADE=window.TRACKS.jade.lines;
 const L2=l=>l.map(x=>[x[0],x[1]]);
 const RM=(rows)=>`<table class="t rm">${rows.map(([k,fr])=>`<tr><th>${k}</th><td>${[].concat(fr).map(x=>F(x)).join(' ')}</td></tr>`).join('')}</table>`;
 window.WRITERS={
- moi:{title:'Mein Text: «C’est moi!»',who:'Léo',hint:'Schreibe mindestens 5–8 Sätze über dich. Tippe auf die Bausteine und ergänze sie (… = deine Angaben). Die Checkliste hakt automatisch ab, was schon drin ist. Dein Text wird auf diesem Gerät gespeichert.',
-  frame:[['Bonjour!','Begrüßung'],['Salut!','Begrüßung'],['Je me présente: c’est moi, …','Ich stelle mich vor'],['Je m’appelle …','Ich heiße …'],['Je suis de …','Ich komme aus …'],['Je suis élève à …','Ich bin Schüler/in in …'],['Je suis en sixième …','Ich bin in der 6 …'],['Le professeur de français, c’est …','Lehrer/in'],['Il est très cool.','Er ist sehr cool.'],['Elle est très cool.','Sie ist sehr cool.'],['Voilà … . … et moi, nous sommes ensemble dans la classe.','Freund/in'],['À la maison, je regarde …','zu Hause'],['J’écoute …','Ich höre …'],['Je téléphone à …','Ich rufe … an'],['Et toi? Tu t’appelles comment?','Frage am Schluss'],['Au revoir!','Verabschiedung']],
+ moi:{title:'Mein Text: «C’est moi!»',who:'Arjen',listen:true,hint:'Die Bausteine sind fertige Sätze: Tippe sie der Reihe nach an – dann steht Arjens kompletter Text da (Klasse 6d). Danach kannst du ihn ändern – und übe ihn auch ohne Hilfe im Heft. Die Checkliste hakt automatisch ab, was schon drin ist. Dein Text wird auf diesem Gerät gespeichert.',
+  frame:[['Salut! Je m’appelle Arjen.','Hallo! Ich heiße Arjen.'],['Je suis de Mainz.','Ich komme aus Mainz.'],['Je suis élève à Mainz.','Ich bin Schüler in Mainz.'],['Je suis en sixième D.','Ich bin in der 6d.'],['Le professeur de français, c’est Monsieur Martel.','Der Französischlehrer ist Herr Martel.'],['Il est très cool.','Er ist sehr cool.'],['Voilà Noah.','Das ist Noah.'],['Noah et moi, nous sommes ensemble dans la classe.','Noah und ich sind zusammen in der Klasse.'],['À la maison, je regarde des B.D.','Zu Hause schaue ich Comics an.'],['J’écoute des CD.','Ich höre CDs.'],['Je téléphone à Noah et nous parlons ensemble.','Ich rufe Noah an und wir reden miteinander.'],['Et toi? Tu t’appelles comment?','Und du? Wie heißt du?'],['Au revoir!','Auf Wiedersehen!']],
   checks:[['Begrüßung (Bonjour! / Salut!)','bonjour|salut'],['Name (Je m’appelle … / c’est moi, …)','m.\\s?appelle|c.\\s?est moi'],['Herkunft (Je suis de …)','je suis de'],['Schule oder Klasse (élève … / en sixième …)','[ée]l[eè]ve|sixi[eè]me|classe'],['mind. 3 Formen von être (suis, es, est, sommes …)','\\b(suis|es|est|sommes|[eê]tes|sont)\\b',3],['mind. 2 Verben auf -er (regarde, écoute, parle …)','\\b(regard|[ée]cout|t[ée]l[ée]phon|parl|pr[ée]sent)\\w*',2],['Schluss (Et toi? / Au revoir!)','et toi|au revoir'],['mind. 5 Sätze','SENT',5]],
-  sample:L2(LEO).map(x=>x[1]),sampleNote:'Das ist Léos Text. Dein Text darf natürlich anders sein – Hauptsache, die Checkliste ist voll!'},
- chambre:{title:'Mein Text: «C’est ma chambre!»',who:'Jade',hint:'Beschreibe dein Zimmer (oder dein Traumzimmer) in mindestens 5–8 Sätzen. Denk an un / une / des!',
-  frame:[['Salut! C’est …','Einleitung'],['Voilà ma chambre!','Das ist mein Zimmer!'],['Dans ma chambre, il y a …','In meinem Zimmer gibt es …'],['un lit','m.'],['une armoire','f.'],['une table','f.'],['une chaise','f.'],['une lampe','f.'],['une étagère','f.'],['un ordinateur','m.'],['des livres','Pl.'],['des posters','Pl.'],['Là, il y a …','Da gibt es …'],['Dans le coin, il y a …','In der Ecke …'],['Dans l’étagère, il y a …','Im Regal …'],['Voilà ma collection de …','Sammlung'],['Il y a des posters partout.','überall Poster'],['J’écoute des CD.','Was ich mache'],['Je regarde des B.D.','Was ich mache'],['C’est trop cool!','Das ist total cool!'],['Et toi? Qu’est-ce qu’il y a dans ta chambre?','Frage am Schluss']],
+  sample:[['Salut! Je m’appelle Arjen.','Hallo! Ich heiße Arjen.'],['Je suis de Mainz.','Ich komme aus Mainz.'],['Je suis élève à Mainz.','Ich bin Schüler in Mainz.'],['Je suis en sixième D.','Ich bin in der 6d.'],['Le professeur de français, c’est Monsieur Martel.','Der Französischlehrer ist Herr Martel.'],['Il est très cool.','Er ist sehr cool.'],['Voilà Noah.','Das ist Noah.'],['Noah et moi, nous sommes ensemble dans la classe.','Noah und ich sind zusammen in der Klasse.'],['À la maison, je regarde des B.D.','Zu Hause schaue ich Comics an.'],['J’écoute des CD.','Ich höre CDs.'],['Je téléphone à Noah et nous parlons ensemble.','Ich rufe Noah an und wir reden miteinander.'],['Et toi? Tu t’appelles comment?','Und du? Wie heißt du?'],['Au revoir!','Auf Wiedersehen!']].map(x=>x[0]),sampleNote:'Das ist Arjens Mustertext – genau die Bausteine von oben, der Reihe nach. Übe ihn, bis du ihn ohne Hilfe schreiben kannst!'},
+ chambre:{title:'Mein Text: «C’est ma chambre!»',who:'Arjen',listen:true,hint:'Die Bausteine sind fertige Sätze: Tippe sie der Reihe nach an – dann steht Arjens kompletter Zimmertext da. Achte beim Lesen auf un / une / des!',
+  frame:[['Salut! C’est Arjen.','Hallo! Hier ist Arjen.'],['Voilà ma chambre!','Das ist mein Zimmer!'],['Dans ma chambre, il y a un lit, une armoire et une étagère.','In meinem Zimmer gibt es ein Bett, einen Schrank und ein Regal.'],['Dans l’étagère, il y a des livres et des photos.','Im Regal gibt es Bücher und Fotos.'],['Et voilà ma collection de B.D.!','Und hier ist meine Comic-Sammlung!'],['Là, dans le coin, il y a une table, une chaise et un ordinateur.','Da, in der Ecke, gibt es einen Tisch, einen Stuhl und einen Computer.'],['Là, il y a une lampe.','Dort gibt es eine Lampe.'],['Dans le coin musique, il y a une minichaîne et des CD.','In der Musikecke gibt es eine Mini-Stereoanlage und CDs.'],['J’écoute des CD et je regarde des B.D.','Ich höre CDs und schaue Comics an.'],['Il y a des posters partout.','Überall gibt es Poster.'],['C’est trop cool!','Das ist total cool!'],['Et toi? Qu’est-ce qu’il y a dans ta chambre?','Und du? Was gibt es in deinem Zimmer?']],
   checks:[['Einleitung (Voilà ma chambre! / C’est ma chambre.)','ma chambre'],['mind. 3× il y a','il y a',3],['mind. 6 Sachen mit un / une / des','\\b(un|une|des)\\s+[a-zàâçéèêëîïôûù]',6],['Wo? (là, dans le coin, dans l’étagère …)','\\blà|dans le coin|dans l.\\s?[ée]tag|dans l.\\s?armoire'],['mind. 1 Verb auf -er (j’écoute, je regarde …)','\\b(regard|[ée]cout|t[ée]l[ée]phon|parl|pr[ée]sent)\\w*'],['Schluss mit Frage (Et toi? …?)','\\?'],['mind. 5 Sätze','SENT',5]],
-  sample:L2(JADE).map(x=>x[1]),sampleNote:'Das ist Jades Text. Tipp: Nimm nur Wörter, die du sicher kannst – lieber einfache, richtige Sätze!'},
+  sample:[['Salut! C’est Arjen.','Hallo! Hier ist Arjen.'],['Voilà ma chambre!','Das ist mein Zimmer!'],['Dans ma chambre, il y a un lit, une armoire et une étagère.','In meinem Zimmer gibt es ein Bett, einen Schrank und ein Regal.'],['Dans l’étagère, il y a des livres et des photos.','Im Regal gibt es Bücher und Fotos.'],['Et voilà ma collection de B.D.!','Und hier ist meine Comic-Sammlung!'],['Là, dans le coin, il y a une table, une chaise et un ordinateur.','Da, in der Ecke, gibt es einen Tisch, einen Stuhl und einen Computer.'],['Là, il y a une lampe.','Dort gibt es eine Lampe.'],['Dans le coin musique, il y a une minichaîne et des CD.','In der Musikecke gibt es eine Mini-Stereoanlage und CDs.'],['J’écoute des CD et je regarde des B.D.','Ich höre CDs und schaue Comics an.'],['Il y a des posters partout.','Überall gibt es Poster.'],['C’est trop cool!','Das ist total cool!'],['Et toi? Qu’est-ce qu’il y a dans ta chambre?','Und du? Was gibt es in deinem Zimmer?']].map(x=>x[0]),sampleNote:'Das ist Arjens Mustertext – genau die Bausteine von oben, der Reihe nach. Tipp: lieber einfache, richtige Sätze!'},
 };
 window.CHAPTERS=[
 /* ===== Block A ===== */
@@ -76,7 +76,7 @@ ex:[
  wr('Übersetze: „Zu Hause höre ich CDs.“',['À la maison, j’écoute des CD.','À la maison j’écoute des CD.','J’écoute des CD à la maison.'],'À la maison, j’écoute des CD. – j’ vor Vokal, des CD ohne s.',{strict:true,lv:2}),
 ]},
 {id:'moi-schreiben',kind:'Schreibwerkstatt',icon:'✍️',title:'Dein Text: C’est moi!',sub:'Mit Schreibrahmen und Checkliste',lv:2,
-html:steps(['<b>Sammeln:</b> Name, woher, Schule/Klasse, Lehrer/in, Freund/in, was du zu Hause machst.','<b>Schreiben:</b> Tippe auf Bausteine und ergänze sie. Ganze Sätze mit Punkt!','<b>Prüfen:</b> Checkliste voll? Akzente (é, à)? Endungen (je regard<b>e</b>, nous somm<b>es</b>)?','<b>Vergleichen:</b> Erst dann die Beispiellösung öffnen.'])+writer('moi')
+html:steps(['<b>Sammeln:</b> Name, woher, Schule/Klasse, Lehrer/in, Freund/in, was du zu Hause machst.','<b>Bausteine antippen:</b> Die Bausteine sind ganze Sätze – der Reihe nach ergeben sie Arjens Mustertext. Danach änderst du, was bei dir anders ist.','<b>Prüfen:</b> Checkliste voll? Akzente (é, à)? Endungen (je regard<b>e</b>, nous somm<b>es</b>)?','<b>Vergleichen:</b> Erst dann die Beispiellösung öffnen.'])+writer('moi')
  +tip('In der Klassenarbeit hast du keine Bausteine zum Antippen. Schreibe deinen Text deshalb auch einmal mit der Hand ins Heft – am besten ohne Hilfe!','📝'),
 ex:[
  wr('Steckbrief → Satz: <b>Name: Lucas</b>',['Je m’appelle Lucas.','Moi, c’est Lucas.','C’est moi, Lucas.','Je me présente: c’est moi, Lucas.'],'Je m’appelle Lucas.',{strict:true}),
@@ -114,7 +114,7 @@ ex:[
  wr('Übersetze: „Überall gibt es Poster.“',['Il y a des posters partout.','Partout, il y a des posters.','Partout il y a des posters.'],'Il y a des posters partout.',{strict:true,lv:3}),
 ]},
 {id:'chambre-schreiben',kind:'Schreibwerkstatt',icon:'✍️',title:'Dein Text: C’est ma chambre!',sub:'Zeichnen, beschriften, beschreiben',lv:2,
-html:steps(['<b>Zeichnen:</b> Zeichne dein Zimmer (oder dein Traumzimmer) auf Papier und beschrifte es mit <b>un / une / des</b>.','<b>Schreiben:</b> Mindestens 5–8 Sätze. Nutze <b>il y a</b> mehrmals und sag, <b>wo</b> etwas ist.','<b>Prüfen:</b> Stimmt der Artikel (m./f./Pl.)? Plural-s? Frage am Schluss?','<b>Vergleichen:</b> Erst dann die Beispiellösung öffnen.'])+writer('chambre'),
+html:steps(['<b>Zeichnen:</b> Zeichne dein Zimmer (oder dein Traumzimmer) auf Papier und beschrifte es mit <b>un / une / des</b>.','<b>Bausteine antippen:</b> Die Bausteine sind ganze Sätze – der Reihe nach ergeben sie Arjens Zimmertext. Achte auf <b>il y a</b> + un / une / des und darauf, <b>wo</b> etwas ist.','<b>Prüfen:</b> Stimmt der Artikel (m./f./Pl.)? Plural-s? Frage am Schluss?','<b>Vergleichen:</b> Erst dann die Beispiellösung öffnen.'])+writer('chambre'),
 ex:[
  gapw('Beschreibe Jades Zimmer: Schreibe den Artikel.','Il y a {0} hamac, {1} étagère et {2} posters.',[['un'],['une'],['des']],'un hamac (m.) · une étagère (f.) · des posters (Pl.).'),
  gapw('Beschreibe Jades Zimmer: Schreibe die fehlenden Wörter.','Dans {0} chambre, {1} {2} lit.',[['ma'],['il y a'],['un']],'Dans ma chambre, il y a un lit.',{strict:true,lv:3}),
@@ -153,9 +153,9 @@ H.setRun({"moi-text":3,"moi-bausteine":4,"moi-schreiben":3,"chambre-text":3,"cha
 H.setIntro({
 _lesson:{t:'Eigene Texte schreiben',
  was:'In der Arbeit schreibst du wahrscheinlich einen kurzen Text: <b>dich vorstellen</b> (C’est moi!) oder <b>dein Zimmer beschreiben</b> (C’est ma chambre!).',
- warum:'Ein guter Text hat einen klaren Aufbau, ganze Sätze und richtige Formen. Mit Bausteinen (fertigen Satzanfängen) schaffst du das sicher.',
- schritte:['<b>Sammeln:</b> Was willst du sagen? (Name, Herkunft, Klasse … oder: Möbel, Sachen, wo sie sind.)','<b>Bausteine nehmen:</b> Je m’appelle … / Je suis de … / Dans ma chambre, il y a …','<b>Schreiben:</b> ganze Sätze mit Punkt, 5–8 Sätze.','<b>Prüfen:</b> Verbformen, Artikel, Akzente, Plural-s.'],
- bsp:[['Salut! Je m’appelle Léo.','Hallo! Ich heiße Léo.'],['Je suis de Berlin.','Ich bin aus Berlin.'],['Je suis en sixième A.','Ich bin in der 6A.'],['Dans ma chambre, il y a un lit et une table.','In meinem Zimmer gibt es ein Bett und einen Tisch.'],['Il y a des posters partout.','Überall gibt es Poster.']],
+ warum:'Ein guter Text hat einen klaren Aufbau, ganze Sätze und richtige Formen. Mit den Bausteinen (fertigen Sätzen aus Arjens Mustertexten) schaffst du das sicher.',
+ schritte:['<b>Sammeln:</b> Was willst du sagen? (Name, Herkunft, Klasse … oder: Möbel, Sachen, wo sie sind.)','<b>Bausteine nehmen:</b> Je m’appelle Arjen. / Je suis en sixième D. / Dans ma chambre, il y a …','<b>Schreiben:</b> ganze Sätze mit Punkt, 5–8 Sätze.','<b>Prüfen:</b> Verbformen, Artikel, Akzente, Plural-s.'],
+ bsp:[['Salut! Je m’appelle Arjen.','Hallo! Ich heiße Arjen.'],['Je suis de Mainz.','Ich komme aus Mainz.'],['Je suis en sixième D.','Ich bin in der 6d.'],['Dans ma chambre, il y a un lit et une table.','In meinem Zimmer gibt es ein Bett und einen Tisch.'],['Il y a des posters partout.','Überall gibt es Poster.']],
  merk:'Begrüßung – Infos in ganzen Sätzen – Schluss. Danach alles prüfen!',
  fallen:['<b>Je suis de Berlin</b> – nicht „von“.','<b>il est</b> (ist) – nicht „il et“ (und).','<b>j’écoute</b> – nicht „je écoute“.','Mit „… et moi“: <b>nous sommes</b> (oder on est).','<b>il y a un / une / des</b> – nicht le / la.'],
  check:['Bausteine auswählen.','Sätze schreiben.','Checkliste abhaken: Formen, Artikel, Akzente.']},
@@ -173,10 +173,10 @@ _lesson:{t:'Eigene Texte schreiben',
  merk:'je m’appelle (zwei p, zwei l) · je suis de … · … et moi, nous sommes / on est …',
  fallen:['<b>je m’appelle</b>: Apostroph und zwei l – nicht „je mapelle“.','<b>Jade et moi, nous sommes</b> – nicht „nous sont“.'],
  check:['Baustein wählen.','Lücke füllen.','Form prüfen.']},
-'moi-schreiben':{rule:"Nimm die Bausteine (Je m’appelle …, Je suis de …, Je suis en sixième …) und schreib ganze Sätze mit Punkt.",t:'Dein Text: C’est moi!',
- was:'Jetzt schreibst du deinen eigenen Text über dich. Nutze die Bausteine und die Checkliste.',
+'moi-schreiben':{rule:"Tippe die Bausteine der Reihe nach an – das ist Arjens kompletter Text (Je m’appelle Arjen. … Je suis en sixième D. …). Dann übe ihn, bis du ihn ohne Hilfe schreiben kannst.",t:'Dein Text: C’est moi!',
+ was:'Jetzt schreibst du deinen Text über dich. Die Bausteine sind ganze Sätze – zusammen ergeben sie Arjens Mustertext für die 6d.',
  schritte:['Sammle Stichpunkte (Name, woher, Klasse, Lehrer/in, Freund/in, zu Hause).','Schreib mit den Bausteinen ganze Sätze.','Prüfe mit der Checkliste.','Vergleiche erst danach mit dem Mustertext.'],
- bsp:[['Bonjour! Je m’appelle Noah.','Guten Tag! Ich heiße Noah.'],['Je suis élève en sixième.','Ich bin Schüler in der 6. Klasse.'],['À la maison, je regarde des photos.','Zu Hause schaue ich Fotos an.']],
+ bsp:[['Salut! Je m’appelle Arjen.','Hallo! Ich heiße Arjen.'],['Je suis en sixième D.','Ich bin in der 6d.'],['Noah et moi, nous sommes ensemble dans la classe.','Noah und ich sind zusammen in der Klasse.']],
  merk:'Lieber kurze, richtige Sätze als lange mit Fehlern.',
  fallen:['Nach je kommt -e (je regard<b>e</b>), nach nous -ons.','Am Satzende Punkt.'],
  check:['Sammeln.','Schreiben.','Prüfen.']},
@@ -195,9 +195,9 @@ _lesson:{t:'Eigene Texte schreiben',
  fallen:['<i>Dans ma chambre, il y a <b>une</b> armoire</i> – nicht „un armoire“.'],
  check:['Baustein wählen.','Artikel prüfen.','Satz fertig schreiben.']},
 'chambre-schreiben':{rule:"Il y a + un / une / des – und jedes Nomen mit dem richtigen Artikel und Plural-s.",t:'Dein Text: C’est ma chambre!',
- was:'Jetzt beschreibst du dein eigenes Zimmer (oder dein Traumzimmer).',
+ was:'Jetzt beschreibst du dein Zimmer. Die Bausteine sind ganze Sätze – zusammen ergeben sie Arjens Mustertext.',
  schritte:['Zeichne dein Zimmer und beschrifte es mit un / une / des.','Schreib 5–8 Sätze mit il y a und sag, wo etwas ist.','Prüfe Artikel, Plural-s und Akzente.'],
- bsp:[['Voilà ma chambre!','Das ist mein Zimmer!'],['Il y a un ordinateur et une guitare.','Es gibt einen Computer und eine Gitarre.'],['Dans le coin, il y a une étagère.','In der Ecke gibt es ein Regal.']],
+ bsp:[['Salut! C’est Arjen. Voilà ma chambre!','Hallo! Hier ist Arjen. Das ist mein Zimmer!'],['Et voilà ma collection de B.D.!','Und hier ist meine Comic-Sammlung!'],['Il y a des posters partout.','Überall gibt es Poster.']],
  merk:'il y a mehrmals benutzen – und jedes Nomen mit dem richtigen Artikel.',
  fallen:['Plural: des livre<b>s</b>, des photo<b>s</b>.'],
  check:['Zeichnen.','Schreiben.','Prüfen.']},
@@ -212,6 +212,8 @@ fehler:{rule:"Text prüfen: Passt die Verbform zur Person? Stimmt der Artikel? A
 (function(){const W=window,V=window.V;
 /* Bildliche Erklärungen (feste Vorlage) – Texte */
 const SK_MOI=[['👋','Begrüßung','Salut!'],['🙋','Name','Je m’appelle …'],['🏙️','Woher?','Je suis de …'],['🏫','Klasse','Je suis en sixième A.'],['👫','Freunde','… et moi, nous sommes …'],['🏠','Zu Hause','À la maison, j’écoute …'],['👋','Schluss','Salut!']];
+const SK_MOI_A=[['👋','Begrüßung','Salut! Je m’appelle Arjen.'],['🏙️','Woher?','Je suis de Mainz.'],['🏫','Klasse','Je suis en sixième D.'],['👨‍🏫','Lehrer','Le professeur de français, c’est Monsieur Martel.'],['👫','Freund','Noah et moi, nous sommes ensemble dans la classe.'],['🏠','Zu Hause','À la maison, je regarde des B.D.'],['👋','Schluss','Et toi? Tu t’appelles comment? Au revoir!']];
+const SK_CH_A=[['🚪','Einleitung','Salut! C’est Arjen. Voilà ma chambre!'],['🛏️','Was gibt es?','Il y a un lit, une armoire et une étagère.'],['📍','Wo?','Là, dans le coin, il y a une table …'],['📚','Sammlung','Et voilà ma collection de B.D.!'],['❓','Schluss','Et toi? Qu’est-ce qu’il y a dans ta chambre?']];
 const SK_CH=[['🚪','Einleitung','Voilà ma chambre!'],['🛏️','Was gibt es?','Il y a un lit, une …'],['📍','Wo?','Dans le coin, il y a …'],['⭐','Lieblingssache','Le hamac est super!']];
 H.patchIntro({
 _lesson:{vis:V.skel(SK_MOI.slice(0,4))+V.skel(SK_CH.slice(0,3)),
@@ -230,10 +232,10 @@ _lesson:{vis:V.skel(SK_MOI.slice(0,4))+V.skel(SK_CH.slice(0,3)),
  warum:'So sind die Sätze automatisch richtig gebaut.',
  schritte:[[V.b('Je m’appelle','v'),'Name'],[V.b('Je suis de','v'),'Herkunft'],[V.b('… et moi, nous sommes','v'),'Freunde']],
  fallen:[['je mapelle Clara','Je m’appelle Clara.','m’ + pp + ll.'],['Jade et moi, nous sont amis.','Jade et moi, nous sommes amis.','nous → <b>sommes</b>.']]},
-'moi-schreiben':{vis:V.skel(SK_MOI),
- was:'Jetzt dein eigener Text über dich.',
+'moi-schreiben':{vis:V.skel(SK_MOI_A),
+ was:'Die Bausteine sind ganze Sätze – zusammen ergeben sie Arjens Text (6d).',
  warum:'Lieber kurze, richtige Sätze als lange mit Fehlern.',
- schritte:[['<span class="big-ic">📝</span>','Stichpunkte sammeln'],['<span class="big-ic">🧱</span>','mit Bausteinen ganze Sätze'],['<span class="big-ic">✅</span>','Checkliste – dann Mustertext vergleichen']],
+ schritte:[['<span class="big-ic">📝</span>','Stichpunkte sammeln'],['<span class="big-ic">🧱</span>','Bausteine der Reihe nach antippen'],['<span class="big-ic">✅</span>','Checkliste – dann Mustertext vergleichen']],
  fallen:[['Je regardes des photos.','Je regarde des photos.','je → <b>-e</b>.']]},
 'chambre-text':{vis:(W.ROOMS&&W.ROOMS.jade?W.ROOMS.jade.svg:'')+V.skel(SK_CH),
  was:'Jade beschreibt ihr Zimmer: was es gibt und wo.',
@@ -245,10 +247,10 @@ _lesson:{vis:V.skel(SK_MOI.slice(0,4))+V.skel(SK_CH.slice(0,3)),
  warum:'Einleitung – was gibt es – wo – was ist super.',
  schritte:[[V.b('Dans ma chambre, il y a','v'),'Was gibt es?'],[V.b('Dans le coin,','x'),'Wo?'],[V.b('… est super!','v'),'Bewertung']],
  fallen:[['Dans ma chambre, il y a la table.','Dans ma chambre, il y a une table.','nach il y a → <b>une</b>.']]},
-'chambre-schreiben':{vis:V.skel(SK_CH),
- was:'Jetzt beschreibst du dein eigenes Zimmer.',
+'chambre-schreiben':{vis:V.skel(SK_CH_A),
+ was:'Die Bausteine sind ganze Sätze – zusammen ergeben sie Arjens Zimmertext.',
  warum:'Der gleiche Bauplan – nur deine Sachen.',
- schritte:[['<span class="big-ic">🛏️</span>','Sachen sammeln (mit un / une / des)'],['<span class="big-ic">🧱</span>','Bausteine'],['<span class="big-ic">✅</span>','prüfen']],
+ schritte:[['<span class="big-ic">🛏️</span>','Sachen sammeln (mit un / une / des)'],['<span class="big-ic">🧱</span>','Bausteine der Reihe nach antippen'],['<span class="big-ic">✅</span>','prüfen']],
  fallen:[['Il y a un lampe.','Il y a une lampe.','lampe ist weiblich.']]},
 fehler:{vis:V.vs('Il/s|et/v|de Berlin./r','Il/s|est/v|de Berlin./r'),
  was:'Finde typische Text-Fehler.',
