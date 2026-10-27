@@ -14,7 +14,7 @@ function lesson(m){const p=raw(m);let done=0,started=0;
  const t=p.test||{};
  return {done,started,total:m.chapters.length,pct:Math.round(done/Math.max(1,m.chapters.length)*100),test:t.best!=null?t.best:null,stars:t.stars||0,
   xs:(m.extras||[]).map(x=>Object.assign({id:x.id,title:x.title,nh:!!x.nh,take:x.take},chStatus(p,x.id)))};}
-function nh(LS){const out=[];(LS||[]).forEach((m,i)=>{const p=raw(m);(m.extras||[]).filter(x=>x.nh).forEach(x=>out.push(Object.assign({slug:m.slug,lesson:m.title,icon:m.icon,color:m.color,n:i+1,id:x.id,title:x.title,take:x.take,href:m.slug+'/#k='+x.id},chStatus(p,x.id))));});return out;}
+function nh(LS){const out=[];(LS||[]).forEach((m,i)=>{const p=raw(m);(m.extras||[]).filter(x=>x.nh).forEach(x=>out.push(Object.assign({slug:m.slug,lesson:m.title,icon:m.icon,color:m.color,n:i+1,id:x.id,title:x.title,take:x.take,lbl:x.lbl,href:m.slug+'/#k='+x.id},chStatus(p,x.id))));});return out;}
 function subject(LS){let done=0,total=0,any=false;(LS||[]).forEach(m=>{const l=lesson(m);done+=l.done;total+=l.total;if(l.started||l.test!=null)any=true;});
  const n=nh(LS);return {done,total,pct:Math.round(done/Math.max(1,total)*100),any,nhOpen:n.filter(x=>x.key!=='fertig').length,nh:n};}
 window.PROG={lesson,nh,subject,ST};

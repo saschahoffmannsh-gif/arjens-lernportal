@@ -27,6 +27,48 @@ const ART=['le','la','l’','les'];
 const TAB=`<table class="gtab"><tr><th class="h"></th><th class="m">♂ männlich</th><th class="f">♀ weiblich</th><th class="p">Plural</th></tr>
  <tr><td class="rl">vor Konsonant</td><td><span class="big c-m">le</span>${G('le','lit','m')}</td><td><span class="big c-f">la</span>${G('la','chaise','f')}</td><td><span class="big c-p">les</span>${G('les','lits','p')}</td></tr>
  <tr><td class="rl">vor Vokal</td><td><span class="big c-m">l’</span>${G('l’','ordinateur','m')}</td><td><span class="big c-f">l’</span>${G('l’','armoire','f')}</td><td><span class="big c-p">les</span>${G('les‿','armoires','p')}</td></tr></table>`;
+/* Nachholbedarf: Geschlecht der Nomen – alle Nomen der Vokabelliste bis „le globe“ (Unité 1 Volet 1 – Unité 2 Volet 1) */
+const GN=(()=>{const O=k=>ob(k),E=t=>`<span class="gl-em">${t}</span>`;
+ // [Wort, Geschlecht, Deutsch, Bild, Extras]  dt = deutscher Artikel (für die Begründung), warn = Arjens Stolperstein
+ const n=(w,g,de,ic,x={})=>Object.assign({w,g,de,ic},x);
+ const M=[n('français','m','Französisch (Fach)',E('🇫🇷'),{dt:''}),n('garçon','m','der Junge',E('👦')),n('crayon de couleur','m','der Buntstift',O('crayoncouleur')),n('crayon','m','der Bleistift',O('crayon')),
+  n('stylo','m','der Kugelschreiber',O('stylo')),n('cahier','m','das Heft',O('cahier'),{warn:1}),n('papier','m','das Papier',O('papier')),n('classeur','m','der Ordner',O('classeur')),
+  n('livre','m','das Buch',O('livre')),n('lit','m','das Bett',O('lit')),n('poster','m','das Poster',O('poster')),n('coin musique','m','die Musikecke',E('🎸🎶')),n('coin','m','die Ecke',E('📐')),
+  n('CD','m','die CD',O('cd'),{pl:'les CD'}),n('hamac','m','die Hängematte',O('hamac'),{alt:'trotz h: le, nicht l’',why:'<b>le hamac</b> – trotz h kein l’. Das Wort ist <b>männlich</b>: le hamac.'}),n('globe','m','der Globus',O('globe'))];
+ const F=[n('classe','f','die Klasse',E('🏫')),n('sixième','f','die 6. Klasse',E('6️⃣')),n('récréation','f','die Pause',E('🔔'),{warn:1}),n('cour','f','der Schulhof',E('⛹️')),
+  n('cinquième','f','die 7. Klasse',E('7️⃣')),n('fille','f','das Mädchen',E('👧')),n('règle','f','das Lineal',O('regle')),n('maison','f','das Haus',O('maison')),n('lampe','f','die Lampe',O('lampe')),
+  n('minichaîne','f','die Mini-Stereoanlage',O('minichaine')),n('chaise','f','der Stuhl',O('chaise')),n('chambre','f','das Zimmer',E('🛏️')),n('photo','f','das Foto',O('photo')),n('musique','f','die Musik',E('🎵')),
+  n('guitare','f','die Gitarre',O('guitare'),{warn:1}),n('table','f','der Tisch',O('table')),n('B.D.','f','der Comic',O('bd'),{pl:'les B.D.',alt:'auch: la bédé'}),n('collection','f','die Sammlung',E('🗂️')),
+  n('figurine','f','die Figur',O('figurine')),n('géo','f','Erdkunde',E('🌍'),{dt:'',alt:'= la géographie'}),n('pierre','f','der Stein',O('pierre'))];
+ const L=[n('école','f','die Schule',E('🏫')),n('effaceur','m','der Tintenkiller',O('effaceur')),n('armoire','f','der Schrank',O('armoire')),n('étagère','f','das Regal',O('etagere')),n('ordinateur','m','der Computer',O('ordinateur'))].map(x=>Object.assign(x,{k:'mf'}));
+ const P=[n('professeur','m','der Lehrer',E('👨‍🏫'),{ctx:'Monsieur Martel',why:'Monsieur Martel ist ein Mann → <b>le professeur</b>. Bei einer Frau: <b>la professeur</b>.'}),
+  n('professeur','f','die Lehrerin',E('👩‍🏫'),{ctx:'Madame Fournier',why:'Madame Fournier ist eine Frau → <b>la professeur</b>. Bei einem Mann: <b>le professeur</b>.'}),
+  n('surveillant','m','die Aufsicht (Mann)',E('🧍‍♂️'),{why:'surveillant <b>ohne -e</b> → männlich: <b>le surveillant</b>.'}),
+  n('surveillante','f','die Aufsicht (Frau)',E('🧍‍♀️'),{why:'surveillant<b>e</b> mit <b>-e</b> am Ende → weiblich: <b>la surveillante</b>.'}),
+  n('élève','m','der Schüler',E('👦'),{k:'mf',ctx:'Théo',why:'<b>l’élève</b> passt für Jungen und Mädchen. Hier ist es Théo, ein Junge → <b>m.</b>'}),
+  n('élève','f','die Schülerin',E('👧'),{k:'mf',ctx:'Clara',why:'<b>l’élève</b> passt für Jungen und Mädchen. Hier ist es Clara, ein Mädchen → <b>f.</b>'}),
+  n('ami','m','der Freund',E('👦'),{k:'mf',why:'<b>l’ami</b> ohne -e = der Freund → <b>m.</b> Die Freundin ist l’ami<b>e</b>.'}),
+  n('amie','f','die Freundin',E('👧'),{k:'mf',why:'l’ami<b>e</b> mit <b>-e</b> = die Freundin → <b>f.</b>'})].map(x=>Object.assign(x,{per:1}));
+ const AR={m:'le',f:'la'},GW={m:'männlich',f:'weiblich'},DT={der:'m',die:'f',das:'n'};
+ [...M,...F,...L,...P].forEach(x=>{x.k=x.k||'art';x.say=x.k==='mf'?'l’'+x.w:AR[x.g]+' '+x.w;
+  if(x.why)return;const d=x.dt!=null?x.dt:x.de.split(' ')[0],dg=DT[d];const W=x.k==='mf'?`<b>l’${x.w}</b> (${x.g}.)`:`<b>${x.say}</b>`;
+  let w=x.k==='mf'?`Bei <b>l’</b> hörst und siehst du das Geschlecht nicht – du musst es mitlernen: ${W} ist ${GW[x.g]}.`:`${x.w} ist ${GW[x.g]} → ${W}.`;
+  if(dg&&dg!==x.g)w+=` Deutsch hilft nicht: „<b>${x.de}</b>“${dg==='n'?' – im Französischen gibt es kein „das“':''}.`;else if(dg)w+=` Wie im Deutschen: ${x.de}.`;
+  if(x.warn)w=`⚠️ Dein Stolperstein! `+w;x.why=w;});
+ return {M,F,L,P,ALL:[...M,...F,...L,...P]};})();
+const glRow=x=>`<div class="gl-r g-${x.g}${x.warn?' warn':''}" data-g="${x.g}"><span class="gl-ic">${x.ic}</span><span class="gl-b"><span class="gl-fr">${x.k==='mf'?`<b class="gl-ap">l’</b>${x.w} <i class="gl-mf">${x.g}.</i>`:`<b class="gl-a">${x.say.split(' ')[0]}</b> ${x.w}`}</span><span class="gl-de">${x.ctx?x.ctx+' · ':''}${x.de}${x.pl?` · Plural: ${x.pl}`:''}${x.alt?` · ${x.alt}`:''}</span>${x.warn?'<span class="gl-warn">⚠️ Stolperstein</span>':''}</span>${spk(x.say,'','mini')}</div>`;
+const GL_HTML=`<div class="genlist" id="lernliste">
+ <div class="gl-bar"><button type="button" class="btn small gl-cover">🙈 Abdecken &amp; selbst testen</button><span class="gl-hint">Alle ${GN.ALL.length} Wörter bis „le globe“ · 🔊 = anhören</span></div>
+ <div class="gl-mixhint" hidden>Die Artikel sind verdeckt. Sag laut: <b>le</b> oder <b>la</b> (bei l’: m. oder f.)? Dann tippe auf das Wort zum Aufdecken.</div>
+ <div class="gl-cols">
+  <section class="gl-g gl-m"><h3 class="gl-h"><span class="gl-big">le</span><span>männlich ♂<small>${GN.M.length} Wörter</small></span></h3>${GN.M.map(glRow).join('')}</section>
+  <section class="gl-g gl-f"><h3 class="gl-h"><span class="gl-big">la</span><span>weiblich ♀<small>${GN.F.length} Wörter</small></span></h3>${GN.F.map(glRow).join('')}</section>
+ </div>
+ <section class="gl-g gl-l"><h3 class="gl-h"><span class="gl-big">l’</span><span>Geschlecht mitlernen!<small>${GN.L.length} Wörter · <i class="gl-mf m">m.</i> = männlich, <i class="gl-mf f">f.</i> = weiblich</small></span></h3>${GN.L.map(glRow).join('')}</section>
+ <section class="gl-g gl-p"><h3 class="gl-h"><span class="gl-big">👥</span><span>Personen: beide Formen<small>Mann/Junge → männlich · Frau/Mädchen → weiblich · weibliche Form oft mit <b>-e</b>: l’ami → l’ami<b>e</b></small></span></h3>${GN.P.map(glRow).join('')}</section>
+ <div class="gl-mix" hidden></div>
+</div>`;
+const GL_AFTER=`<div class="gl-after"><div><b>🎮 Danach: Spiel zum Festigen</b><span>Im Vokabel-Memory findest du Bild und Wort und tippst dann le / la / l’.</span></div><a class="btn" href="../training/#spiel-memory">🃏 Vokabel-Memory</a><a class="btn ghost" href="../training/#spiel-artikel">🧺 Artikel-Sortierer</a></div>`;
 window.CHAPTERS=[
 /* 1 */
 {id:'entdecken',kind:'Einstieg',icon:'🔎',title:'Entdecken: Voilà ma chambre!',sub:'Théo zeigt Clara sein Zimmer – le, la, l’ oder les?',lv:1,
@@ -150,6 +192,11 @@ ex:[
  wr('Verbessere: «la ordinateur»',['l’ordinateur'],'Vor Vokal → l’ordinateur.'),
  wr('Verbessere: «les élève»',['les élèves'],'Im Plural mit -s: les élèves.'),
 ]},
+{id:'geschlecht',kind:'Nachholbedarf',nh:true,extra:true,icon:'⚖️',title:'Nachholbedarf: Geschlecht der Nomen (le / la)',sub:'Alle Nomen bis „le globe“: erst die Lernliste, dann bei jedem Wort le / la (bei l’: m. / f.) tippen',lv:1,c:'#f97316',
+ lbl:GN.ALL.length+' Wörter: le / la?',openHtml:true,matTitle:'📋 Lernliste: le (blau) · la (rot) · l’ (m./f.)',introEnd:{label:'📋 Zur Lernliste',act:'#lernliste'},after:GL_AFTER,
+ html:GL_HTML,
+ ex:[{type:'genus',q:'Männlich oder weiblich? Tippe bei jedem Nomen auf <b class="c-m">le</b> oder <b class="c-f">la</b> – bei l’-Wörtern auf <b class="c-m">m.</b> oder <b class="c-f">f.</b>',items:GN.ALL,lv:1,must:true,
+  why:'Für die Punkte zählt dein erster Versuch bei jedem Wort. Die falschen Wörter stehen oben – lies sie in der Lernliste noch einmal nach und spiel danach das Vokabel-Memory.'}]},
 ];
 window.TEST_EX=[
  gapw('Setze den bestimmten Artikel ein (le, la, l’, les).','1. {0} chaise 2. {1} lit 3. {2} armoire 4. {3} posters 5. {4} garçon 6. {5} école 7. {6} hamac 8. {7} B.D. (Plural)',[['la'],['le'],['l’',"l'"],['les'],['le'],['l’',"l'"],['le'],['les']],'la chaise · le lit · l’armoire · les posters · le garçon · l’école · le hamac · les B.D.',{ref:'regel',tag:'Artikel einsetzen',say:false}),
@@ -159,7 +206,7 @@ window.TEST_EX=[
  det('Fehlerdetektiv: Finde die 4 Fehler.','Voilà [le|la] classe de sixième A. [Le|Les] élèves sont dans la cour. [La|L’] étagère est dans [la|le] coin.','la classe · Les élèves · L’étagère · le coin.',{ref:'fehler',tag:'Fehler finden'}),
 ];
 /* Pro Durchgang: so viele Aufgaben je Kapitel (Rest = Reserve-Pool); Pflichtaufgaben zu den Heftfehlern */
-H.setRun({entdecken:2,regel:3,plural:2,szenen:2,leicht:4,mittel:4,schwer:4,fehler:3},{fehler:[0],test:[4]});
+H.setRun({entdecken:2,regel:3,plural:2,szenen:2,leicht:4,mittel:4,schwer:4,fehler:3,geschlecht:1},{fehler:[0],test:[4]});
 /* INTRO */
 H.setIntro({
 _lesson:{t:'Der bestimmte Artikel: le, la, l’, les',
@@ -226,7 +273,12 @@ fehler:{rule:"Plural → les. Vokal am Anfang → l’. Sonst männlich → le, 
  bsp:[['la chambre','nicht: <s>le chambre</s> – chambre ist weiblich'],['le lit','nicht: <s>la lit</s> – lit ist männlich'],['l’école','nicht: <s>le école</s> – Vokal → l’'],['les posters','nicht: <s>les poster</s> – Plural-s']],
  merk:'Bei jedem Nomen: Geschlecht? Vokal? Plural?',
  fallen:['le hamac – hier ist l’ falsch.'],
- check:['Lesen.','Prüfen.','Antippen.']}
+ check:['Lesen.','Prüfen.','Antippen.']},
+geschlecht:{t:'Geschlecht der Nomen',rule:'Blau = le (männlich) · Rot = la (weiblich) · bei l’ das Geschlecht mitlernen',
+ vis:`<div class="gi-vis"><span class="gi-c g-m">${ob('lit')}<span><b>le</b> lit</span><small>♂ männlich</small></span><span class="gi-c g-f">${ob('chaise')}<span><b>la</b> chaise</span><small>♀ weiblich</small></span></div>`,
+ was:'Jedes Nomen hat ein Geschlecht. <b class="c-m">Blau = le</b> (männlich), <b class="c-f">Rot = la</b> (weiblich). Lerne das Wort <b>immer mit Artikel</b>.',
+ merk:'Bei <b>l’</b> siehst du das Geschlecht nicht: <b>l’armoire</b> <i class="gl-mf f">f.</i>, <b>l’ordinateur</b> <i class="gl-mf m">m.</i> – das musst du mitlernen.',
+ fallen:[['le chaise','la chaise','Deutsch hilft nicht: „<b>der</b> Stuhl“, aber <b>la chaise</b>.']]}
 });
 (function(){const W=window,V=window.V;
 /* Bildliche Erklärungen (feste Vorlage) – le, la, l’, les */
