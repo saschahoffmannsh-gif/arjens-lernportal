@@ -1086,3 +1086,12 @@ a.ft2:active{transform:scale(.97)}
 .pp-zl li .pq{display:block;line-height:1.45;margin:0 0 2px}.pp-zl li .xin{display:block;width:100%!important;margin-top:2px}
 .pp-kbleg{margin:8px 0}.pp-dlg{margin:6px 0 4px}.pp-dl{line-height:2.15;margin:4px 0}.pp-dl .xin{vertical-align:baseline}
 .pp-sg li{line-height:1.9}.pp-sg li .xin{min-width:9em}
+/* Wortkasten (Nachholbedarf Lückentext & Wortpaare) */
+.wk-bank{gap:6px 6px}.wk-w{font:inherit;font-size:.98rem;color:var(--navy);cursor:pointer;min-height:36px;line-height:1.2}
+button.wk-w:active{transform:scale(.96)}.wk-w.used{text-decoration:line-through;text-decoration-thickness:2px;color:#94a3b8;background:#f1f5f9;border-color:#cbd5e1}
+.wk-w.used::after{content:' ✓';color:#16a34a;text-decoration:none;display:inline-block;margin-left:2px}
+.wk-bank.nomark .wk-w{cursor:default}
+.wk-text{line-height:2.35}.wk-in{cursor:pointer;caret-color:transparent}.wk-in:not([readonly]){caret-color:auto;cursor:text}
+.wk-in.act{border-bottom-color:#f59e0b;background:#fef3c7;box-shadow:0 0 0 2px #fde68a}
+.wk-pairs{display:grid;grid-template-columns:1fr auto 1fr;gap:4px 6px;align-items:center;margin:4px 0}.wk-pairs .ar{color:#94a3b8;font-weight:800}
+.wk-scale{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:4px 0}.wk-scale span{background:#fff;border:2px solid #e2e8f0;border-radius:12px;padding:4px 8px;font-weight:800;text-align:center}.wk-scale small{display:block;font-weight:600;color:var(--muted);font-size:.75rem}

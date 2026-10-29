@@ -175,7 +175,7 @@ function storyCards(x,h,u,compact,noMerk){const C=[];const add=(k,body)=>C.push(
 V.story=(x,o={})=>{if(!x)return '';const P=x.parts||[],multi=P.length>0;
  // mehrere Teile: Überblick (Teil 1) kompakt; ohne eigene Schritte/Beispiele wandert der Merksatz als Zusammenfassung ans Ende
  const overview=multi&&!(x.schritte||[]).length&&!(x.bsp||[]).length;
- let C=storyCards(x,o.h||(multi&&!overview?'Grundregel':''),0,multi,overview);if(multi&&!overview&&C.length)C[0].pn=1;P.forEach((p,i)=>{const pc=storyCards(p,p.h||('Teil '+(i+2)),i+1,true);if(pc.length)pc[0].pn=overview?i+1:i+2;C=C.concat(pc);});
+ let C=storyCards(x,o.h||x.h||(multi&&!overview?'Grundregel':''),0,multi,overview);if(multi&&!overview&&C.length)C[0].pn=1;P.forEach((p,i)=>{const pc=storyCards(p,p.h||('Teil '+(i+2)),i+1,true);if(pc.length)pc[0].pn=overview?i+1:i+2;C=C.concat(pc);});
  if(overview&&x.merk||x.ende){const u=C.length?C[C.length-1].u+1:0;C.push({k:overview&&x.merk?'merk':'ende',u,h:overview&&x.merk?'Zusammenfassung':'',body:(overview&&x.merk?`<div class="sc-note">${x.merk}</div>`:'')+(x.ende?`<p class="sc-t sc-ende">💡 ${x.ende}</p>`:'')});}
  if(!C.length)return '';const N=C.length,U=new Set(C.map(c=>c.u)).size;
  const end=o.end?`<button type="button" class="btn green sy-end" data-syend="${o.end.act||''}">${o.end.label}</button>`:'';

@@ -196,6 +196,7 @@ X.seg=(q,opts,rows,why,x={})=>Object.assign({type:'seg',q,opts,rows,why},x);
 X.tf=(q,rows,why,x={})=>Object.assign({type:'seg',tf:true,q,opts:['vrai','faux'],rows:rows.map(r=>[r[0],r[1]?'vrai':'faux',r[2]])},{why},x);
 X.det=(q,text,why,x={})=>Object.assign({type:'detect',q,text,why},x);
 /* Zeile für Zeile nach deutschen Vorgaben (wie in der Klassenarbeit): lines=[{de,sol:[…],core:[[Label,/re/]],errs:[[/re/,Tipp]],max}] */
+X.wk=(q,text,ans,bank,why,x={})=>Object.assign({type:'wk',q,text,ans,bank,why},x);
 X.zl=(q,lines,why,x={})=>Object.assign({type:'lines',q,lines,why},x);
 W.X=X;
 })(window);

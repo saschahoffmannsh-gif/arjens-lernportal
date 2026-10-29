@@ -28,7 +28,7 @@ CHAPTERS.forEach((c,i)=>{c.idx=i;c.c=c.c||L.color;CHMAP[c.id]=c;c.num=c.extra?RE
 TEST_EX.forEach((e,j)=>{e.ch='test';e.id='test-'+j;e.lv=e.lv||3;});
 CHMAP.test={id:'test',title:'Abschlusstest',c:'#c8102e',icon:'🏆'};
 const ALLEX=CHAPTERS.flatMap(c=>c.ex).concat(TEST_EX);
-const TYPE={lines:['Zeile für Zeile schreiben','📝'],mc:['Multiple Choice','🔘'],genus:['Geschlechter-Check','⚖️'],pick:['Bild wählen','🖼️'],gap:['Lückentext','✏️'],gapw:['Lücken schreiben','⌨️'],order:['Satzpuzzle','🧩'],write:['Schreiben','⌨️'],
+const TYPE={wk:['Wortkasten','🧺'],lines:['Zeile für Zeile schreiben','📝'],mc:['Multiple Choice','🔘'],genus:['Geschlechter-Check','⚖️'],pick:['Bild wählen','🖼️'],gap:['Lückentext','✏️'],gapw:['Lücken schreiben','⌨️'],order:['Satzpuzzle','🧩'],write:['Schreiben','⌨️'],
  match:['Zuordnen','🔗'],dialog:['Mini-Dialog','💬'],click:['Bild-Aufgabe','👆'],mark:['Bild markieren','🖍️'],multi:['Mehrfachauswahl','☑️'],seg:['Auswählen','🎯'],detect:['Fehlerdetektiv','🔍']};
 const RA=e=>!!((e&&e._L)||L).readAu;
 const HUB=window.HUB||null;
@@ -345,6 +345,34 @@ RENDER.gapw=(e,el)=>{const KB=['','Pronomen','Artikel','Info'];
  return {check(){if(!ins.every(i=>i.value.trim()))return null;let n=0;const accs=[];
   const pairs=[],vals={};ins.forEach(i=>{const A=[].concat(e.ans[+i.dataset.g]);const r=compare(i.value,A);if(r.acc&&e.strict)r.ok=false;vals[i.dataset.g]=[i.value,r.ok];i.classList.add(r.ok?'ok':'bad');if(r.ok)n++;else pairs.push([i.value,r.acc||A[0],gapCtx(i)]);if(r.acc)accs.push(r.acc);i.disabled=true;});$$('.acc button',el).forEach(b=>b.disabled=true);
   return {ok:n===ins.length,pts:n,max:ins.length,acc:accs.join(' · '),sol:solT,pairs,given:givenFill(e.text,vals),showSol:accs.length>0,say:sayOf(e,strip(solT))};}};};
+/* Wortkasten-Lückentext (wie Cornelsen-Leistungsmessung): Wörter antippen → Lücke; benutzte Wörter werden abgehakt (e.mark), e.tap=false: selbst schreiben.
+   e.ans[k] = erlaubte Wörter, e.bank = Wortkasten (mit übrigen Wörtern), e.distinct = Lücken-Gruppen, die verschiedene Wörter brauchen, e.tip[k] = Begründung je Lücke, e.xtip[wort] = Falle (übrige Wörter) */
+RENDER.wk=(e,el)=>{const tap=e.tap!==false,mark=e.mark!==false;const K=w=>norm(strip(w),false);
+ const bank=e.order===false?shuffle(e.bank.slice()):e.bank.slice();
+ el.innerHTML=`<div class="ex-sub">${e.sub||(tap?'Tippe eine Lücke an und dann das passende Wort im Wortkasten. Benutzte Wörter werden abgehakt – <b>'+(e.bank.length-Object.keys(e.ans).length)+' Wörter bleiben übrig</b>. Nochmal auf eine Lücke tippen macht sie leer.':'Schreibe die Wörter selbst in die Lücken. Im Wortkasten wird <b>nichts</b> abgehakt – <b>'+(e.bank.length-Object.keys(e.ans).length)+' Wörter bleiben übrig</b>.')}</div>
+ <div class="kb-bank wk-bank${mark?'':' nomark'}"><span class="lbl">🧺 Wortkasten:</span> ${bank.map(w=>tap?`<button type="button" class="kb-w wk-w" data-w="${esc(w)}">${w}</button>`:`<span class="kb-w wk-w" data-w="${esc(w)}">${w}</span>`).join('')}</div>
+ <div class="gaptext wk-text">${e.text.replace(/\{(\d+)\}/g,(m,k)=>{const len=Math.max(...bank.map(x=>strip(x).length).filter(x=>x<14),6);return `<input class="gapin wk-in" data-g="${k}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Lücke ${+k+1}"${tap?' readonly inputmode="none"':''} style="width:${Math.min(9.5,Math.max(4.5,len*0.62+1.2))}em">`;})}</div>
+ ${tap?'':`<div class="acc">${['é','è','ê','à','ç','’'].map(c=>`<button type="button" data-c="${c}">${c}</button>`).join('')}</div>`}`;
+ const ins=$$('.wk-in',el),chips=$$('.wk-w',el);let act=null;
+ const paint=()=>{if(mark){const used={};ins.forEach(i=>{const v=K(i.value);if(v)used[v]=(used[v]||0)+1;});const seen={};chips.forEach(c=>{const v=K(c.dataset.w);seen[v]=(seen[v]||0)+1;c.classList.toggle('used',(used[v]||0)>=seen[v]);if(c.tagName==='BUTTON')c.disabled=c.classList.contains('used')||ins[0].disabled;});}
+  ins.forEach(i=>i.classList.toggle('act',i===act));ready(ins.every(i=>i.value.trim().length>0));};
+ const nextEmpty=from=>{const k=ins.indexOf(from);return ins.slice(k+1).concat(ins.slice(0,k+1)).find(i=>!i.value.trim())||null;};
+ if(tap){act=ins[0];
+  ins.forEach(i=>i.addEventListener('click',()=>{if(i.disabled)return;if(i.value.trim()&&act===i){i.value='';}act=i;paint();}));
+  chips.forEach(c=>c.onclick=()=>{if(c.disabled)return;const t=act&&!act.value.trim()?act:(act||nextEmpty(ins[ins.length-1]));if(!t){toast('Alle Lücken sind voll. Tippe eine Lücke an, um sie zu leeren.');return;}t.value=strip(c.dataset.w);act=nextEmpty(t)||t;paint();});}
+ else{let lastI=ins[0];ins.forEach(i=>{i.addEventListener('input',paint);i.addEventListener('focus',()=>{lastI=i;act=i;paint();});i.addEventListener('keydown',ev=>{if(ev.key==='Enter'){const k=ins.indexOf(i);if(k<ins.length-1)ins[k+1].focus();else{const cb=$('#checkBtn');if(cb&&!cb.disabled)cb.click();}}});});
+  $$('.acc button',el).forEach(b=>b.onclick=()=>{const i=lastI;const s=i.selectionStart??i.value.length,t=i.selectionEnd??s;i.value=i.value.slice(0,s)+b.dataset.c+i.value.slice(t);i.focus();i.setSelectionRange(s+1,s+1);paint();});}
+ ins.forEach(i=>i.addEventListener('input',paint));paint();
+ const solT=e.text.replace(/\{(\d+)\}( ?)/g,(m,k,sp)=>{const a=[].concat(e.ans[+k])[0];return '<u>'+a+'</u>'+(/[’']$/.test(a)?'':sp);});
+ return {check(){if(!ins.every(i=>i.value.trim()))return null;let n=0;const pairs=[],vals={},tips=[];const okv={};
+  ins.forEach(i=>{const k=+i.dataset.g;const A=[].concat(e.ans[k]);const r=compare(i.value,A);okv[k]=r.ok?K(i.value):null;vals[k]=[i.value,r.ok];});
+  (e.distinct||[]).forEach(g=>{const s={};g.forEach(k=>{const v=okv[k];if(v==null)return;if(s[v]){okv[k]=null;vals[k][1]=false;tips.push({t:`✌️ <b>${esc(ins[0]&&vals[k][0])}</b> hast du schon benutzt. Jedes Wort aus dem Wortkasten kommt nur <b>einmal</b> dran – hier passt das andere Wort.`});}s[v]=1;});});
+  ins.forEach(i=>{const k=+i.dataset.g;const ok=vals[k][1];const A=[].concat(e.ans[k]);i.classList.add(ok?'ok':'bad');i.disabled=true;if(ok){n++;return;}
+   const exp=A.find(a=>!Object.entries(okv).some(([j,v])=>+j!==k&&v===K(a)))||A[0];pairs.push([i.value,exp,'']);
+   if(e.tip&&e.tip[k])tips.push({t:e.tip[k]});const xt=e.xtip&&e.xtip[K(i.value)];if(xt)tips.push({t:xt});});
+  chips.forEach(c=>{if(c.tagName==='BUTTON')c.disabled=true;});$$('.acc button',el).forEach(b=>b.disabled=true);
+  const seen=new Set();const T=tips.filter(x=>!seen.has(x.t)&&seen.add(x.t)).slice(0,4);
+  return {ok:n===ins.length,pts:n,max:ins.length,sol:solT,pairs,tips:T,log:{gaps:pairs.map(p=>[strip(p[0]),strip(p[1])])},given:givenFill(e.text,vals),say:sayOf(e,strip(solT))};}};};
 /* Zeile für Zeile (wie in der Klassenarbeit): deutsche Vorgabe → französischer Satz, Auswertung pro Zeile mit Musterlösung */
 RENDER.lines=(e,el)=>{const LS=window.LS;
  el.innerHTML=(e.ctx?`<div class="zl-ctx">${e.ctx}</div>`:'')+`<ol class="zl">${e.lines.map((L,i)=>`<li class="zl-li"><div class="zl-de">${L.de} <span class="zl-p">${L.max||2} P.</span></div>${L.who?`<span class="zl-who">${L.who}:</span>`:''}<input class="inp zl-in" data-i="${i}" autocomplete="off" autocapitalize="sentences" autocorrect="off" spellcheck="false" placeholder="Auf Französisch …" aria-label="Zeile ${i+1}"><div class="zl-fb" hidden></div></li>`).join('')}</ol>
@@ -399,7 +427,7 @@ RENDER.match=(e,el)=>{
   else{const owner=Object.keys(pairs).find(k=>pairs[k]===i);if(owner!=null){delete pairs[owner];}else if(selL!=null){pairs[selL]=i;selL=null;}else{toast('Tippe zuerst links etwas an.');}}
   paint();});
  return {check(){if(Object.keys(pairs).length<e.pairs.length)return null;let n=0;Object.entries(pairs).forEach(([l,r])=>{const g=l===r;if(g)n++;[$(`.mi[data-side="L"][data-i="${l}"]`,el),$(`.mi[data-side="R"][data-i="${r}"]`,el)].forEach(b=>b.classList.add(g?'ok':'bad'));});
-  $$('.mi',el).forEach(b=>b.disabled=true);const wrongP=Object.entries(pairs).filter(([l,r])=>l!==r).map(([l,r])=>`${e.pairs[l][0]} → <span class="gw">${e.pairs[r][1]}</span>`);return {ok:n===e.pairs.length,pts:n,max:e.pairs.length,given:wrongP.join('<br>'),sol:e.pairs.map(p=>`${p[0]} → ${p[1]}`).join('<br>'),say:sayOf(e,null)};}};};
+  $$('.mi',el).forEach(b=>b.disabled=true);const wrongP=Object.entries(pairs).filter(([l,r])=>l!==r).map(([l,r])=>`${e.pairs[l][0]} → <span class="gw">${e.pairs[r][1]}</span>`);const mtips=Object.entries(pairs).filter(([l,r])=>l!==r&&e.pairs[l][2]).map(([l])=>({t:e.pairs[l][2]})).slice(0,3);return {ok:n===e.pairs.length,pts:n,max:e.pairs.length,tips:mtips,log:e.tip||mtips.length?{gaps:Object.entries(pairs).filter(([l,r])=>l!==r).map(([l,r])=>[strip(e.pairs[l][0]+' – '+e.pairs[r][1]),strip(e.pairs[l][0]+' – '+e.pairs[l][1])])}:undefined,given:wrongP.join('<br>'),sol:e.pairs.map(p=>`${p[0]} → ${p[1]}`).join('<br>'),say:sayOf(e,null)};}};};
 function roomSel(el,e,multi){const R=window.ROOMS[e.room];
  el.innerHTML=`<div class="ex-sub">${multi?'Tippe im Bild alles an, was passt. Nochmal tippen hebt die Markierung auf.':'Tippe im Bild auf den richtigen Gegenstand.'}</div><div class="roomwrap">${R.svg}</div>`;
  const sel=new Set();
