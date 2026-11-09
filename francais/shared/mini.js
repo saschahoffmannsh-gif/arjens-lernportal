@@ -12,7 +12,7 @@ const txt=t=>String(t==null?'':t).replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').tr
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
 const OK_TYPES=['mc','gap','seg','order','match','multi','gapw','detect','pick','click','mark','write','dialog'];
 const ring=(p,c)=>`<span class="pk-ring big" style="--p:${p||0};--rc:${c}"><b>${p==null?'?':p+'<small>%</small>'}</b></span>`;
-function pool(pkg){const S=PK.slugs(pkg);return HUB.E.ALLEX.filter(e=>S.includes(e._slug)&&OK_TYPES.includes(e.type)&&!(e.type==='write'&&!(e.ans&&e.ans.length)));}
+function pool(pkg){const S=PK.slugs(pkg);const CH=pkg.probe&&pkg.probe.ch;return HUB.E.ALLEX.filter(e=>S.includes(e._slug)&&(!CH||CH.includes(chOf(e).loc))&&OK_TYPES.includes(e.type)&&!(e.type==='write'&&!(e.ans&&e.ans.length)));}
 function pick(pkg){const n=(pkg.probe&&pkg.probe.n)||10;const P=pool(pkg);const by={};P.forEach(e=>{const k=chOf(e).full;(by[k]=by[k]||[]).push(e);});
  const groups=shuffle(Object.values(by).map(shuffle));const out=[];let au=0;
  while(out.length<n&&groups.some(g=>g.length)){for(const g of groups){if(out.length>=n)break;let k=g.findIndex(e=>!e.au||au<2);if(k<0)continue;const e=g.splice(k,1)[0];if(e.au)au++;out.push(e);}}
@@ -24,7 +24,7 @@ HUB.views.mini=function(id){const pkg=PK.get(id);const h=$('#hubTitle');
  const r=PK.probe(pkg)||{n:0};const n=(pkg.probe&&pkg.probe.n)||10;const L=PK.lessons(pkg);
  M().innerHTML=`<div class="crumb"><a class="btn ghost small" href="../${pkg.id}/">← ${esc(pkg.titel)}</a><span class="crumb-n">Mini-Probearbeit</span></div>
  <section class="mini-hero">${ring(r.n?r.last.pct:null,'#0d9488')}<div><div class="ov-k">🧪 Mini-Probearbeit · ${PK.fmtDate(pkg)}</div><h1>${esc(pkg.titel)}</h1>
- <p>${n} gemischte Aufgaben aus ${L.length===1?'der Lektion':'den '+L.length+' Lektionen'} dieses Pakets. Gezählt wird der erste Versuch. Am Ende siehst du Prozent und Note (Orientierung).</p>
+ <p>${n} gemischte Aufgaben ${pkg.probe.lbl?'aus: '+esc(pkg.probe.lbl):'aus '+(L.length===1?'der Lektion':'den '+L.length+' Lektionen')+' dieses Pakets'}. Gezählt wird der erste Versuch. Am Ende siehst du Prozent und Note (Orientierung).</p>
  <p class="legend">${r.n?`Zuletzt: <b>${r.last.pct} %</b> · Note ${r.last.grade}${r.n>1?` · bestes Ergebnis: ${r.best.pct} %`:''} · ${r.n}× geschrieben`:'Noch nicht geschrieben.'}</p></div></section>
  <div class="pk-chips" style="margin:10px 0">${(pkg.schwerpunkte||[]).map(s=>`<span class="chip">${esc(s)}</span>`).join('')}</div>
  <div class="toolbar center"><button class="btn green big" id="miniGo">🧪 Mini-Probearbeit starten</button></div>`;

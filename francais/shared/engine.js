@@ -128,7 +128,7 @@ function materialBox(c){const h=c.html||'';if(!h)return '';
  return `<details class="matbox"><summary><span class="mb-ic">📚</span><span class="mb-t"><b>Zum Nachschlagen</b><small>${T.length?T.join(' · '):'Tabellen und Tipps'}</small></span><span class="in-tg" aria-hidden="true"></span></summary><div class="lesson-body">${h}</div></details>`;}
 function home(){
  const o=overall(),nc=nextChapter(),RI=H.runInfo();
- let h=`<section class="lhero" style="--c:${L.color}"><div class="lh-txt"><div class="kicker"><span class="flag"><i></i><i></i><i></i></span>Französisch · Klassenarbeit 30.10.</div>
+ let h=`<section class="lhero" style="--c:${L.color}"><div class="lh-txt"><div class="kicker"><span class="flag"><i></i><i></i><i></i></span>Französisch · ${L.kicker||'Klassenarbeit 30.10.'}</div>
  <h1>${L.title}</h1><div class="lh-fr">${L.fr}</div><p>${L.intro}</p>
  <div class="lh-btns">${nc?`<button class="btn big" data-open="${nc.id}">▶ ${o.d?'Weiter mit Kapitel '+(nc.idx+1):'Los geht’s: Kapitel 1'}</button>`:`<button class="btn big red" data-test="1">🏆 Abschlusstest</button>`}${EXTRA().filter(c=>!chapterStatus(c).done).map(c=>`<button class="btn big extra-btn" data-open="${c.id}">🧡 Extra-Übung: ${c.title}</button>`).join('')}</div></div>
  <div class="lh-art">${window.HERO[L.slug]||''}</div></section>
@@ -149,8 +149,8 @@ function home(){
  ${lessonNav()}`;
  main.innerHTML=h;
 }
-function lessonNav(){const LS=window.LESSONS||[];if(!LS.length)return '';
- return `<div class="lnav"><h3>Weitere Lektionen zur Klassenarbeit</h3><div class="lnav-g">${LS.filter(x=>x.slug!==L.slug).map(x=>`<a href="../${x.slug}/" style="--c:${x.color}"><span>${x.icon}</span><b>${x.title}</b></a>`).join('')}</div></div>`;}
+function lessonNav(){const all=window.LESSONS||[];const me=all.find(x=>x.slug===L.slug)||{};const LS=all.filter(x=>x.slug!==L.slug&&x.pk===me.pk);if(!LS.length)return '';
+ return `<div class="lnav"><h3>Weitere Lektionen ${/^klassenarbeit/.test(me.pk||'')?'zur Klassenarbeit':'im Paket'}</h3><div class="lnav-g">${LS.map(x=>`<a href="../${x.slug}/" style="--c:${x.color}"><span>${x.icon}</span><b>${x.title}</b></a>`).join('')}</div></div>`;}
 
 function lesson(id){
  const c=CHMAP[id];const p=chp(id);p.seen=true;save();

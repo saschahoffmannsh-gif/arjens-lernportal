@@ -5,9 +5,12 @@
 (function(){
 'use strict';
 const W=window,E=W.EN;
+/* Sprache: Englisch (Standard) oder Französisch (E.pkg.lang='fr', gleiche Spiele; Feld „en“ = angezeigtes Wort der Fremdsprache) */
+const LG=E.pkg.lang==='fr'?{code:'fr',name:'Französisch',adj:'französische',Adj:'Französisches',flag:'🇫🇷',ok:['Excellent!','Très bien! Teil geschafft!','Courage! Spiel die Runde gleich nochmal.'],col:['#002395','#ed2939','#fff','#f59e0b','#10b981']}
+ :{code:'en',name:'Englisch',adj:'englische',Adj:'Englisches',flag:'🇬🇧',ok:['Excellent! Du hast es drauf!','Very good! Teil geschafft!','Good try! Spiel die Runde gleich nochmal.'],col:['#c8102e','#012169','#fff','#f59e0b','#10b981']};
 const get=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v;}catch(e){return d;}};
 const set=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}};
-const SLUG='en-'+E.pkg.id;
+const SLUG=E.pkg.slug||('en-'+E.pkg.id);
 const WM={};E.words.forEach(w=>{WM[w.k]=w;});
 const esc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 /* ---------- Datum / Freischaltung ---------- */
@@ -15,12 +18,12 @@ const now=()=>{const f=+(localStorage.getItem('fr_fake_now')||0);return f||Date.
 const day0=d=>{const x=new Date(d);x.setHours(0,0,0,0);return x;};
 const startD=()=>{const [y,m,d]=E.pkg.start.split('-').map(Number);return new Date(y,m-1,d);};
 const openDate=n=>{const d=startD();d.setDate(d.getDate()+n-1);return d;};
-const isOpen=n=>day0(now())>=openDate(n);
+const isOpen=n=>!!E.pkg.allOpen||day0(now())>=openDate(n);
 const WD=['So','Mo','Di','Mi','Do','Fr','Sa'];
 const fmt=d=>`${WD[d.getDay()]} ${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.`;
-const todayN=()=>{let t=0;E.lessons.forEach(l=>{if(isOpen(l.n))t=l.n;});return t;};
+const todayN=()=>{if(E.pkg.allOpen)return 0;let t=0;E.lessons.forEach(l=>{if(isOpen(l.n))t=l.n;});return t;};
 /* ---------- Ereignisse ---------- */
-const RK='en_sync_v1';const LOGB=(W.LOG&&W.LOG.store)||null;
+const RK=E.pkg.slug?'en_sync_v1_'+E.pkg.slug:'en_sync_v1';const LOGB=(W.LOG&&W.LOG.store)||null;
 let RC=get(RK,null);if(!RC||RC.base!==LOGB)RC={base:LOGB,ev:[]};
 const subs=[];let ver=0,memo=null;
 function events(){const L=W.LOG?W.LOG.local(SLUG):[];const k=ver+':'+L.length;if(memo&&memo.k===k)return memo.v;
@@ -56,11 +59,13 @@ const spk=(k,cls='')=>k&&AF.has(k)?`<button type="button" class="en-spk ${cls}" 
 const norm=t=>String(t||'').toLowerCase().replace(/[’`´]/g,"'").replace(/[.!?…,]/g,' ').replace(/\s+/g,' ').trim();
 const lev=(a,b)=>{const m=a.length,n=b.length;const d=Array.from({length:m+1},(_,i)=>[i].concat(Array(n).fill(0)));for(let j=1;j<=n;j++)d[0][j]=j;
  for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return d[m][n];};
+const deacc=t=>t.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 function judge(w,inp){const x=norm(inp);if(!x)return {ok:false,exact:false};const acc=w.acc.map(norm).concat(w.acc.map(a=>norm(a).replace(/^to /,'')));
  if(acc.includes(x)||acc.includes(x.replace(/^to /,'')))return {ok:true,exact:true};
+ if(LG.code==='fr'&&acc.map(deacc).includes(deacc(x)))return {ok:true,exact:false,acc:true};
  const y=x.replace(/^to /,'');let best=99;acc.forEach(a=>{best=Math.min(best,lev(y,a.replace(/^to /,'')));});
  const L=norm(w.bt).length;if(best<=1&&L>=4||best<=2&&L>=9)return {ok:true,exact:false};return {ok:false,exact:false};}
-W.ENC={E,WM,SLUG,esc,now,openDate,isOpen,fmt,todayN,events,log,load,on:f=>subs.push(f),lesson,records,wstats,reviewPick,pkgProgress,play,stop,spk,judge,norm,GAMES,get,set};
+W.ENC={E,LG,WM,SLUG,esc,now,openDate,isOpen,fmt,todayN,events,log,load,on:f=>subs.push(f),lesson,records,wstats,reviewPick,pkgProgress,play,stop,spk,judge,norm,GAMES,get,set};
 if(W.LOG)W.LOG.attach(SLUG);
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>load());else setTimeout(load,0);
 })();

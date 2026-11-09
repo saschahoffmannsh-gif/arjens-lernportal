@@ -3,16 +3,16 @@
    dann geübt – Erkennen → Erinnern → Schreiben – und zum Schluss „Hast du’s drauf?“ mit Wiederholung früherer Teile. */
 (function(){
 'use strict';
-const W=window,C=W.ENC,E=C.E,PG=W.PAGE||{},esc=C.esc,$=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const W=window,C=W.ENC,E=C.E,LG=C.LG,PG=W.PAGE||{},esc=C.esc,$=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
 const N=PG.les,LES=E.lessons.find(l=>l.n===N);const M=()=>$('#main');
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
 const STEPS=[
  {g:'entdecker',ic:'🔭',t:'Wort-Entdecker',sub:'Neue Wörter kennenlernen: Bild + Ton → Wort',c:'#0ea5e9'},
- {g:'memory',ic:'🃏',t:'Memory',sub:'Englisch und Deutsch finden',c:'#8b5cf6'},
+ {g:'memory',ic:'🃏',t:'Memory',sub:LG.name+' und Deutsch finden',c:'#8b5cf6'},
  {g:'baukasten',ic:'🧱',t:'Buchstaben-Baukasten',sub:'Das Wort aus Bausteinen bauen',c:'#f97316'},
  {g:'luecke',ic:'📖',t:'Lückensatz',sub:'Sätze aus dem Buch ergänzen',c:'#10b981'},
  {g:'blitz',ic:'⚡',t:'Blitzrunde',sub:'45 Sekunden: stimmt das Paar?',c:'#eab308'},
- {g:'schreiben',ic:'✍️',t:'Schreib-Profi',sub:'Deutsch → Englisch tippen',c:'#e11d48'},
+ {g:'schreiben',ic:'✍️',t:'Schreib-Profi',sub:'Deutsch → '+LG.name+' tippen',c:'#e11d48'},
  {g:'check',ic:'🏆',t:'Hast du’s drauf?',sub:'Abschlussrunde mit Prozent + Wiederholung',c:'#0f766e'}];
 W.ENG_NAMES=Object.fromEntries(STEPS.map(s=>[s.g,s.t]));
 const NOTE={'as-220':'Du kennst <b>as</b> schon als „wie“ (Teil 2). Hier neu: <b>während, indem</b>.','as-219':'<b>as</b> hat noch eine 2. Bedeutung – die kommt in Teil 3.',
@@ -86,7 +86,7 @@ function entdecker(G,el){const ws=shuffle(LW);const known=intro();const Q=[];let
  step();}
 /* ---------- 2 Memory ---------- */
 function memory(G,el){const ws=pickWords(6);let cards=shuffle(ws.flatMap(w=>[{w,s:'en'},{w,s:'de'}]));let open=[],found=0,moves=0,lock=false;
- el.innerHTML=`<div class="eg-q"><div class="eg-prompt">Finde die Paare: <b class="c-en">Englisch</b> + <b class="c-de">Deutsch</b></div></div><div class="eg-mem">${cards.map((c,i)=>`<button type="button" class="mc2" data-i="${i}"><span class="mc2-b">🇬🇧</span><span class="mc2-f ${c.s}">${c.s==='en'?`<span class="mc2-e">${c.w.e}</span>${esc(disp(c.w))}`:esc(c.w.de)}</span></button>`).join('')}</div><div class="eg-memi">Züge: <b class="mv">0</b></div><div class="eg-fb"></div>`;
+ el.innerHTML=`<div class="eg-q"><div class="eg-prompt">Finde die Paare: <b class="c-en">${LG.name}</b> + <b class="c-de">Deutsch</b></div></div><div class="eg-mem">${cards.map((c,i)=>`<button type="button" class="mc2" data-i="${i}"><span class="mc2-b">${LG.flag}</span><span class="mc2-f ${c.s}">${c.s==='en'?`<span class="mc2-e">${c.w.e}</span>${esc(disp(c.w))}`:esc(c.w.de)}</span></button>`).join('')}</div><div class="eg-memi">Züge: <b class="mv">0</b></div><div class="eg-fb"></div>`;
  const flip=b=>{if(lock||b.classList.contains('up')||b.classList.contains('got'))return;const c=cards[+b.dataset.i];b.classList.add('up');if(c.s==='en')C.play(c.w.a);open.push(b);
   if(open.length===2){moves++;$('.mv').textContent=moves;const [a,d]=open.map(x=>cards[+x.dataset.i]);
    if(a.w.k===d.w.k&&a.s!==d.s){open.forEach(x=>{x.classList.add('got');});open=[];found++;hit(G,a.w);prog(G,found,ws.length);if(found===ws.length)setTimeout(()=>finish(G,{stars:moves<=9?3:moves<=13?2:1}),700);}
@@ -104,7 +104,7 @@ function baukasten(G,el){const ws=pickWords(6);let i=0;
   const fixed=p=>T.mode!=='w'&&(p===' '||p==='-'||p==="'");
   const slots=T.parts.map((p,j)=>fixed(p)?`<span class="bk-fix">${p===' '?'&nbsp;':p}</span>`:`<span class="bk-slot${T.mode!=='l'?' wide':''}" data-j="${j}"></span>`).join('');
   const pool=shuffle(T.parts.map((p,j)=>[p,j]).filter(([p])=>!fixed(p)));
-  el.innerHTML=`<div class="eg-q pop"><div class="eg-pic">${w.e}</div><div class="eg-prompt">Bau das englische Wort für<br><b class="c-de">${esc(w.de)}</b></div></div>
+  el.innerHTML=`<div class="eg-q pop"><div class="eg-pic">${w.e}</div><div class="eg-prompt">Bau das ${LG.adj} Wort für<br><b class="c-de">${esc(w.de)}</b></div></div>
   <div class="bk-line">${w.bpre?`<span class="bk-pre">${w.bpre}</span>`:''}${slots}</div><div class="bk-pool">${pool.map(([p,j],x)=>`<button type="button" class="bk-t" data-x="${x}">${esc(p)}</button>`).join('')}</div>
   <div class="bk-act"><button type="button" class="btn ghost small bk-undo">↶ zurück</button></div><div class="eg-fb"></div>`;
   const fill=[];const sl=$$('.bk-slot',el);
@@ -141,9 +141,9 @@ function blitz(G,el){const T=45;const pool=LW.concat(C.reviewPick(6,N));let left
 function schreiben(G,el){const ws=pickWords(8);let i=0;
  const step=()=>{if(i>=ws.length){finish(G);return;}const w=ws[i++];prog(G,i-1,ws.length);let tips=1;
   const pat=()=>[...w.bt].map((ch,j)=>ch===' '?'&nbsp;&nbsp;':/[\-'’?!.]/.test(ch)?ch:j<tips?esc(ch):'_').join(' ');
-  el.innerHTML=`<div class="eg-q pop"><div class="eg-pic">${w.e}</div><div class="eg-prompt">Wie heißt das auf Englisch?<br><b class="c-de">${esc(w.de)}</b></div></div>
+  el.innerHTML=`<div class="eg-q pop"><div class="eg-pic">${w.e}</div><div class="eg-prompt">Wie heißt das auf ${LG.name}?<br><b class="c-de">${esc(w.de)}</b></div></div>
   <div class="sw-pat">${w.bpre?`<span class="bk-pre">${w.bpre}</span> `:''}<span class="sw-p">${pat()}</span></div>
-  <div class="sw-row"><input class="sw-in" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" aria-label="Englisches Wort"><button type="button" class="btn sw-ok">OK</button></div>
+  <div class="sw-row"><input class="sw-in" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" aria-label="${LG.Adj} Wort"><button type="button" class="btn sw-ok">OK</button></div>
   <div class="sw-act"><button type="button" class="btn ghost small sw-tip">💡 Tipp: noch ein Buchstabe</button></div><div class="eg-fb"></div>`;
   const inp=$('.sw-in',el);setTimeout(()=>{try{inp.focus({preventScroll:true});}catch(e){}},50);let done=false;
   $('.sw-tip',el).onclick=()=>{tips=Math.min(w.bt.length-1,tips+1);$('.sw-p',el).innerHTML=pat();};
@@ -158,15 +158,15 @@ function check(G,el){const rv=C.reviewPick(4,N);const own=pickWords(12-rv.length
  const step=()=>{if(i>=Q.length){done();return;}const x=Q[i];const w=x.w;const m=i%4;i++;prog(G,i-1,Q.length);
   const tag=x.r?`<div class="ck-rev">🔁 Wiederholung aus Teil ${w.les}</div>`:'';
   const rec=ok=>{res.push({w,ok,r:x.r});};
-  if(m===3){el.innerHTML=`${tag}<div class="eg-q pop"><div class="eg-pic">${w.e}</div><div class="eg-prompt">Schreib auf Englisch:<br><b class="c-de">${esc(w.de)}</b></div></div><div class="sw-pat">${w.bpre?`<span class="bk-pre">${w.bpre}</span> `:''}<span class="sw-p">${[...w.bt].map((ch,j)=>ch===' '?'&nbsp;&nbsp;':/[\-'’?!.]/.test(ch)?ch:j<1?esc(ch):'_').join(' ')}</span></div>
-   <div class="sw-row"><input class="sw-in" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" aria-label="Englisches Wort"><button type="button" class="btn sw-ok">OK</button></div><div class="eg-fb"></div>`;
+  if(m===3){el.innerHTML=`${tag}<div class="eg-q pop"><div class="eg-pic">${w.e}</div><div class="eg-prompt">Schreib auf ${LG.name}:<br><b class="c-de">${esc(w.de)}</b></div></div><div class="sw-pat">${w.bpre?`<span class="bk-pre">${w.bpre}</span> `:''}<span class="sw-p">${[...w.bt].map((ch,j)=>ch===' '?'&nbsp;&nbsp;':/[\-'’?!.]/.test(ch)?ch:j<1?esc(ch):'_').join(' ')}</span></div>
+   <div class="sw-row"><input class="sw-in" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" aria-label="${LG.Adj} Wort"><button type="button" class="btn sw-ok">OK</button></div><div class="eg-fb"></div>`;
    const inp=$('.sw-in',el);setTimeout(()=>{try{inp.focus({preventScroll:true});}catch(e){}},50);let d=false;
    const go=()=>{if(d||!inp.value.trim())return;d=true;inp.disabled=true;const r=C.judge(w,inp.value);rec(r.ok);
     if(r.ok){hit(G,w);C.play(w.a);inp.classList.add('ok');G.auto=null;setTimeout(step,900);}else{inp.classList.add('bad');miss(G,w);explain(G,w,inp.value,step);}};
    $('.sw-ok',el).onclick=go;inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();go();}});G.auto=ok=>{inp.value=ok?w.bt:'xqz';go();};return;}
   const o={field:m===1?'en':m===0?'de':'en',onDone:ok=>{rec(ok);step();},pool:x.r?E.words.filter(y=>y.les===w.les):null};
   if(m===0)choice(G,w,Object.assign(o,{q:`${tag}Was heißt <b class="c-en">${esc(disp(w))}</b>? ${C.spk(w.a)}`,pic:`<div class="eg-pic sm">${w.e}</div>`,label:y=>esc(y.de)}));
-  else if(m===1)choice(G,w,Object.assign(o,{q:`${tag}Was heißt <b class="c-de">${esc(w.de)}</b> auf Englisch?`,pic:`<div class="eg-pic sm">${w.e}</div>`,label:y=>esc(disp(y))}));
+  else if(m===1)choice(G,w,Object.assign(o,{q:`${tag}Was heißt <b class="c-de">${esc(w.de)}</b> auf ${LG.name}?`,pic:`<div class="eg-pic sm">${w.e}</div>`,label:y=>esc(disp(y))}));
   else{choice(G,w,Object.assign(o,{q:`${tag}🎧 Welches Wort hörst du?`,pic:`<div class="eg-pic eg-ear">${C.spk(w.a,'big')}</div>`,label:y=>esc(disp(y))}));C.play(w.a);}};
  const done=()=>{const r=res.filter(x=>x.ok).length,pct=Math.round(r/Math.max(1,res.length)*100);G.pct=pct;
   finish(G,{stars:pct>=90?3:pct>=70?2:pct>=50?1:0,final:{pct,right:r,max:res.length,review:rv.map(w=>w.k),wrongList:res.filter(x=>!x.ok).map(x=>x.w)}});};
@@ -180,14 +180,14 @@ function finish(G,o={}){if(G.fin)return;G.fin=true;if(G.timer){clearInterval(G.t
  C.log({kind:'en_game_end',les:N,game:G.s.g,step:G.n,score:G.score,right:G.right,wrong:G.wrong,combo:G.best,stars,okW,badW,ms:Date.now()-G.t0,flush:true});
  const rec=G.score>recOld&&G.score>0;const nx=G.n<STEPS.length?STEPS[G.n]:null;
  const F=o.final;
- M().innerHTML=`<div class="eg-end pop" style="--c:${G.s.c}">${F?`<div class="ee-big">${F.pct>=90?'🏆':F.pct>=70?'🥈':'💪'}</div><div class="ee-pct">${F.pct} %</div><div class="ee-t">${F.pct>=90?'Excellent! Du hast es drauf!':F.pct>=70?'Very good! Teil geschafft!':'Good try! Spiel die Runde gleich nochmal.'}</div><div class="legend">${F.right} von ${F.max} richtig${F.review.length?` · davon ${F.review.length} Wiederholungswörter`:''}</div>`:`<div class="ee-big">${G.s.ic}</div><div class="ee-t">${G.s.t} geschafft!</div>`}
+ M().innerHTML=`<div class="eg-end pop" style="--c:${G.s.c}">${F?`<div class="ee-big">${F.pct>=90?'🏆':F.pct>=70?'🥈':'💪'}</div><div class="ee-pct">${F.pct} %</div><div class="ee-t">${F.pct>=90?LG.ok[0]:F.pct>=70?LG.ok[1]:LG.ok[2]}</div><div class="legend">${F.right} von ${F.max} richtig${F.review.length?` · davon ${F.review.length} Wiederholungswörter`:''}</div>`:`<div class="ee-big">${G.s.ic}</div><div class="ee-t">${G.s.t} geschafft!</div>`}
  <div class="stars">${[0,1,2].map(i=>`<span class="s ${i<stars?'on':''}" style="animation-delay:${i*.2}s">★</span>`).join('')}</div>
  <div class="ee-sc">${G.score} Punkte · ${G.right} richtig${G.best>=3?` · 🔥 Combo ×${G.best}`:''}</div>${rec?'<div class="ee-rec">🏆 Neuer Rekord!</div>':''}
  ${F&&F.wrongList.length?`<div class="ee-wl"><b>Diese Wörter üben wir nochmal:</b>${F.wrongList.map(w=>`<div class="ee-w">${w.e} <b>${esc(disp(w))}</b> = ${esc(w.de)} ${C.spk(w.a)}</div>`).join('')}</div>`:''}
  <div class="toolbar center">${nx?`<button type="button" class="btn green big" data-step="${G.n+1}">Weiter: ${nx.ic} ${nx.t} →</button>`:''}<button type="button" class="btn ghost" data-step="${G.n}">↻ Nochmal</button><button type="button" class="btn ghost" data-home="1">Übersicht Teil ${N}</button></div>
  ${F?`<div class="toolbar center"><a class="btn" href="../">← Alle Teile</a></div>`:''}</div>`;
  if(F&&F.pct>=70)confetti();cur=null;}
-function confetti(){const box=document.createElement('div');box.className='en-conf';const col=['#c8102e','#012169','#fff','#f59e0b','#10b981'];
+function confetti(){const box=document.createElement('div');box.className='en-conf';const col=LG.col;
  for(let i=0;i<60;i++){const s=document.createElement('i');s.style.left=Math.random()*100+'%';s.style.background=col[i%col.length];s.style.animationDelay=Math.random()*.8+'s';s.style.transform=`rotate(${Math.random()*360}deg)`;box.appendChild(s);}
  document.body.appendChild(box);setTimeout(()=>box.remove(),3500);}
 /* ---------- Navigation ---------- */

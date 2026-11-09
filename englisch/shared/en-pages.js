@@ -1,7 +1,7 @@
 /* Englisch: Fachseite (Hausaufgaben / Klassenarbeiten), Paket-Listen und Paketseite mit Tages-Freischaltung */
 (function(){
 'use strict';
-const W=window,C=W.ENC,E=C.E,PG=W.PAGE||{},$=s=>document.querySelector(s),esc=C.esc;
+const W=window,C=W.ENC,E=C.E,LG=C.LG,FR=LG.code==='fr',HC=FR?'#1e3a8a':'#0f766e',PG=W.PAGE||{},$=s=>document.querySelector(s),esc=C.esc;
 const TYP={klassenarbeit:{t:'Klassenarbeiten',ic:'🎯',dir:'klassenarbeiten',c:'#1e3a8a',g:['#e11d48','#fb923c']},hausaufgabe:{t:'Hausaufgaben',ic:'📝',dir:'hausaufgaben',c:'#0d9488',g:['#0d9488','#4ade80']}};
 const PKGS=[E.pkg];
 const MON=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
@@ -27,11 +27,11 @@ function pkgPage(){const p=E.pkg;const pg=C.pkgProgress();const tn=C.todayN();co
   const emo=ws.slice(0,5).map(w=>w.e).join(' ');
   const inner=`<span class="enl-n">${l.n}</span><span class="enl-b"><span class="enl-t">Teil ${l.n} · ${l.pages}</span><span class="enl-s">${esc(l.t)}</span><span class="enl-m"><span class="enl-emo" aria-hidden="true">${open?emo:'❔ ❔ ❔'}</span> · ${ws.length} Wörter</span>${open?`<span class="enl-bar"><i style="width:${o.done?100:Math.min(100,Math.round(Math.min(o.step,7)/7*100))}%"></i></span>`:''}</span>${st}`;
   return open?`<a class="enl tap${o.done?' done':''}${today?' today':''}" href="teil-${l.n}/" data-les="${l.n}">${inner}</a>`:`<div class="enl locked" data-les="${l.n}" aria-disabled="true">${inner}</div>`;}).join('');
- $('#main').innerHTML=`<section class="ov-hero en-hero" style="--c:#0f766e"><div class="ov-flag">🇬🇧</div><div><div class="ov-k">Englisch · Hausaufgabe · ${C.fmt(pdate(p))}${pdate(p).getFullYear()}</div><h1>${esc(p.titel)}</h1>
- <p class="en-sub">${E.words.length} Wörter aus dem ${esc(p.buch)} – gelernt wird nur mit Spielen. <b>Jeden Tag kommt ein neuer Teil dazu.</b> Fertige Teile bleiben offen zum Wiederholen.</p></div>
- <div class="en-hring">${ring(pg.pct,'#0f766e')}<small>${pg.done}/${pg.total} Teile</small></div></section>
+ $('#main').innerHTML=`<section class="ov-hero en-hero" style="--c:${HC}"><div class="ov-flag">${LG.flag}</div><div><div class="ov-k">${LG.name} · Hausaufgabe · ${C.fmt(pdate(p))}${pdate(p).getFullYear()}</div><h1>${esc(p.titel)}</h1>
+ <p class="en-sub">${E.words.length} Wörter aus dem ${esc(p.buch)} – gelernt wird nur mit Spielen. ${E.pkg.allOpen?'<b>Alle Teile sind offen</b> – am besten einen Teil pro Tag. Fertige Teile kannst du jederzeit wiederholen.':'<b>Jeden Tag kommt ein neuer Teil dazu.</b> Fertige Teile bleiben offen zum Wiederholen.'}</p></div>
+ <div class="en-hring">${ring(pg.pct,HC)}<small>${pg.done}/${pg.total} Teile</small></div></section>
  <div class="en-how"><span>🔭 Entdecken &amp; Hören</span><span>🃏 Memory</span><span>🧱 Bauen</span><span>📖 Lücke</span><span>⚡ Blitz</span><span>✍️ Schreiben</span><span>🏆 Hast du’s drauf?</span></div>
- <div class="section-title"><div class="bar"></div><h2>7 Teile – jeden Tag ein neuer</h2></div><div class="enl-list">${items}</div>
+ <div class="section-title"><div class="bar"></div><h2>${E.lessons.length} Teile${E.pkg.allOpen?' – einer pro Tag':' – jeden Tag ein neuer'}</h2></div><div class="enl-list">${items}</div>
  <p class="en-foot">Rekorde: ${C.GAMES.filter(g=>rec[g]).map(g=>`${W.ENG_NAMES?W.ENG_NAMES[g]:g} ${rec[g]}`).join(' · ')||'noch keine – leg los! 🚀'}</p>`;}
 const render=()=>{if(PG.mode==='fach')fachPage();else if(PG.mode==='list')listPage();else if(PG.mode==='pkg')pkgPage();};
 render();C.on(render);
