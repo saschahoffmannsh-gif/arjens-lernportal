@@ -17,9 +17,14 @@ function card(p){const T=TYP[p.typ];const dt=pdate(p);const pg=C.pkgProgress();c
  <span class="pk-stats"><span class="pk-stat">${ring(pg.pct,T.c)}<span class="pk-sl"><b>${E.lessons.length} Lektionen · ${E.words.length} Wörter</b><small>${pg.done}/${pg.total} geschafft · ${tn<E.lessons.length?`Teil ${tn} ist offen, jeden Tag kommt einer dazu`:'alle Teile offen'}</small></span></span></span>
  <span class="pk-go">Öffnen ›</span></a>`;}
 function listPage(){const T=TYP[PG.typ];const L=PKGS.filter(p=>p.typ===PG.typ);
+ /* Grammatik-Pakete (gemeinsame Lern-Engine) kommen über PK / PKCARD dazu */
+ const PK=W.PK,G=(PK&&W.PKCARD)?PK.sorted(PK.list('englisch',PG.typ)):[];
+ const vdone=p=>{const pg=C.pkgProgress();return pg.done===pg.total;};
+ const up=G.filter(p=>!PK.done(p)).map(W.PKCARD).concat(L.filter(p=>!vdone(p)).map(card)),old=G.filter(p=>PK.done(p)).map(W.PKCARD).concat(L.filter(vdone).map(card));
  let h=`<section class="list-hero" style="--c:${T.c}"><span class="fh-ic">${T.ic}</span><div><div class="ov-k">Englisch</div><h1>${T.t}</h1></div></section>`;
- if(!L.length)h+=`<div class="pk-empty"><div class="pe-art">${T.ic}</div><h2>Noch keine ${T.t}</h2><p>Hier erscheinen später die Lernpakete für Englisch.</p></div>`;
- else h+=`<div class="section-title"><div class="bar"></div><h2>Aktuell</h2></div><div class="pklist">${L.map(card).join('')}</div>`;
+ if(!up.length&&!old.length)h+=`<div class="pk-empty"><div class="pe-art">${T.ic}</div><h2>Noch keine ${T.t}</h2><p>Hier erscheinen später die Lernpakete für Englisch.</p></div>`;
+ if(up.length)h+=`<div class="section-title"><div class="bar"></div><h2>Aktuell</h2></div><div class="pklist">${up.join('')}</div>`;
+ if(old.length)h+=`<div class="section-title"><div class="bar"></div><h2>Erledigt</h2></div><div class="pklist">${old.join('')}</div>`;
  $('#main').innerHTML=h;}
 function pkgPage(){const p=E.pkg;const pg=C.pkgProgress();const tn=C.todayN();const rec=C.records();
  const items=E.lessons.map(l=>{const o=pg.L[l.n-1];const open=C.isOpen(l.n);const ws=l.words.map(k=>C.WM[k]);const today=l.n===tn&&!o.done;

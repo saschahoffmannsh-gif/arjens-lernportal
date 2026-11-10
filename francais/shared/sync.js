@@ -18,7 +18,7 @@ const set=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true;}cat
 const local=/^(localhost|127\.0\.0\.1|0\.0\.0\.0|)$/.test(location.hostname);
 const BASE=get('fr_sync_base',null)||get('fr_log_base',null)||(local?null:PROD);
 const CK='fr_sync_v1';            // {base, ts, ev:{slug:[kompakte Ereignisse]}}
-const RK='fr_train_remote_v1';    // Probe/Spiele/Mini aus dem Dokument „training“ (wie bisher von train-core.js genutzt)
+const TDOC=window.TR_DOC||'training';const RK=TDOC==='training'?'fr_train_remote_v1':'fr_train_remote_v1_'+TDOC;    // Probe/Spiele/Mini aus dem Dokument „training“ (wie bisher von train-core.js genutzt)
 const TIMEOUT=3000;
 const KEEP=/^(snapshot_chapter|snapshot_test|backfill_chapter|backfill_test|chapter_end|test_end|reset_chapter|reset_test|reset_lesson)$/;
 const TKINDS=/^(game_end|probe_end|mini_end)$/;
@@ -72,9 +72,9 @@ function load(){if(loading)return loading;
  if(!BASE){loading=Promise.resolve({state:'lokal',changed:0});return loading;}
  if(typeof navigator!=='undefined'&&navigator.onLine===false){state='offline';pill('offline – lokaler Stand','off');loading=Promise.resolve({state,changed:0});return loading;}
  const slugs=(W.LESSONS||[]).map(m=>m.slug);
- loading=Promise.all(slugs.concat(['training']).map(s=>getDoc(s).then(ev=>[s,ev],()=>[s,null]))).then(res=>{let ok=0,changed=0;
+ loading=Promise.all(slugs.concat([TDOC]).map(s=>getDoc(s).then(ev=>[s,ev],()=>[s,null]))).then(res=>{let ok=0,changed=0;
   res.forEach(([s,ev])=>{if(ev==null)return;ok++;
-   if(s==='training'){const tr=ev.filter(e=>TKINDS.test(e.kind||'')).slice(-400);const old=JSON.stringify(get(RK,[]));const nw=JSON.stringify(tr);if(old!==nw){set(RK,tr);changed++;}return;}
+   if(s===TDOC){const tr=ev.filter(e=>TKINDS.test(e.kind||'')).slice(-400);const old=JSON.stringify(get(RK,[]));const nw=JSON.stringify(tr);if(old!==nw){set(RK,tr);changed++;}return;}
    const nev=ev.filter(e=>KEEP.test(e.kind||'')).map(pick);if(JSON.stringify(nev)!==JSON.stringify(C.ev[s]||[])){C.ev[s]=nev;changed++;}});
   if(ok){C.ts=new Date().toISOString();set(CK,C);}
   state=ok===res.length?'zentral':ok?'teilweise':'offline';

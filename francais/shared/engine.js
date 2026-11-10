@@ -5,6 +5,8 @@ const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelect
 const L=window.LESSON, CHAPTERS=window.CHAPTERS, TRACKS=window.TRACKS||{}, WRITERS=window.WRITERS||{}, TEST_EX=window.TEST_EX||[];
 const {esc,strip,ttsText,akey,H,diagnose,hlDiff,DN}=window;
 const main=$('#main');
+/* Sprache der Lektion (Standard Französisch; Englisch-Lektionen setzen window.LANG vorher) */
+const LANG=Object.assign({name:'Französisch',tts:'fr-FR',acc:['é','è','ê','à','ç','’'],accHint:'Akzente bitte mitschreiben – die Knöpfe helfen dir.',orderTip:'Im Französischen steht meist <b>wer</b> (Subjekt) → <b>Verb</b> → <b>Rest</b> – wie im Deutschen.',praise:['Super, richtig!','Très bien!','Genau!','Bravo!','Parfait!','Klasse!','Excellent!'],end:['Excellent! Das sitzt!','Très bien! Schon richtig gut.','Pas mal! Noch ein bisschen üben.','Courage! Schau dir die Kapitel noch einmal an.'],allOk:'Alles richtig – fantastique!',tfSub:'Tippe bei jedem Satz auf <b>vrai</b> (richtig) oder <b>faux</b> (falsch).'},window.LANG||{});
 const KEY='fr_lekt_'+L.slug+'_v2', OLDKEY='fr_lekt_'+L.slug+'_v1', WKEY=OLDKEY; // WKEY: eigene Texte bleiben unter dem alten Schlüssel
 let P=load();
 function blank(){return {v:2,ch:{},asked:{},test:{best:null,stars:0,runs:0,pts:null}};}
@@ -40,7 +42,7 @@ const AUD=new Set(window.AUDIO_FILES||[]);
 const ABASE=(window.AUDIO_BASE||'../shared/audio/');
 const TTS=('speechSynthesis' in window)&&typeof window.SpeechSynthesisUtterance!=='undefined';
 let frVoice=null;
-function pickVoice(){if(!TTS)return;const v=speechSynthesis.getVoices()||[];frVoice=v.find(x=>/^fr[-_]FR/i.test(x.lang))||v.find(x=>/^fr/i.test(x.lang))||null;}
+function pickVoice(){if(!TTS)return;const v=speechSynthesis.getVoices()||[];const lc=LANG.tts.slice(0,2);frVoice=v.find(x=>x.lang&&x.lang.replace('_','-').toLowerCase()===LANG.tts.toLowerCase())||v.find(x=>new RegExp('^'+lc,'i').test(x.lang))||null;}
 if(TTS){pickVoice();try{speechSynthesis.onvoiceschanged=pickVoice;}catch(e){}}
 let AEL=null,playingBtn=null,playTok=0;
 function getEl(){if(!AEL){AEL=new Audio();AEL.preload='auto';AEL.setAttribute('playsinline','');}return AEL;}
@@ -60,7 +62,7 @@ function speak(texts,btn,whos){
  next();return true;
 }
 function viaTTS(text,cb){const tok=playTok;
- try{const u=new SpeechSynthesisUtterance(text);u.lang='fr-FR';u.rate=.8;if(frVoice)u.voice=frVoice;
+ try{const u=new SpeechSynthesisUtterance(text);u.lang=LANG.tts;u.rate=.8;if(frVoice)u.voice=frVoice;
   u.onend=()=>{if(tok===playTok)setTimeout(cb,350);};u.onerror=()=>{if(tok===playTok)cb();};speechSynthesis.speak(u);}catch(e){cb();}}
 window.APPAUDIO={akey,ttsText,has:h=>AUD.has(h),el:()=>AEL,base:ABASE};
 document.addEventListener('click',e=>{const b=e.target.closest('[data-say]');if(!b)return;e.preventDefault();
@@ -128,7 +130,7 @@ function materialBox(c){const h=c.html||'';if(!h)return '';
  return `<details class="matbox"><summary><span class="mb-ic">📚</span><span class="mb-t"><b>Zum Nachschlagen</b><small>${T.length?T.join(' · '):'Tabellen und Tipps'}</small></span><span class="in-tg" aria-hidden="true"></span></summary><div class="lesson-body">${h}</div></details>`;}
 function home(){
  const o=overall(),nc=nextChapter(),RI=H.runInfo();
- let h=`<section class="lhero" style="--c:${L.color}"><div class="lh-txt"><div class="kicker"><span class="flag"><i></i><i></i><i></i></span>Französisch · ${L.kicker||'Klassenarbeit 30.10.'}</div>
+ let h=`<section class="lhero" style="--c:${L.color}"><div class="lh-txt"><div class="kicker"><span class="flag"><i></i><i></i><i></i></span>${LANG.name} · ${L.kicker||'Klassenarbeit 30.10.'}</div>
  <h1>${L.title}</h1><div class="lh-fr">${L.fr}</div><p>${L.intro}</p>
  <div class="lh-btns">${nc?`<button class="btn big" data-open="${nc.id}">▶ ${o.d?'Weiter mit Kapitel '+(nc.idx+1):'Los geht’s: Kapitel 1'}</button>`:`<button class="btn big red" data-test="1">🏆 Abschlusstest</button>`}${EXTRA().filter(c=>!chapterStatus(c).done).map(c=>`<button class="btn big extra-btn" data-open="${c.id}">🧡 Extra-Übung: ${c.title}</button>`).join('')}</div></div>
  <div class="lh-art">${window.HERO[L.slug]||''}</div></section>
@@ -184,7 +186,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('.tab');if(!t)ret
 function mountWriter(el,w,id){if(!w)return;const sk=WKEY+'_w_'+id;let txt='';try{txt=localStorage.getItem(sk)||'';}catch(e){}
  el.innerHTML=`<div class="wr-head">✍️ ${w.title}</div><p class="legend">${w.hint||''}</p>
  <div class="wr-frame"><div class="wr-ft">🧱 Schreibrahmen – tippe auf einen Baustein, dann wird er in deinen Text eingefügt:</div>${w.listen?`<div class="wr-listen">${H.spkLines(w.frame.map(f=>[w.who||'',f[0]]),'','Mustertext anhören')}<span>Mustertext anhören</span></div>`:''}${w.frame.map(([fr,de])=>`<button type="button" class="wr-b" data-ins="${esc(fr)}"><span class="fr">${fr}</span><small>${de}</small></button>`).join('')}</div>
- <textarea class="wr-ta" rows="9" autocapitalize="sentences" spellcheck="false" placeholder="Schreibe hier deinen Text auf Französisch …">${esc(txt)}</textarea>
+ <textarea class="wr-ta" rows="9" autocapitalize="sentences" spellcheck="false" placeholder="Schreibe hier deinen Text auf ${LANG.name} …">${esc(txt)}</textarea>
  <div class="acc">${['é','è','ê','à','ç','ô','î','’'].map(c=>`<button type="button" data-c="${c}">${c}</button>`).join('')}</div>
  <div class="wr-check"><div class="wr-ct">✅ Checkliste <span class="wr-n"></span></div><ul>${w.checks.map((c,i)=>`<li data-i="${i}"><span class="ck-b"></span>${c[0]}</li>`).join('')}</ul></div>
  <div class="toolbar"><button type="button" class="btn ghost small wr-clear">🗑 Text löschen</button><button type="button" class="btn small wr-copy">📋 Text kopieren</button></div>
@@ -261,7 +263,7 @@ function mountEx(e){
  cur=RENDER[e.type](e,body);if(S)S.tt[S.i]=Date.now();
 }
 function ready(v){const b=$('#checkBtn');if(b&&!b.dataset.next)b.disabled=!v;}
-const PRAISE=['Super, richtig!','Très bien!','Genau!','Bravo!','Parfait!','Klasse!','Excellent!'];
+const PRAISE=LANG.praise;
 
 /* ---------- Protokoll ---------- */
 const LG=window.LOG;
@@ -274,7 +276,7 @@ function logAnswer(e,r,first){if(!S)return;S.att[S.i]=(S.att[S.i]||0)+1;const C=
   ok:!!r.ok,pts:r.pts,max:r.max,accent:r.acc?true:undefined,attempt:S.att[S.i],first,pos:S.i+1,of:S.list.length,ms:Math.min(600000,Date.now()-(S.tt[S.i]||Date.now())),...(r.log||{})});}
 function feedback(e,r,a){
  const fb=$('#fb');const first=!S.res[S.i];
- if(first)S.res[S.i]={e,ok:r.ok,pts:r.pts,max:r.max};
+ if(first)S.res[S.i]={e,ok:r.ok,pts:r.pts,max:r.max,sol:r.sol,given:r.given,raw:r.raw};
  if(r.ok&&S.mode!=='single'&&e.ch!=='test'){const p=chp(e.ch);p.solved[e.id]=1;save();}
  fb.className='fb show '+(r.ok?'ok':'bad');
  const say=r.say&&r.say.length?r.say:null;const c=CHMAP[e.ref]||CHMAP[e.ch]||{};
@@ -283,7 +285,7 @@ function feedback(e,r,a){
  const allP=(r.pairs||[]).filter(p=>p&&p[0]!=null&&p[1]!=null&&DN(p[0])!==DN(p[1]));
  let own=[];if(!r.ok&&r.tips&&r.tips.length)own=r.tips.slice();else if(!r.ok&&typeof e.dx==='function'){try{own=e.dx(r.raw!=null?String(r.raw):strip(String(r.given||'')),r,e)||[];}catch(err){own=[];}}
  const dg=own.slice();if(!own.length)allP.forEach(p=>dg.push(...diagnose(p[0],p[1],p[2]||'')));
- const pairs=allP.filter(p=>!/^(vrai|faux)$/.test(p[0])&&(own.length||close(p[0],p[1])||diagnose(p[0],p[1],p[2]||'').length));
+ const pairs=allP.filter(p=>!/^(vrai|faux|true|false)$/.test(p[0])&&(own.length||close(p[0],p[1])||diagnose(p[0],p[1],p[2]||'').length));
  const seen=new Set();const D=dg.filter(x=>!seen.has(x.t)&&seen.add(x.t)).slice(0,own.length?3:2);
  const why=e.why||'';const sw=DN(strip(r.sol||''));const dw=DN(why);const quote=/^\s*«/.test(strip(why));const weak=!quote&&strip(why).length<45||!quote&&(sw.length>8&&(dw===sw||dw.startsWith(sw.slice(0,Math.min(40,sw.length)))&&dw.length<sw.length+25));
  const ovl=(x,y)=>{const A=new Set(DN(x).split(' ').filter(w=>w.length>2)),B=DN(y).split(' ').filter(w=>w.length>2);if(!B.length)return 1;return B.filter(w=>A.has(w)).length/B.length;};const dtxt=D.map(x=>x.t).join(' ');const showWhy=why&&!D.length;void ovl;void dtxt;
@@ -297,7 +299,7 @@ function feedback(e,r,a){
   if(r.given&&(!pairs.length||r.detect||['gap','gapw','dialog','seg'].includes(e.type)))h+=`<div class="you"><span class="lbl">Deine Antwort:</span> ${r.given||'–'}</div>`;
   if(cmp||dcmp)h+=`<div class="cmps">${cmp||dcmp}</div>`;
   h+=`<div class="sol"><span class="lbl">Richtig ist:</span> <span class="fr">${r.sol}</span> ${say?spk(say.map(x=>x[1]),say.map(x=>x[0]),'mini','Lösung anhören'):''}</div>`;
-  h+=`<div class="whybox"><div class="wb-h">🤔 Warum?</div>${D.length?`<ul>${D.map(x=>`<li>${x.t}</li>`).join('')}</ul>`:''}${showWhy?`<p>${quote?'Im Text heißt es: ':''}${why}</p>`:''}${!D.length&&weak&&(c.rule||L.merk)?`<p><b>Regel:</b> ${c.rule||L.merk}</p>`:''}${r.orderHint?'<p class="legend">Tipp: Im Französischen steht meist <b>wer</b> (Subjekt) → <b>Verb</b> → <b>Rest</b> – wie im Deutschen.</p>':''}</div>`;
+  h+=`<div class="whybox"><div class="wb-h">🤔 Warum?</div>${D.length?`<ul>${D.map(x=>`<li>${x.t}</li>`).join('')}</ul>`:''}${showWhy?`<p>${quote?'Im Text heißt es: ':''}${why}</p>`:''}${!D.length&&weak&&(c.rule||L.merk)?`<p><b>Regel:</b> ${c.rule||L.merk}</p>`:''}${r.orderHint?'<p class="legend">Tipp: '+LANG.orderTip+'</p>':''}</div>`;
   if(merk)h+=`<div class="merkline">📌 <b>Merksatz:</b> ${merk}</div>`;
  }else{
   if(r.showSol)h+=`<div class="sol">Lösung: <span class="fr">${r.sol}</span> ${say?spk(say.map(x=>x[1]),say.map(x=>x[0]),'mini','Lösung anhören'):''}</div>`;
@@ -336,7 +338,7 @@ RENDER.gap=(e,el)=>{el.innerHTML=`<div class="ex-sub">${e.sub||'Wähle in jeder 
  return {check(){const r=gapCheck(e,el);if(r==null)return null;return {ok:r.n===r.max,pts:r.n,max:r.max,sol:fill(e,e.text),pairs:r.pairs,given:givenFill(e.text,r.vals),raw:strip(e.text.replace(/\{(\d+)\}/g,(m,k)=>(r.vals[k]||[''])[0])),say:sayOf(e,e.table?null:strip(fill(e,e.text,false)))};}};};
 RENDER.gapw=(e,el)=>{const KB=['','Pronomen','Artikel','Info'];
  el.innerHTML=`<div class="ex-sub">${e.sub||'Schreibe die fehlenden Wörter in die Lücken.'}</div>${e.box?`<div class="kb-leg"><span><span class="kb kb1">1</span> Personalpronomen</span><span><span class="kb kb2">2</span> Artikel</span><span><span class="kb kb3">3</span> passende Information</span></div>`:''}${e.bank?`<div class="kb-bank"><span class="lbl">🧺 Wortkasten:</span> ${shuffle(Object.keys(e.ans).map(k=>[].concat(e.ans[k])[0])).map(w=>`<span class="kb-w">${w}</span>`).join('')}</div>`:''}<div class="gaptext${e.box?' kbt':''}">${e.text.replace(/\{(\d+)\}/g,(m,k)=>{const len=Math.max(...[].concat(e.ans[+k]).map(x=>x.length));return `${e.box&&e.box[+k]?`<span class="kb kb${e.box[+k]}" title="${KB[e.box[+k]]}">${e.box[+k]}</span>`:''}<input class="gapin" data-g="${k}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Lücke ${+k+1}" style="width:${Math.max(3.2,len*0.72+1.4)}em">`;})}</div>
- <div class="acc">${['é','è','ê','à','ç','’'].map(c=>`<button type="button" data-c="${c}">${c}</button>`).join('')}</div>`;
+ <div class="acc">${LANG.acc.map(c=>`<button type="button" data-c="${c}">${c}</button>`).join('')}</div>`;
  const ins=$$('.gapin',el);let lastI=ins[0];
  const upd=()=>ready(ins.every(i=>i.value.trim().length>0));
  ins.forEach(i=>{i.addEventListener('input',upd);i.addEventListener('focus',()=>lastI=i);i.addEventListener('keydown',ev=>{if(ev.key==='Enter'){const k=ins.indexOf(i);if(k<ins.length-1)ins[k+1].focus();else{const cb=$('#checkBtn');if(cb&&!cb.disabled)cb.click();}}});});
@@ -352,7 +354,7 @@ RENDER.wk=(e,el)=>{const tap=e.tap!==false,mark=e.mark!==false;const K=w=>norm(s
  el.innerHTML=`<div class="ex-sub">${e.sub||(tap?'Tippe eine Lücke an und dann das passende Wort im Wortkasten. Benutzte Wörter werden abgehakt – <b>'+(e.bank.length-Object.keys(e.ans).length)+' Wörter bleiben übrig</b>. Nochmal auf eine Lücke tippen macht sie leer.':'Schreibe die Wörter selbst in die Lücken. Im Wortkasten wird <b>nichts</b> abgehakt – <b>'+(e.bank.length-Object.keys(e.ans).length)+' Wörter bleiben übrig</b>.')}</div>
  <div class="kb-bank wk-bank${mark?'':' nomark'}"><span class="lbl">🧺 Wortkasten:</span> ${bank.map(w=>tap?`<button type="button" class="kb-w wk-w" data-w="${esc(w)}">${w}</button>`:`<span class="kb-w wk-w" data-w="${esc(w)}">${w}</span>`).join('')}</div>
  <div class="gaptext wk-text">${e.text.replace(/\{(\d+)\}/g,(m,k)=>{const len=Math.max(...bank.map(x=>strip(x).length).filter(x=>x<14),6);return `<input class="gapin wk-in" data-g="${k}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Lücke ${+k+1}"${tap?' readonly inputmode="none"':''} style="width:${Math.min(9.5,Math.max(4.5,len*0.62+1.2))}em">`;})}</div>
- ${tap?'':`<div class="acc">${['é','è','ê','à','ç','’'].map(c=>`<button type="button" data-c="${c}">${c}</button>`).join('')}</div>`}`;
+ ${tap?'':`<div class="acc">${LANG.acc.map(c=>`<button type="button" data-c="${c}">${c}</button>`).join('')}</div>`}`;
  const ins=$$('.wk-in',el),chips=$$('.wk-w',el);let act=null;
  const paint=()=>{if(mark){const used={};ins.forEach(i=>{const v=K(i.value);if(v)used[v]=(used[v]||0)+1;});const seen={};chips.forEach(c=>{const v=K(c.dataset.w);seen[v]=(seen[v]||0)+1;c.classList.toggle('used',(used[v]||0)>=seen[v]);if(c.tagName==='BUTTON')c.disabled=c.classList.contains('used')||ins[0].disabled;});}
   ins.forEach(i=>i.classList.toggle('act',i===act));ready(ins.every(i=>i.value.trim().length>0));};
@@ -375,8 +377,8 @@ RENDER.wk=(e,el)=>{const tap=e.tap!==false,mark=e.mark!==false;const K=w=>norm(s
   return {ok:n===ins.length,pts:n,max:ins.length,sol:solT,pairs,tips:T,log:{gaps:pairs.map(p=>[strip(p[0]),strip(p[1])])},given:givenFill(e.text,vals),say:sayOf(e,strip(solT))};}};};
 /* Zeile für Zeile (wie in der Klassenarbeit): deutsche Vorgabe → französischer Satz, Auswertung pro Zeile mit Musterlösung */
 RENDER.lines=(e,el)=>{const LS=window.LS;
- el.innerHTML=(e.ctx?`<div class="zl-ctx">${e.ctx}</div>`:'')+`<ol class="zl">${e.lines.map((L,i)=>`<li class="zl-li"><div class="zl-de">${L.de} <span class="zl-p">${L.max||2} P.</span></div>${L.who?`<span class="zl-who">${L.who}:</span>`:''}<input class="inp zl-in" data-i="${i}" autocomplete="off" autocapitalize="sentences" autocorrect="off" spellcheck="false" placeholder="Auf Französisch …" aria-label="Zeile ${i+1}"><div class="zl-fb" hidden></div></li>`).join('')}</ol>
- <div class="acc">${['é','è','ê','à','ç','’'].map(c=>`<button type="button" data-c="${c}">${c}</button>`).join('')}</div>
+ el.innerHTML=(e.ctx?`<div class="zl-ctx">${e.ctx}</div>`:'')+`<ol class="zl">${e.lines.map((L,i)=>`<li class="zl-li"><div class="zl-de">${L.de} <span class="zl-p">${L.max||2} P.</span></div>${L.who?`<span class="zl-who">${L.who}:</span>`:''}<input class="inp zl-in" data-i="${i}" autocomplete="off" autocapitalize="sentences" autocorrect="off" spellcheck="false" placeholder="Auf ${LANG.name} …" aria-label="Zeile ${i+1}"><div class="zl-fb" hidden></div></li>`).join('')}</ol>
+ <div class="acc">${LANG.acc.map(c=>`<button type="button" data-c="${c}">${c}</button>`).join('')}</div>
  <div class="legend">Groß-/Kleinschreibung und Satzzeichen sind egal. Wichtig sind die <b>Kernteile</b> jedes Satzes.</div>`;
  const ins=$$('.zl-in',el);let lastI=ins[0];const upd=()=>ready(ins.every(i=>i.value.trim().length>0));
  ins.forEach((i,k)=>{i.addEventListener('input',upd);i.addEventListener('focus',()=>lastI=i);i.addEventListener('keydown',ev=>{if(ev.key==='Enter'){if(k<ins.length-1)ins[k+1].focus();else{const cb=$('#checkBtn');if(cb&&!cb.disabled)cb.click();}}});});
@@ -393,7 +395,7 @@ RENDER.lines=(e,el)=>{const LS=window.LS;
 RENDER.dialog=(e,el)=>{let side={},n=0;
  el.innerHTML=`<div class="ex-sub">Wähle in jeder Lücke das passende Wort.</div><div class="dlg">`+e.lines.map(([w,t])=>{if(!(w in side))side[w]=n++%2;return `<div class="row ${side[w]?'r':''}"><div class="av">${window.CHARS[w]||''}<span>${window.NAMES[w]||w}</span></div><div class="bub"><span class="tx">${gapSelects(e,t)}</span></div></div>`;}).join('')+'</div>';bindGaps(el);
  return {check(){const r=gapCheck(e,el);if(r==null)return null;return {ok:r.n===r.max,pts:r.n,max:r.max,pairs:r.pairs,given:e.lines.map(([w,t])=>`${window.NAMES[w]||w}: `+givenFill(t,r.vals)).join('<br>'),sol:e.lines.map(([w,t])=>`${window.NAMES[w]||w}: `+fill(e,t)).join('<br>'),say:e.lines.map(([w,t])=>[w,strip(fill(e,t,false))])};}};};
-function closest(v,ans){const n=x=>DN(x).split(' ');const a=n(v);let best=ans[0],bs=-1;ans.forEach(x=>{const b=n(x);let sc=0;b.forEach((t,i)=>{if(a[i]===t)sc+=i===0?3:2;else if(a.includes(t))sc+=1;});sc-=Math.abs(a.length-b.length);if(sc>bs){bs=sc;best=x;}});return best;}
+function closest(v,ans){const n=x=>(window.CLOSE_N?window.CLOSE_N(x):DN(x)).split(' ');const a=n(v);let best=ans[0],bs=-1;ans.forEach(x=>{const b=n(x);let sc=0;b.forEach((t,i)=>{if(a[i]===t)sc+=i===0?3:2;else if(a.includes(t))sc+=1;});sc-=Math.abs(a.length-b.length);if(sc>bs){bs=sc;best=x;}});return best;}
 const joinTok=a=>a.join(' ').replace(/\s+([?.!,])/g,'$1').replace(/’ /g,'’');
 RENDER.order=(e,el)=>{
  let toks=e.tok.map((t,i)=>({t,i}));let sh;do{sh=shuffle(toks);}while(toks.length>2&&sh.every((x,k)=>x.i===k));
@@ -405,9 +407,9 @@ RENDER.order=(e,el)=>{
  return {check(){if(pool.children.length)return null;const got=$$('.tok',zone).map(b=>b.textContent);$$('.tok',el).forEach(b=>{b.disabled=true;});
   const r=compare(joinTok(got),[joinTok(e.tok),...e.alts]);zone.classList.add(r.ok?'ok':'bad');return {ok:r.ok,pts:r.ok?1:0,max:1,sol:joinTok(e.tok),given:esc(joinTok(got)),raw:joinTok(got),orderHint:!r.ok,say:sayOf(e,joinTok(e.tok))};}};};
 RENDER.write=(e,el)=>{
- el.innerHTML=(e.img?`<div class="ex-img">${e.img}</div>`:'')+(e.prompt?`<div class="prompt">${e.prompt}</div>`:'')+`<input class="inp" id="inp" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="${e.ph||'Schreibe hier auf Französisch …'}" aria-label="Antwort">
- <div class="acc">${['é','è','ê','à','ç','’'].map(c=>`<button type="button" data-c="${c}">${c}</button>`).join('')}</div>
- <div class="legend">Groß-/Kleinschreibung ist egal. Akzente bitte mitschreiben – die Knöpfe helfen dir.</div>`;
+ el.innerHTML=(e.img?`<div class="ex-img">${e.img}</div>`:'')+(e.prompt?`<div class="prompt">${e.prompt}</div>`:'')+`<input class="inp" id="inp" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="${e.ph||'Schreibe hier auf '+LANG.name+' …'}" aria-label="Antwort">
+ <div class="acc">${LANG.acc.map(c=>`<button type="button" data-c="${c}">${c}</button>`).join('')}</div>
+ <div class="legend">Groß-/Kleinschreibung ist egal. ${LANG.accHint}</div>`;
  const inp=$('#inp',el);inp.addEventListener('input',()=>ready(inp.value.trim().length>0));
  inp.addEventListener('keydown',ev=>{const cb=$('#checkBtn');if(ev.key==='Enter'&&inp.value.trim().length>0&&cb)cb.click();});
  $$('.acc button',el).forEach(b=>b.onclick=()=>{const s=inp.selectionStart??inp.value.length,t=inp.selectionEnd??s;inp.value=inp.value.slice(0,s)+b.dataset.c+inp.value.slice(t);inp.focus();inp.setSelectionRange(s+1,s+1);ready(inp.value.trim().length>0);});
@@ -443,7 +445,7 @@ RENDER.mark=(e,el)=>{const {R,sel}=roomSel(el,e,true);const T=new Set(e.targets)
   if(T.has(k)&&sel.has(k)){g.classList.add('ok');hit++;}else if(!T.has(k)&&sel.has(k)){g.classList.add('bad');fp++;}else if(T.has(k))g.classList.add('miss');});
   const pts=Math.max(0,hit-fp);const miss=e.targets.filter(k=>!sel.has(k)),extra=[...sel].filter(k=>!T.has(k));return {ok:hit===T.size&&fp===0,pts,max:T.size,given:[miss.length?'Nicht markiert: '+miss.map(k=>R.labels[k]).join(', '):'',extra.length?'Zu viel markiert: '+extra.map(k=>R.labels[k]).join(', '):''].filter(Boolean).join('<br>'),sol:e.targets.map(k=>R.labels[k]).join(', '),say:sayOf(e,null)};}};};
 RENDER.multi=(e,el)=>{
- const o=shuffle(e.o);el.innerHTML=`${e.img?`<div class="ex-img">${e.img}</div>`:''}<div class="ex-sub">${e.sub||'Tippe alle passenden an (mehrere sind richtig).'}</div><div class="chips">${o.map((x,i)=>`<button class="chipc" data-i="${i}">${x[0]}</button>`).join('')}</div>`;
+ const o=e.keep?e.o.slice():shuffle(e.o);el.innerHTML=`${e.img?`<div class="ex-img">${e.img}</div>`:''}<div class="ex-sub">${e.sub||'Tippe alle passenden an (mehrere sind richtig).'}</div><div class="chips${e.keep?' chips-sent':''}">${o.map((x,i)=>`<button class="chipc" data-i="${i}">${x[0]}</button>`).join('')}</div>`;
  $$('.chipc',el).forEach(b=>b.onclick=()=>{if(b.disabled)return;b.classList.toggle('sel');ready($$('.chipc.sel',el).length>0);});
  return {check(){const s=$$('.chipc.sel',el);if(!s.length)return null;let hit=0,fp=0;const T=e.o.filter(x=>x[1]).length;$$('.chipc',el).forEach(b=>{const x=o[+b.dataset.i];const on=b.classList.contains('sel');b.disabled=true;
   if(x[1]&&on){b.classList.add('ok');hit++;}else if(!x[1]&&on){b.classList.add('bad');fp++;}else if(x[1]&&!on){b.classList.add('miss');}});
@@ -451,8 +453,8 @@ RENDER.multi=(e,el)=>{
   return {ok:hit===T&&fp===0,pts:Math.max(0,hit-fp),max:T,sol:e.o.filter(x=>x[1]).map(x=>x[0]).join(' · '),given:[mi.length?'Vergessen: '+mi.join(', '):'',ex.length?'Falsch angetippt: '+ex.join(', '):''].filter(Boolean).join('<br>'),say:sayOf(e,null)};}};};
 RENDER.seg=(e,el)=>{
  const ch={};
- el.innerHTML=`${e.img?`<div class="ex-img">${e.img}</div>`:''}<div class="ex-sub">${e.sub||(e.tf?'Tippe bei jedem Satz auf <b>vrai</b> (richtig) oder <b>faux</b> (falsch).':'Wähle in jeder Zeile die richtige Antwort.')}</div><div class="segs">`+e.rows.map((r,i)=>{const [p,ans,au,who]=r;
-  return `<div class="segrow" data-r="${i}"><div class="sg-p">${au?spk(au,who||'','', 'Anhören'):''}<span class="sg-t">${p}</span></div><div class="sg-o${e.tf?' tf':''}">${(r[4]||e.opts).map(o=>`<button type="button" class="sgb${e.tf?(o==='vrai'?' v':' f'):''}" data-v="${esc(o)}">${e.tf?(o==='vrai'?'✓ vrai':'✗ faux'):o}</button>`).join('')}</div></div>`;}).join('')+'</div>';
+ el.innerHTML=`${e.img?`<div class="ex-img">${e.img}</div>`:''}<div class="ex-sub">${e.sub||(e.tf?LANG.tfSub:'Wähle in jeder Zeile die richtige Antwort.')}</div><div class="segs">`+e.rows.map((r,i)=>{const [p,ans,au,who]=r;
+  return `<div class="segrow" data-r="${i}"><div class="sg-p">${au?spk(au,who||'','', 'Anhören'):''}<span class="sg-t">${p}</span></div><div class="sg-o${e.tf?' tf':''}">${(r[4]||e.opts).map(o=>`<button type="button" class="sgb${e.tf?(o===e.opts[0]?' v':' f'):''}" data-v="${esc(o)}">${e.tf?(o===e.opts[0]?'✓ ':'✗ ')+o:o}</button>`).join('')}</div></div>`;}).join('')+'</div>';
  $$('.segrow',el).forEach(row=>{$$('.sgb',row).forEach(b=>b.onclick=()=>{if(b.disabled)return;$$('.sgb',row).forEach(x=>x.classList.remove('sel'));b.classList.add('sel');ch[row.dataset.r]=b.dataset.v;ready(Object.keys(ch).length===e.rows.length);});});
  return {check(){if(Object.keys(ch).length<e.rows.length)return null;let n=0;const pairs=[],gv=[];
   $$('.segrow',el).forEach(row=>{const r=e.rows[+row.dataset.r];const v=ch[row.dataset.r];const okr=v===r[1];if(okr)n++;else{pairs.push([v,r[1],strip(r[0])]);gv.push(`${strip(r[0]).trim()||'…'}: <span class="gw">${esc(v)}</span> (richtig: <b>${esc(r[1])}</b>)`);}row.classList.add(okr?'ok':'bad');
@@ -521,12 +523,12 @@ function result(){
  if(S.mode==='test'){P.test.runs++;P.test.best=Math.max(P.test.best??0,pct);P.test.stars=Math.max(P.test.stars,st);P.test.last=pct;save();}
  if(!S.logged){S.logged=1;const fr=res.filter(x=>x.ok).length;lg({kind:S.mode==='test'?'test_end':S.mode==='chapter'?'chapter_end':S.mode+'_end',mode:S.mode,ch:S.mode==='chapter'?S.ch:S.mode==='test'?'test':null,run:S.run||null,pct,pts,max,stars:st,tasks:res.length,firstRight:fr,done:S.mode==='chapter'?pct>=70:undefined,best:S.mode==='chapter'?chp(S.ch).best:S.mode==='test'?P.test.best:undefined,wrongTasks:res.filter(x=>!x.ok).map(x=>x.e.id),ms:Date.now()-S.t0,flush:true});}
  const badge=st===3?medal('#f59e0b','GOLD'):st===2?medal('#94a3b8','SILBER'):st===1?medal('#b45309','BRONZE'):'';
- const title=st===3?'Excellent! Das sitzt!':st===2?'Très bien! Schon richtig gut.':st===1?'Pas mal! Noch ein bisschen üben.':'Courage! Schau dir die Kapitel noch einmal an.';
+ const title=LANG.end[st===3?0:st===2?1:st===1?2:3];
  const wrong=res.filter(r=>!r.ok);const by={};wrong.forEach(r=>{const k=r.e.ref||r.e.ch;(by[k]=by[k]||[]).push(r.e);});
  let rev='';
  if(wrong.length){rev=`<div class="review"><h3>📌 Das solltest du noch einmal üben</h3>`+Object.entries(by).map(([ch,es])=>{const c=CHMAP[ch]||CHMAP.test;const tags=[...new Set(es.map(x=>x.tag||tlabel(x)[0]))];
   return `<div class="it"><div class="t"><b>${c.icon||''} ${c.title}</b><br><span class="legend">${es.length} ${es.length>1?'Fehler':'Fehler'}: ${tags.join(' · ')}</span></div>${CHMAP[ch]&&ch!=='test'?`<button class="btn small" data-open="${ch}">📘 Erklärung</button><button class="btn small ghost" data-practice="${ch}">✏️ Üben</button>`:''}</div>`;}).join('')+`</div>`;}
- else rev=`<div class="tip" style="margin-top:16px"><span class="tip-ic">🎉</span><div>Alles richtig – fantastique!</div></div>`;
+ else rev=`<div class="tip" style="margin-top:16px"><span class="tip-ic">🎉</span><div>${LANG.allOk}</div></div>`;
  main.innerHTML=`<div class="ex-wrap"><div class="ex-card result fade">${S.mode==='test'?`<div class="kick-red">ABSCHLUSSTEST · ${L.title}</div>`:''}
  ${badge}<div class="stars">${[0,1,2].map(i=>`<span class="s ${i<st?'on':''}" style="animation-delay:${i*.2}s">★</span>`).join('')}</div>
  <div class="score">${pts} / ${max} Punkte</div><div class="score-sub">${pct} % · ${title}</div>

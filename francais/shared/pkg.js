@@ -5,9 +5,11 @@ const W=window;const ALL=()=>W.PACKAGES||[];const LSS=()=>W.LESSONS||[];
 const TYP={klassenarbeit:{t:'Klassenarbeiten',one:'Klassenarbeit',ic:'🎯',dir:'klassenarbeiten',c:'#1e3a8a'},hausaufgabe:{t:'Hausaufgaben',one:'Hausaufgabe',ic:'📝',dir:'hausaufgaben',c:'#0d9488'}};
 const now=()=>{const f=+(localStorage.getItem('fr_fake_now')||0);return f||Date.now();};
 const dateOf=p=>{const [y,m,d]=String(p.datum||'').split('-').map(Number);return y?new Date(y,m-1,d,8,0,0):null;};
-const days=p=>{const d=dateOf(p);if(!d)return null;const t=new Date(now());t.setHours(0,0,0,0);const x=new Date(d);x.setHours(0,0,0,0);return Math.round((x-t)/864e5);};
+/* Abgabe: Hausaufgaben mit Abgabedatum gelten erst NACH der Abgabe als erledigt */
+const dueOf=p=>{const [y,m,d]=String(p.abgabe||p.datum||'').split('-').map(Number);return y?new Date(y,m-1,d,8,0,0):null;};
+const days=p=>{const d=dueOf(p);if(!d)return null;const t=new Date(now());t.setHours(0,0,0,0);const x=new Date(d);x.setHours(0,0,0,0);return Math.round((x-t)/864e5);};
 const WD=['So','Mo','Di','Mi','Do','Fr','Sa'];
-const fmtDate=p=>{const d=dateOf(p);return d?`${WD[d.getDay()]} ${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`:'';};
+const fmtDate=(p,due)=>{const d=due?dueOf(p):dateOf(p);return d?`${WD[d.getDay()]} ${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`:'';};
 const slugs=p=>(p.teile||[]).flatMap(t=>t.lektionen||[]);
 const lessons=p=>slugs(p).map(s=>LSS().find(m=>m.slug===s)).filter(Boolean);
 const list=(fach,typ)=>ALL().filter(p=>(!fach||p.fach===fach)&&(!typ||p.typ===typ));
@@ -25,5 +27,5 @@ function probe(p){const TR=W.TR;if(!p.probe||!TR)return null;const mini=p.probe.
 const probeHref=p=>!p.probe?null:p.probe.typ==='mini'?'training/#mini-'+p.id:'training/#probe';
 function progress(p){const PR=W.PROG;const L=lessons(p);let d=0,t=0,any=false;L.forEach(m=>{const x=PR.lesson(m);d+=x.done;t+=x.total;if(x.started||x.test!=null)any=true;});
  const nh=PR.nh(L);return {done:d,total:t,pct:Math.round(d/Math.max(1,t)*100),any,nh,nhOpen:nh.filter(x=>x.key!=='fertig').length,n:L.length};}
-W.PK={TYP,list,get,lessons,slugs,sorted,done,days,fmtDate,dateOf,probe,probeHref,progress,firstKA,currentKA,now};
+W.PK={TYP,list,get,lessons,slugs,sorted,done,days,fmtDate,dateOf,dueOf,probe,probeHref,progress,firstKA,currentKA,now};
 })();

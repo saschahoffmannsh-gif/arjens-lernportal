@@ -12,12 +12,12 @@ const BE=new Set(['suis','es','est','sommes','êtes','etes','sont']);
 const ERST=['regard','écout','ecout','parl','présent','present','téléphon','telephon','appel','appell','aim','ador','jou','travaill','cherch','rentr','dessin','chant','mang','arriv','habit'];
 const ERX=new RegExp('^('+ERST.join('|')+')(e|es|ons|ez|ent|er)$','i');
 const ART={le:'m',un:'m',la:'f',une:'f','l’':'l',les:'p',des:'p'};
-const LBL={s:'Wer?',v:'Verb',r:'Rest',p:'Pronomen',x:''};
+const LBL={s:'Wer?',v:'Verb',r:'Rest',p:'Pronomen',x:'',a:'Hilfsverb',m:'Vollverb',o:'Objekt',w:'Ort',t:'Zeit'};
 const low=t=>String(t).toLowerCase().replace(/'/g,'’').replace(/[.,!?;:«»"“”()]/g,'');
 /* ---------- Satz in Wörter mit Rolle zerlegen ---------- */
 function tok(s){const out=[];String(strip(s)).replace(/'/g,'’').trim().split(/\s+/).forEach(w=>{const m=w.match(/^(j|l|m|t|s|c|qu|d)’(.+)$/i);
  if(m){out.push({t:m[1]+'’',glue:true});out.push({t:m[2]});}else if(w)out.push({t:w});});return out;}
-function roles(ts){const n=ts.length;let vi=-1,vl=1;
+function roles(ts){if(W.VROLE){const r=W.VROLE(ts,low);if(r)return r;}const n=ts.length;let vi=-1,vl=1;
  for(let i=0;i<n;i++){const w=low(ts[i].t);
   if(BE.has(w)||ERX.test(w)){vi=i;break;}
   if(w==='y'&&i+1<n&&low(ts[i+1].t)==='a'){vi=i;vl=2;break;}
@@ -89,7 +89,7 @@ V.skel=(cards,o={})=>`<div class="skel">${cards.map((c,i)=>`<div class="sk-c"><s
 /* ---------- Hinweise / Beispielkarten ---------- */
 V.hint=(ic,t,cls='')=>`<div class="vh ${cls}"><span class="vh-i">${ic}</span><div>${t}</div></div>`;
 /** Beispielkarte: Bild (Figur / Gegenstand / eigenes Bild) + farbige Satzblöcke + Deutsch + 🔊 */
-V.picOf=(fr,who)=>{const o=V.objOf(fr);if(o)return H.ob(o.k,o.pl?3:1);
+V.picOf=(fr,who)=>{if(W.PICOF)return W.PICOF(fr,who);const o=V.objOf(fr);if(o)return H.ob(o.k,o.pl?3:1);
  const s=low(strip(fr).split(/\s+/)[0]||'');const P={je:who||'Karim','j’':who||'Karim',tu:'Théo',il:'Léo',elle:'Clara',on:['Théo','Clara'],nous:['Théo','Clara'],vous:['Noah','Jade'],ils:['Théo','Karim'],elles:['Jade','Yasmine']};
  if(who&&W.CHARS[who])return V.who(who);
  for(const n of Object.keys(W.CHARS||{}))if(strip(fr).includes(n))return V.who(strip(fr).includes(' et ')?Object.keys(W.CHARS).filter(x=>strip(fr).includes(x)).slice(0,2):n);

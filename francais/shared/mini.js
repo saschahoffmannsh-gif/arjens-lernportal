@@ -38,7 +38,7 @@ HUB.result=(S,x)=>{if(S.mode!=='mini')return prevRes?prevRes(S,x):null;const pkg
   wrong:wrong.slice(0,10).map(r=>({task:r.e.id,lesson:r.e._slug,ch:chOf(r.e).loc,q:TR.clip(r.e.q||r.e.sub||'',120),given:TR.clip(r.raw!=null?r.raw:txt(r.given),80),correct:TR.clip(txt(r.sol),80)})),ms:Date.now()-S.t0});}
  const by={};wrong.forEach(r=>{const c=chOf(r.e);(by[c.full]=by[c.full]||{s:r.e._slug,full:c.full,ch:c.loc,L:r.e._L,n:0}).n++;});
  const CH=HUB.E.CHMAP;
- const msg=pct>=81?'Très bien! Das sitzt.':pct>=67?'Bien! Fast alles verstanden.':pct>=50?'Pas mal – schau dir die Fehler noch einmal an.':'Courage! Übe die Lektionen noch einmal.';
+ const MM=(W.LANG&&W.LANG.mini)||['Très bien! Das sitzt.','Bien! Fast alles verstanden.','Pas mal – schau dir die Fehler noch einmal an.','Courage! Übe die Lektionen noch einmal.'];const msg=pct>=81?MM[0]:pct>=67?MM[1]:pct>=50?MM[2]:MM[3];
  if(pct>=81)setTimeout(()=>HUB.E.confetti&&HUB.E.confetti(),50);
  return `<div class="ex-wrap"><div class="ex-card result fade"><div class="mini-kick">MINI-PROBEARBEIT · ${esc(pkg.titel)}</div>
  <div class="mini-res">${ring(pct,pct>=67?'#16a34a':pct>=50?'#f59e0b':'#dc2626')}<div><div class="score">${x.pts} / ${x.max} Punkte</div><div class="score-sub">Note ${grade} (Orientierung) · ${msg}</div></div></div>

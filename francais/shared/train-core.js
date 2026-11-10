@@ -3,7 +3,7 @@
    Ergebnisse anderer Geräte werden beim Abgleich zwischengespeichert (für Rekorde und frühere Probe-Arbeiten). */
 (function(){
 'use strict';
-const W=window;const DOC='training';
+const W=window;const DOC=W.TR_DOC||'training';
 const get=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v;}catch(e){return d;}};
 const set=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}};
 const pad=n=>(n<10?'0':'')+n;
@@ -16,7 +16,7 @@ const clip=(t,n=140)=>{t=String(t==null?'':t).replace(/<[^>]+>/g,' ').replace(/\
 /* frühere Fehlerkiste (entfernt): Daten still löschen */
 try{localStorage.removeItem('fr_kiste_v1');}catch(e){}
 const KINDS=/^(game_end|probe_end|mini_end)$/;
-const RK='fr_train_remote_v1';
+const RK=DOC==='training'?'fr_train_remote_v1':'fr_train_remote_v1_'+DOC;
 function allEvents(){const L=LOG();const loc=(L?L.local(DOC):[]).filter(e=>KINDS.test(e.kind||''));const rem=get(RK,[]).filter(e=>KINDS.test(e.kind||''));const ids=new Set(loc.map(e=>e.id));return loc.concat(rem.filter(e=>!ids.has(e.id)));}
 let syncing=null;
 function sync(){if(syncing)return syncing;

@@ -1,0 +1,52 @@
+/* Englisch-Grammatik: Ergänzungen zur gemeinsamen app.css */
+.acc:empty{display:none}
+.ov-flag.uk{display:block;right:-14px;top:-10px;transform:rotate(10deg);opacity:.28}.ov-flag.uk svg{width:120px;height:72px;display:block}
+.wb-a{border-color:#f59e0b;background:#fff7ed;color:#9a3412;border-style:dashed}
+.wb-m{border-color:#ea580c;background:#ffedd5;color:#9a3412}
+.wb-o{border-color:#16a34a;background:#dcfce7;color:#166534}
+.wb-w{border-color:#7c3aed;background:#ede9fe;color:#5b21b6}
+.wb-t{border-color:#db2777;background:#fce7f3;color:#9d174d}
+/* Bauplan-Zug */
+.gplan{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin:8px 0;padding:8px;border-radius:14px;background:#f0fdfa;border:2px solid #99f6e4}
+.gp-c{display:inline-flex;flex-direction:column;align-items:center;padding:3px 8px;border-radius:10px;border:2px solid;background:#fff;line-height:1.2}
+.gp-c small{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.03em;opacity:.75}
+.gp-c b{font-size:1rem}
+.gp-s{border-color:#0284c7;color:#075985;background:#e0f2fe}.gp-be{border-color:#f59e0b;color:#92400e;background:#fef3c7}
+.gp-gt{border-color:#0d9488;color:#115e59;background:#ccfbf1}.gp-v{border-color:#ea580c;color:#9a3412;background:#ffedd5}
+.gp-plus{font-weight:900;color:#94a3b8}.gp-rest{font-weight:700;color:#334155;padding:0 2px}
+.gplan.anim .gp-c{animation:gpIn .5s both}.gplan.anim .gp-c:nth-of-type(2){animation-delay:.25s}.gplan.anim .gp-c:nth-of-type(3){animation-delay:.5s}.gplan.anim .gp-c:nth-of-type(4){animation-delay:.75s}
+@keyframes gpIn{from{opacity:0;transform:translateX(-18px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.gplan.anim .gp-c,.gs-jump,.gs-land,.gt-line i{animation:none!important}}
+table.gbe td,table.gbe th{padding:3px 5px;font-size:.92rem}
+/* Zeitstrahl */
+.gtime{display:flex;align-items:center;gap:6px;margin:8px 0;font-weight:800;color:#334155}
+.gt-now{white-space:nowrap;font-size:.85rem}.gt-line{flex:1;height:6px;border-radius:3px;background:#e2e8f0;position:relative;overflow:hidden}
+.gt-line i{position:absolute;left:0;top:0;bottom:0;width:40%;background:linear-gradient(90deg,#14b8a6,#0ea5e9);border-radius:3px;animation:gtRun 2.4s ease-in-out infinite}
+@keyframes gtRun{0%{left:-40%}100%{left:100%}}
+.gt-fut{display:flex;flex-direction:column;align-items:center}.gt-ic{font-size:1.6rem;line-height:1}.gt-fut small{font-size:.7rem;color:#64748b}
+/* Frage-Umstellung */
+.gswap{margin:8px 0;padding:8px;border-radius:14px;background:#fff;border:2px solid #e2e8f0}
+.gs-row{display:flex;flex-wrap:wrap;gap:4px;align-items:center}.gs-arr{margin:4px 0;font-weight:900;color:#0d9488}.gs-arr small{font-weight:700;color:#64748b}
+.gs-jump{animation:gsJ 2.2s ease-in-out infinite}.gs-land{animation:gsL 2.2s ease-in-out infinite}
+@keyframes gsJ{0%,60%,100%{transform:none}30%{transform:translate(-10px,-8px)}}
+@keyframes gsL{0%,100%{box-shadow:0 0 0 0 #f59e0b00}50%{box-shadow:0 0 0 5px #f59e0b55}}
+/* Prädikat: Hilfsverb gestrichelt, Vollverb durchgezogen */
+.gpred{font-size:1.08rem;font-weight:700;line-height:2;margin:6px 0;color:#1e293b}
+.gpa{border-bottom:3px dashed #f59e0b;padding:0 1px;color:#9a3412}.gpm{border-bottom:3px solid #ea580c;padding:0 1px;color:#9a3412}
+.gps{border-bottom:3px solid #0284c7;padding:0 1px;color:#075985}.gpr{color:#334155}
+.gpleg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:.82rem;color:#475569;margin:4px 0}
+/* Wochenplaner */
+.gplanner{border-radius:14px;border:2px solid #fde68a;background:#fffbeb;padding:6px 8px;margin:8px 0}
+.gpl-h{font-weight:900;color:#92400e;margin-bottom:4px}.gpl-r{display:flex;align-items:center;gap:8px;padding:4px 0;border-top:1px dashed #fcd34d}
+.gpl-d{min-width:84px;font-weight:900;color:#b45309}.gpl-ic{font-size:1.3rem}.gpl-t{flex:1}
+/* Deutsch ↔ Englisch */
+.gde,.gneb{border-radius:14px;border:2px solid #e2e8f0;background:#fff;padding:6px 8px;margin:8px 0}
+.gde-r,.gnb-r{display:flex;align-items:center;gap:8px;padding:3px 0;flex-wrap:wrap}.gde-f{font-size:1.2rem}.gde-n{font-size:.82rem;color:#64748b;margin-top:3px}
+.gnb-v{background:#ffedd5;color:#9a3412;border-radius:6px;padding:0 4px}.gnb-end{outline:2px dashed #dc2626}
+/* Plan oder Anzeichen */
+.gab{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+.gab-c{display:flex;flex-direction:column;gap:3px;border-radius:14px;padding:8px;border:2px solid}.gab-c i{font-size:.86rem;color:#334155}
+.gab-a{border-color:#0d9488;background:#f0fdfa}.gab-b{border-color:#7c3aed;background:#f5f3ff}.gab-ic{font-size:1.5rem}.gab-c small{color:#475569}
+@media (max-width:360px){.gab{grid-template-columns:1fr}}
+/* Satz zum Antippen (Subjekt finden): Reihenfolge bleibt */
+.chips.chips-sent{gap:6px}

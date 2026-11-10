@@ -2,6 +2,7 @@
 (function(){
 'use strict';
 const $=s=>document.querySelector(s);
+const OVL=Object.assign({name:'Französisch',flag:'<i></i><i></i><i></i>',flagCls:'',sound:'Alle französischen Sätze kannst du anhören.'},window.OV_LANG||{});
 const PK=window.PK;const PKG=PK&&window.PKG_ID?PK.get(window.PKG_ID):null;const R=PKG?'../':'';
 const LS=PKG?PK.lessons(PKG):(window.LESSONS||[]);
 const get=k=>{try{return JSON.parse(localStorage.getItem(k)||'null');}catch(e){return null;}};
@@ -10,7 +11,7 @@ const PR=window.PROG;const prog=m=>PR.lesson(m);
 const KA=!PKG||PKG.typ==='klassenarbeit';const exam=PKG&&PK.dateOf(PKG)||new Date(2026,9,30,8,0,0);
 const days=PKG?PK.days(PKG):Math.ceil((exam-new Date())/864e5);
 const cd=days>1?`Noch <b>${days} Tage</b>`:days===1?'<b>Morgen</b> ist es so weit!':days===0?'<b>Heute</b> ist die Klassenarbeit – Bonne chance!':'Die Klassenarbeit ist geschafft 🎉';
-const cdH=!KA?(days>0?`Abgabe in <b>${days} Tagen</b>`:days===0?'<b>Heute</b> abgeben':'Erledigt ✓'):cd;
+const cdH=!KA?(days>1?`Abgabe in <b>${days} Tagen</b>`:days===1?'Abgabe <b>morgen</b>':days===0?'<b>Heute</b> abgeben':'Erledigt ✓'):cd;
 const CHECK=(PKG&&PKG.checkliste)||[];const CKEY=!PKG||PKG.id===(PK.firstKA()||PKG.id)?'fr_ka_check_v1':'fr_check_'+PKG.id;
 const PLAN=(PKG&&PKG.lernplan)||[];
 const ck=get(CKEY)||{};
@@ -42,7 +43,7 @@ function vokHTML(){if(!VS)return '';const p=vokProg();const st=p.d>=p.t?'fertig'
  <span class="lt-foot"><span class="ov-bar"><i style="width:${p.pct}%"></i></span><span class="ov-s">${p.d}/${p.t} Teile ✓ · je ca. 10 Min.</span></span>
  <span class="lt-st lt-${st}">${st==='fertig'?'✓ fertig':st==='arbeit'?'✏️ begonnen':'neu'}</span></a>`;}
 if(VS&&window.SYNC&&window.SYNC.doc&&window.SYNC.base)window.SYNC.doc(VS.slug).then(ev=>{const nev=(ev||[]).filter(e=>/^en_/.test(e.kind||''));const c=get('en_sync_v1_'+VS.slug)||{};if(nev.length&&nev.length!==((c.ev||[]).length)){set('en_sync_v1_'+VS.slug,{base:(window.LOG&&window.LOG.store)||null,ev:nev});if(typeof refresh==='function')refresh();}}).catch(()=>{});
-function build(){let h=nhHTML()+`<section class="ov-hero"><div class="ov-flag"><i></i><i></i><i></i></div><div class="ov-k">Französisch · ${PKG?(KA?'Klassenarbeit':'Hausaufgabe')+' · '+PK.fmtDate(PKG):'6. Klasse · 1. Lernjahr'}</div><h1>${PKG?esc0(PKG.titel):'Klassenarbeit 30. Oktober'}</h1><p class="ov-cd">⏳ ${cdH}</p>${PKG&&PKG.schwerpunkte?`<div class="ov-chips">${PKG.schwerpunkte.map(x=>`<span class="chip">${esc0(x)}</span>`).join('')}</div>`:''}<p class="ov-sub">${VS?`${VS.parts} Spiele-Teile + `:''}${LS.length} Lektion${LS.length===1?'':'en'} · je ca. 30 Aufgaben · am besten 2 × 15–20 Min. pro Lektion</p></section>
+function build(){let h=nhHTML()+`<section class="ov-hero"><div class="ov-flag${OVL.flagCls}">${OVL.flag}</div><div class="ov-k">${OVL.name} · ${PKG?(KA?'Klassenarbeit':'Hausaufgabe')+' · '+PK.fmtDate(PKG)+(PKG.abgabe?' · Abgabe '+PK.fmtDate(PKG,1):''):'6. Klasse · 1. Lernjahr'}</div><h1>${PKG?esc0(PKG.titel):'Klassenarbeit 30. Oktober'}</h1><p class="ov-cd">⏳ ${cdH}</p>${PKG&&PKG.schwerpunkte?`<div class="ov-chips">${PKG.schwerpunkte.map(x=>`<span class="chip">${esc0(x)}</span>`).join('')}</div>`:''}<p class="ov-sub">${OVL.sub?OVL.sub(LS):`${VS?`${VS.parts} Spiele-Teile + `:''}${LS.length} Lektion${LS.length===1?'':'en'} · je ca. 30 Aufgaben · am besten 2 × 15–20 Min. pro Lektion`}</p></section>
 <div class="section-title"><div class="bar"></div><h2>Deine Lektionen</h2></div><div class="ov-grid">`+vokHTML();
 const PARTS=PKG?PKG.teile:[{t:'Teil 1 · Grammatik & Texte – zuerst alles in Ruhe durcharbeiten',lektionen:LS.filter(m=>m.slug!=='ecouter').map(m=>m.slug)},{t:'Teil 2 · Hören & Aussprache – zum Schluss',lektionen:['ecouter']}];
 const FIRST={};PARTS.forEach(t=>{const f=(t.lektionen||[]).find(s=>LS.some(m=>m.slug===s));if(f)FIRST[f]=t.t;});
@@ -53,7 +54,7 @@ LS.forEach((m,i)=>{const p=prog(m);if(FIRST[m.slug]&&(PARTS.length>1||PKG))h+=`<
  <span class="lt-foot"><span class="ov-bar"><i style="width:${p.pct}%"></i></span><span class="ov-s">${p.done}/${p.total} Kapitel ✓ · ca. ${m.min} Min.</span>${p.test!=null?`<span class="ov-s lt-test">Test ${p.test} % <span class="lt-stars">${'★'.repeat(p.stars)}${'☆'.repeat(3-p.stars)}</span></span>`:''}
  ${p.xs.map(x=>`<span class="ov-extra ${x.cls}">${x.nh?'🔁':'🧡'} ${esc0(x.title)}: ${x.t}${x.runs&&x.key!=='fertig'?` · ${x.best} %`:''}</span>`).join('')}</span>
  <span class="lt-st lt-${st}">${st==='fertig'?'✓ fertig':st==='arbeit'?'✏️ begonnen':'neu'}</span></a>`;});
-h+=`</div><div class="soundtip"><span class="st-ic">🔊</span><div><b>Mit Ton lernen:</b> Alle französischen Sätze kannst du anhören. <b>Kein Ton auf dem iPhone?</b> Stummschalter an der Seite aus und lauter stellen.</div></div><div id="ovTrain">${trainHTML()}</div><div id="ovBericht"></div>`;
+h+=`</div><div class="soundtip"><span class="st-ic">🔊</span><div><b>Mit Ton lernen:</b> ${OVL.sound} <b>Kein Ton auf dem iPhone?</b> Stummschalter an der Seite aus und lauter stellen.</div></div><div id="ovTrain">${trainHTML()}</div><div id="ovBericht"></div>`;
 if(CHECK.length){h+=`<div class="section-title"><div class="bar"></div><h2>Was kommt dran? – Checkliste</h2></div><div class="card ov-check"><p class="legend">Hake ab, was du sicher kannst. (Die Häkchen werden auf diesem Gerät gespeichert.)</p><ul>`;
 CHECK.forEach(([k,t])=>{const m=LS.find(x=>x.slug===k);h+=`<li><label><input type="checkbox" data-k="${k}" ${ck[k]?'checked':''}><span>${t}</span></label>${m?`<a href="${R}${m.slug}/">zur Lektion ›</a>`:''}</li>`;});h+='</ul></div>';}
 if(PLAN.length){h+=`<div class="section-title"><div class="bar"></div><h2>Lernplan bis zur Arbeit</h2></div><div class="card ov-plan"><table>`;

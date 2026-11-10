@@ -7,7 +7,7 @@ const HUB={views:{},E:null};W.HUB=HUB;
 const M=()=>document.getElementById('main');
 const howBox=(t,x,open)=>`<details class="intro howto"${open?' open':''}><summary><span class="in-ic">📖</span><span>${t}</span><span class="in-tg" aria-hidden="true"></span></summary><div class="intro-body">${V.explain(x)}</div></details>`;
 HUB.howBox=howBox;
-function setTitle(t){const h=$('#hubTitle');if(h)h.textContent=t;document.title=t+' – Französisch · Arjens Lernportal';}
+function setTitle(t){const h=$('#hubTitle');if(h)h.textContent=t;document.title=t+' – '+((W.LANG&&W.LANG.name)||'Französisch')+' · Arjens Lernportal';}
 HUB.views.home=function(){setTitle('Training');
  M().innerHTML=`<section class="hubhero"><h1>🎯 Training</h1><p>Zusätzlich zu den Lektionen: Probe-Arbeit und Spiele.</p></section>
  <div class="hubgrid"><button class="hubtile" data-hub="probe"><span class="ht-ic">📝</span><b>Probe-Klassenarbeit</b><small>wie die echte Arbeit · 45 Min.</small></button>

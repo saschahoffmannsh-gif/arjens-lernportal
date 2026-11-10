@@ -3,7 +3,7 @@
 'use strict';
 const W=window,PK=W.PK,PG=W.PAGE||{},$=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const FACH={francais:{n:'Französisch',ic:'🇫🇷',c:'#1e3a8a',k:'6. Klasse · 1. Lernjahr'}}[PG.fach]||{n:PG.fach,ic:'📘',c:'#1e3a8a',k:''};
+const FACH={francais:{n:'Französisch',ic:'🇫🇷',c:'#1e3a8a',k:'6. Klasse · 1. Lernjahr'},englisch:{n:'Englisch',ic:'🇬🇧',c:'#0f766e',k:''}}[PG.fach]||{n:PG.fach,ic:'📘',c:'#1e3a8a',k:''};
 const R=PG.root||'';  // Pfad zum Fachordner (francais/)
 const cdTxt=d=>d==null?'':d>1?`in ${d} Tagen`:d===1?'morgen':d===0?'heute':'vorbei';
 const ring=(pct,lbl,col)=>`<span class="pk-ring" style="--p:${pct==null?0:pct};--rc:${col||'var(--c)'}"><b>${pct==null?'–':pct+'<small>%</small>'}</b></span>${lbl?`<span class="pk-rl">${lbl}</span>`:''}`;
@@ -19,7 +19,7 @@ function card(p){const T=PK.TYP[p.typ];const d=PK.days(p),dn=PK.done(p),pg=PK.pr
  const MON=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
  const pl=p.probe?(p.probe.typ==='mini'?'Mini-Probearbeit':'Probe-Klassenarbeit'):'';
  return `<a class="pkcard tap${dn?' pk-done':''}" href="../${p.id}/" style="--c:${T.c}" data-pkg="${p.id}">
- <span class="pk-top"><span class="pk-date">${dt?`<b>${dt.getDate()}</b><small>${MON[dt.getMonth()]}</small>`:'–'}</span><span class="pk-tb"><span class="pk-t">${esc(p.titel)}</span><span class="pk-d">${PK.fmtDate(p)}${p.typ==='hausaufgabe'?' · Hausaufgabe':''}</span></span>
+ <span class="pk-top"><span class="pk-date">${dt?`<b>${dt.getDate()}</b><small>${MON[dt.getMonth()]}</small>`:'–'}</span><span class="pk-tb"><span class="pk-t">${esc(p.titel)}</span><span class="pk-d">${PK.fmtDate(p)}${p.typ==='hausaufgabe'?' · Hausaufgabe':''}${p.abgabe?` · Abgabe ${PK.fmtDate(p,1)}`:''}</span></span>
  <span class="pk-st ${dn?'pk-st-done':'pk-st-up'}">${dn?'✓ erledigt':p.typ==='klassenarbeit'?'⏳ '+cdTxt(d):'aktuell'}</span></span>
  ${pg.nhOpen?`<span class="pk-nh">🔁 Nachholbedarf: ${pg.nhOpen} noch zu tun</span>`:''}
  <span class="pk-chips">${(p.schwerpunkte||[]).map(s=>`<span class="chip">${esc(s)}</span>`).join('')}</span>
@@ -33,6 +33,7 @@ function listPage(){const T=PK.TYP[PG.typ];const L=PK.sorted(PK.list(PG.fach,PG.
  if(up.length)h+=`<div class="section-title"><div class="bar"></div><h2>${PG.typ==='klassenarbeit'?'Kommend':'Aktuell'}</h2></div><div class="pklist">${up.map(card).join('')}</div>`;
  if(old.length)h+=`<div class="section-title"><div class="bar"></div><h2>Erledigt</h2></div><div class="pklist">${old.map(card).join('')}</div>`;
  $('#main').innerHTML=h;}
+W.PKCARD=card;if(PG.cardOnly)return; // Englisch-Liste nutzt nur den Karten-Baustein
 const render=()=>{if(PG.mode==='fach')fachPage();else listPage();};
 render();if(W.SYNC)W.SYNC.on(render);else if(W.TR&&W.TR.sync)W.TR.sync().then(n=>{if(n)render();});
 })();
